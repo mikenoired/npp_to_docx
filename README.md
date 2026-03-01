@@ -1,15 +1,17 @@
 # npp_to_docx
 
-CLI tool that converts SVG files from `input` into DOCX files in `output`.
+## Установка
 
-## Run
+1. Поместите в папку с программой папку `input`, в котором будут располагаться svg-файлы
+2. Выполните установку зависимостей с помощью комманды `bun install`. Выполнить команду в папке с программой
+
+## Запуск
 
 ```bash
-bun install
 bun run src/index.ts
 ```
 
-## Useful options
+## Полезные опции
 
 ```bash
 bun run src/index.ts --limit 5
