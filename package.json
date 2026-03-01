@@ -1,0 +1,21 @@
+{
+  "name": "npp_to_docx",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "check": "bunx tsc --noEmit"
+  },
+  "dependencies": {
+    "docx": "^9.5.1",
+    "iconv-lite": "^0.6.3",
+    "sax": "^1.4.1",
+    "sharp": "^0.34.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "@types/sax": "^1.2.7",
+    "typescript": "^5.8.2"
+  }
+}
