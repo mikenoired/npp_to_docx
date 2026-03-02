@@ -1,6 +1,8 @@
+import { createWriteStream, type WriteStream } from "node:fs";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { AlignmentType, Document, ImageRun, Packer, Paragraph, TextRun } from "docx";
 import iconv from "iconv-lite";
@@ -48,6 +50,25 @@ type ElementCtx = {
   firstChildPoint?: Point;
 };
 
+class FileLogger {
+  private stream: WriteStream;
+
+  constructor(public readonly filePath: string) {
+    this.stream = createWriteStream(filePath, { flags: "a", encoding: "utf8" });
+  }
+
+  log(message: string): void {
+    this.stream.write(`[${new Date().toISOString()}] ${message}\n`);
+  }
+
+  async close(): Promise<void> {
+    await new Promise<void>((resolve, reject) => {
+      this.stream.once("error", reject);
+      this.stream.end(() => resolve());
+    });
+  }
+}
+
 function printHelp(): void {
   console.log(`Использование: bun run src/index.ts [options]
 
@@ -58,6 +79,26 @@ function printHelp(): void {
   --match <text>        Обработать только те svg, которые содержать некоторый текст
   --limit <n>           Обработать только N-ое кол-во файлов с начала
   --help                Показать справочник`);
+}
+
+function formatDateTimeForFileName(value: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const year = value.getFullYear();
+  const month = pad(value.getMonth() + 1);
+  const day = pad(value.getDate());
+  const hour = pad(value.getHours());
+  const minute = pad(value.getMinutes());
+  const second = pad(value.getSeconds());
+  return `${year}-${month}-${day}_${hour}-${minute}-${second}`;
+}
+
+function renderProgressBar(done: number, total: number, success: number, failed: number, startTs: number): string {
+  const width = 28;
+  const ratio = total === 0 ? 0 : done / total;
+  const filled = Math.round(ratio * width);
+  const bar = `${"=".repeat(filled)}${"-".repeat(Math.max(0, width - filled))}`;
+  const elapsedSec = (Date.now() - startTs) / 1000;
+  return `[${bar}] ${done}/${total} ok:${success} fail:${failed} ${elapsedSec.toFixed(1)}s`;
 }
 
 function parseArgs(argv: string[]): CliOptions {
@@ -527,9 +568,19 @@ async function runWithConcurrency<T>(
 }
 
 async function main(): Promise<void> {
+  const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+  const projectRoot = path.resolve(scriptDir, "..");
+  const logFilePath = path.join(projectRoot, `${formatDateTimeForFileName(new Date())}.log`);
+  const logger = new FileLogger(logFilePath);
+
   const options = parseArgs(process.argv.slice(2));
   const inputDir = path.resolve(options.inputDir);
   const outputDir = path.resolve(options.outputDir);
+
+  logger.log("Process started");
+  logger.log(`Input directory: ${inputDir}`);
+  logger.log(`Output directory: ${outputDir}`);
+  logger.log(`Concurrency: ${options.concurrency}`);
 
   await mkdir(outputDir, { recursive: true });
   const entries = await readdir(inputDir, { withFileTypes: true });
@@ -547,19 +598,31 @@ async function main(): Promise<void> {
   }
 
   if (files.length === 0) {
-    console.log("Не найдено SVG-файлов при обработке");
+    logger.log("No SVG files found for processing");
+    await logger.close();
+    console.log(`SVG-файлы не найдены. Лог: ${path.basename(logFilePath)}`);
     return;
   }
 
-  console.log(
-    `Начало конвертации: ${files.length} файл(ов), паралельно=${options.concurrency}, вход=${inputDir}, выход=${outputDir}`,
-  );
+  logger.log(`Starting conversion. Files: ${files.length}`);
 
   sharp.concurrency(Math.max(1, Math.min(options.concurrency, 4)));
 
+  const startedAt = Date.now();
+  let completed = 0;
   let success = 0;
   let failed = 0;
   let totalMarkers = 0;
+  let lastProgressLength = 0;
+
+  const updateProgressLine = (): void => {
+    const line = renderProgressBar(completed, files.length, success, failed, startedAt);
+    const paddedLine = line.padEnd(lastProgressLength, " ");
+    process.stdout.write(`\r${paddedLine}`);
+    lastProgressLength = paddedLine.length;
+  };
+
+  updateProgressLine();
 
   await runWithConcurrency(files, options.concurrency, async (fileName, index, total) => {
     const svgPath = path.join(inputDir, fileName);
@@ -572,18 +635,26 @@ async function main(): Promise<void> {
       success += 1;
       totalMarkers += result.markers;
       const elapsedMs = Date.now() - start;
-      console.log(
-        `[${index + 1}/${total}] OK   ${fileName} -> ${outName} | маркеры=${result.markers} | кодировка=${result.encoding} | ${elapsedMs}мс`,
+      logger.log(
+        `[${index + 1}/${total}] OK ${fileName} -> ${outName} | markers=${result.markers} | encoding=${result.encoding} | ${elapsedMs}ms`,
       );
     } catch (error) {
       failed += 1;
       const elapsedMs = Date.now() - start;
       const message = error instanceof Error ? error.message : String(error);
-      console.error(`[${index + 1}/${total}] ОШИБКА ${fileName} | ${elapsedMs}мс | ${message}`);
+      logger.log(`[${index + 1}/${total}] FAIL ${fileName} | ${elapsedMs}ms | ${message}`);
+    } finally {
+      completed += 1;
+      updateProgressLine();
     }
   });
 
-  console.log(`Готово. успешно=${success}, провально=${failed}, всего_маркеров=${totalMarkers}`);
+  process.stdout.write("\n");
+  const summary = `Готово. успешно=${success}, провально=${failed}, всего_маркеров=${totalMarkers}`;
+  logger.log(summary);
+  logger.log("Process finished");
+  await logger.close();
+  console.log(`${summary}. Лог: ${path.basename(logFilePath)}`);
 }
 
 await main();
