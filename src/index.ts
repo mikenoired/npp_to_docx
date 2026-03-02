@@ -49,15 +49,15 @@ type ElementCtx = {
 };
 
 function printHelp(): void {
-  console.log(`Usage: bun run src/index.ts [options]
+  console.log(`Использование: bun run src/index.ts [options]
 
-Options:
-  --input <dir>         Input folder with SVG files (default: input)
-  --output <dir>        Output folder for DOCX files (default: output)
-  --concurrency <n>     Parallel worker count (default: cpu/2, max 6)
-  --match <text>        Process only files that contain text in filename
-  --limit <n>           Process only first N files after filtering
-  --help                Show this help`);
+Опции:
+  --input <dir>         Путь до папки, содержащий svg (по умолчанию: input)
+  --output <dir>        Путь до папки, где будут готовые DOCX-файлы (по умолчанию: output)
+  --concurrency <n>     Кол-во паралельных обработок (по умолчанию: ядра процессора / 2, макс. 6)
+  --match <text>        Обработать только те svg, которые содержать некоторый текст
+  --limit <n>           Обработать только N-ое кол-во файлов с начала
+  --help                Показать справочник`);
 }
 
 function parseArgs(argv: string[]): CliOptions {
@@ -104,7 +104,7 @@ function parseArgs(argv: string[]): CliOptions {
       i += 1;
       continue;
     }
-    throw new Error(`Unknown argument: ${arg}`);
+    throw new Error(`Неизвестный аргумент: ${arg}`);
   }
 
   return opts;
@@ -457,7 +457,7 @@ async function buildDocx(imagePng: Buffer, width: number, height: number, marker
   ];
 
   if (markers.length === 0) {
-    paragraphs.push(new Paragraph({ children: [new TextRun("Elements with title were not found.")] }));
+    paragraphs.push(new Paragraph({ children: [new TextRun("Элементов с title не найдено")] }));
   } else {
     for (const marker of markers) {
       paragraphs.push(new Paragraph({ children: [new TextRun(`${marker.index}. ${marker.title}`)] }));
@@ -487,7 +487,7 @@ async function convertSvgToDocx(svgPath: string, outputPath: string): Promise<{ 
   const width = metadata.width;
   const height = metadata.height;
   if (!width || !height) {
-    throw new Error("Failed to detect rendered image size.");
+    throw new Error("Не удалось вычислить размер выходной картинки");
   }
 
   const renderedMarkers = projectMarkers(parsed.markers, width, height, parsed.viewWidth, parsed.viewHeight);
@@ -547,12 +547,12 @@ async function main(): Promise<void> {
   }
 
   if (files.length === 0) {
-    console.log("No SVG files found for processing.");
+    console.log("Не найдено SVG-файлов при обработке");
     return;
   }
 
   console.log(
-    `Starting conversion: ${files.length} file(s), concurrency=${options.concurrency}, input=${inputDir}, output=${outputDir}`,
+    `Начало конвертации: ${files.length} файл(ов), паралельно=${options.concurrency}, вход=${inputDir}, выход=${outputDir}`,
   );
 
   sharp.concurrency(Math.max(1, Math.min(options.concurrency, 4)));
@@ -573,17 +573,17 @@ async function main(): Promise<void> {
       totalMarkers += result.markers;
       const elapsedMs = Date.now() - start;
       console.log(
-        `[${index + 1}/${total}] OK   ${fileName} -> ${outName} | markers=${result.markers} | encoding=${result.encoding} | ${elapsedMs}ms`,
+        `[${index + 1}/${total}] OK   ${fileName} -> ${outName} | маркеры=${result.markers} | кодировка=${result.encoding} | ${elapsedMs}мс`,
       );
     } catch (error) {
       failed += 1;
       const elapsedMs = Date.now() - start;
       const message = error instanceof Error ? error.message : String(error);
-      console.error(`[${index + 1}/${total}] FAIL ${fileName} | ${elapsedMs}ms | ${message}`);
+      console.error(`[${index + 1}/${total}] ОШИБКА ${fileName} | ${elapsedMs}мс | ${message}`);
     }
   });
 
-  console.log(`Done. success=${success}, failed=${failed}, total_markers=${totalMarkers}`);
+  console.log(`Готово. успешно=${success}, провально=${failed}, всего_маркеров=${totalMarkers}`);
 }
 
 await main();
