@@ -1,13 +1,15 @@
 import { createWriteStream, type WriteStream } from "node:fs";
-import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { AlignmentType, Document, ImageRun, Packer, Paragraph, TextRun } from "docx";
+import { AlignmentType, Document, ImageRun, Packer, Paragraph, Table, TableCell, TableLayoutType, TableRow, TextRun, WidthType } from "docx";
 import iconv from "iconv-lite";
 import sax from "sax";
 import sharp from "sharp";
+
+import { loadDescriptionIndex, lookupDescription, type DescriptionIndex } from "./pls-db";
 
 type CliOptions = {
   inputDir: string;
@@ -25,6 +27,10 @@ type Point = {
 type RawMarker = {
   index: number;
   title: string;
+  kks?: string;
+  submodel?: string;
+  description?: string;
+  isMismatch: boolean;
   tag: string;
   point?: Point;
 };
@@ -32,6 +38,10 @@ type RawMarker = {
 type RenderedMarker = {
   index: number;
   title: string;
+  kks?: string;
+  submodel?: string;
+  description?: string;
+  isMismatch: boolean;
   x: number;
   y: number;
 };
@@ -45,6 +55,7 @@ type ParsedSvg = {
 type ElementCtx = {
   name: string;
   attrs: Record<string, string>;
+  dynValues: Record<string, string>;
   titleText?: string;
   textContent?: string;
   firstChildPoint?: Point;
@@ -73,7 +84,7 @@ function printHelp(): void {
   console.log(`Использование: bun run src/index.ts [options]
 
 Опции:
-  --input <dir>         Путь до папки, содержащий svg (по умолчанию: input)
+  --input <dir>         Путь до корневой папки input с dmp/csv и подпапкой svg (по умолчанию: input)
   --output <dir>        Путь до папки, где будут готовые DOCX-файлы (по умолчанию: output)
   --concurrency <n>     Кол-во паралельных обработок (по умолчанию: ядра процессора / 2, макс. 6)
   --match <text>        Обработать только те svg, которые содержать некоторый текст
@@ -231,11 +242,41 @@ function decodeXmlEntities(input: string): string {
 }
 
 function cleanTitle(raw: string): string {
-  let value = decodeXmlEntities(raw).replace(/\s+/g, " ").trim();
-  if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-    value = value.slice(1, -1).trim();
-  }
+  const value = decodeXmlEntities(raw).replace(/\s+/g, " ").trim().replace(/^["']+|["']+$/g, "").trim();
   return value.length > 0 ? value : "(empty title)";
+}
+
+function normalizeIdentity(value: string | undefined): string | undefined {
+  if (!value) {
+    return undefined;
+  }
+  const normalized = cleanTitle(value);
+  return normalized === "(empty title)" ? undefined : normalized;
+}
+
+function normalizeDynType(value: string | undefined): string | undefined {
+  const normalized = normalizeIdentity(value);
+  if (!normalized) {
+    return undefined;
+  }
+  return normalized.replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_+|_+$/g, "").toUpperCase();
+}
+
+function pickMarkerKks(dynValues: Record<string, string>, title: string): string | undefined {
+  const priorities = ["FKKS", "KKS", "POINTID_STATUS", "POINTID"];
+  for (const priority of priorities) {
+    const found = normalizeIdentity(dynValues[priority]);
+    if (found) {
+      return found;
+    }
+  }
+  return normalizeIdentity(title);
+}
+
+function isTitleMismatch(title: string, kks: string | undefined): boolean {
+  const normalizedTitle = normalizeIdentity(title);
+  const normalizedKks = normalizeIdentity(kks);
+  return normalizedTitle !== undefined && normalizedKks !== undefined && normalizedTitle !== normalizedKks;
 }
 
 function getAttr(attrs: Record<string, string>, ...names: string[]): string | undefined {
@@ -315,9 +356,19 @@ function parseMarkersWithSax(svgContent: string): ParsedSvg {
       }
     }
 
+    const parent = stack[stack.length - 1];
+    if (parent && tag.name === "rt:dyn") {
+      const dynType = normalizeDynType(getAttr(attrs, "type"));
+      const dynValue = normalizeIdentity(getAttr(attrs, "value"));
+      if (dynType && dynValue) {
+        parent.dynValues[dynType] = dynValue;
+      }
+    }
+
     const node: ElementCtx = {
       name: tag.name,
       attrs,
+      dynValues: {},
     };
     stack.push(node);
 
@@ -363,9 +414,16 @@ function parseMarkersWithSax(svgContent: string): ParsedSvg {
     }
 
     if (node.titleText !== undefined && node.name !== "svg") {
+      const title = cleanTitle(node.titleText);
+      const kks = pickMarkerKks(node.dynValues, title);
+      const submodel = normalizeIdentity(getAttr(node.attrs, "xlink:href", "href"));
+
       markers.push({
         index: markers.length + 1,
-        title: cleanTitle(node.titleText),
+        title,
+        kks,
+        submodel,
+        isMismatch: isTitleMismatch(title, kks),
         tag: node.name,
         point: nodePoint ?? node.firstChildPoint,
       });
@@ -397,6 +455,8 @@ function parseMarkers(svgContent: string): ParsedSvg {
         index: markers.length + 1,
         tag,
         title: cleanTitle(match[3]),
+        kks: normalizeIdentity(match[3]),
+        isMismatch: false,
       });
     }
     const viewBoxMatch = svgContent.match(/\bviewBox=["']([^"']+)["']/i);
@@ -449,6 +509,10 @@ function projectMarkers(
     return {
       index: marker.index,
       title: marker.title,
+      kks: marker.kks,
+      submodel: marker.submodel,
+      description: marker.description,
+      isMismatch: marker.isMismatch,
       x,
       y,
     };
@@ -475,12 +539,76 @@ ${nodes}
 </svg>`;
 }
 
+function makeCell(
+  text: string,
+  widthTwip: number,
+  options: { alignment?: (typeof AlignmentType)[keyof typeof AlignmentType]; bold?: boolean; color?: string } = {},
+): TableCell {
+  return new TableCell({
+    width: {
+      size: widthTwip,
+      type: WidthType.DXA,
+    },
+    children: [
+      new Paragraph({
+        alignment: options.alignment,
+        children: [
+          new TextRun({
+            text,
+            bold: options.bold,
+            color: options.color,
+          }),
+        ],
+      }),
+    ],
+  });
+}
+
+function buildLegendTable(markers: RenderedMarker[]): Table {
+  const columnWidths = [700, 2500, 4200, 1600] as const;
+
+  const rows = [
+    new TableRow({
+      children: [
+        makeCell("№", columnWidths[0], { alignment: AlignmentType.CENTER, bold: true }),
+        makeCell("KKS", columnWidths[1], { bold: true }),
+        makeCell("Текстовое описание", columnWidths[2], { bold: true }),
+        makeCell("Подмодель", columnWidths[3], { bold: true }),
+      ],
+    }),
+    ...markers.map(
+      (marker) =>
+        new TableRow({
+          children: [
+            makeCell(String(marker.index), columnWidths[0], {
+              alignment: AlignmentType.CENTER,
+              color: marker.isMismatch ? "CC0000" : undefined,
+            }),
+            makeCell(marker.kks ?? marker.title, columnWidths[1]),
+            makeCell(marker.description ?? "", columnWidths[2]),
+            makeCell(marker.submodel ?? "", columnWidths[3]),
+          ],
+        }),
+    ),
+  ];
+
+  return new Table({
+    width: {
+      size: 100,
+      type: WidthType.PERCENTAGE,
+    },
+    columnWidths: [...columnWidths],
+    layout: TableLayoutType.FIXED,
+    rows,
+  });
+}
+
 async function buildDocx(imagePng: Buffer, width: number, height: number, markers: RenderedMarker[]): Promise<Buffer> {
   const maxWidth = 900;
   const imageWidth = width > maxWidth ? maxWidth : width;
   const imageHeight = Math.max(1, Math.round((height / width) * imageWidth));
 
-  const paragraphs: Paragraph[] = [
+  const children: Array<Paragraph | Table> = [
     new Paragraph({
       alignment: AlignmentType.CENTER,
       children: [
@@ -498,17 +626,40 @@ async function buildDocx(imagePng: Buffer, width: number, height: number, marker
   ];
 
   if (markers.length === 0) {
-    paragraphs.push(new Paragraph({ children: [new TextRun("Элементов с title не найдено")] }));
+    children.push(new Paragraph({ children: [new TextRun("Элементов с title не найдено")] }));
   } else {
-    for (const marker of markers) {
-      paragraphs.push(new Paragraph({ children: [new TextRun(`${marker.index}. ${marker.title}`)] }));
+    children.push(buildLegendTable(markers));
+
+    const mismatches = markers.filter((marker) => marker.isMismatch);
+    if (mismatches.length > 0) {
+      children.push(new Paragraph({ text: "" }));
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: "Несовпадения title/KKS:",
+              bold: true,
+            }),
+          ],
+        }),
+      );
+
+      for (const marker of mismatches) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun(`№ ${marker.index}: title="${marker.title}", KKS="${marker.kks ?? ""}"`),
+            ],
+          }),
+        );
+      }
     }
   }
 
   const doc = new Document({
     sections: [
       {
-        children: paragraphs,
+        children,
       },
     ],
   });
@@ -516,12 +667,20 @@ async function buildDocx(imagePng: Buffer, width: number, height: number, marker
   return Packer.toBuffer(doc);
 }
 
-async function convertSvgToDocx(svgPath: string, outputPath: string): Promise<{ markers: number; encoding: string }> {
+async function convertSvgToDocx(
+  svgPath: string,
+  outputPath: string,
+  descriptions: DescriptionIndex,
+): Promise<{ markers: number; mismatches: number; encoding: string }> {
   const rawBuffer = await readFile(svgPath);
   const { content: svgContent, encoding } = decodeSvgBuffer(rawBuffer);
   const svgForRender = toUtf8Xml(svgContent);
 
   const parsed = parseMarkers(svgContent);
+  const enrichedMarkers = parsed.markers.map((marker) => ({
+    ...marker,
+    description: lookupDescription(descriptions, marker.kks),
+  }));
 
   const sourcePng = await sharp(Buffer.from(svgForRender, "utf8")).png().toBuffer();
   const metadata = await sharp(sourcePng).metadata();
@@ -531,7 +690,7 @@ async function convertSvgToDocx(svgPath: string, outputPath: string): Promise<{ 
     throw new Error("Не удалось вычислить размер выходной картинки");
   }
 
-  const renderedMarkers = projectMarkers(parsed.markers, width, height, parsed.viewWidth, parsed.viewHeight);
+  const renderedMarkers = projectMarkers(enrichedMarkers, width, height, parsed.viewWidth, parsed.viewHeight);
   const overlaySvg = buildOverlaySvg(renderedMarkers, width, height);
   const compositedPng = await sharp(sourcePng).composite([{ input: Buffer.from(overlaySvg) }]).png().toBuffer();
 
@@ -540,6 +699,7 @@ async function convertSvgToDocx(svgPath: string, outputPath: string): Promise<{ 
 
   return {
     markers: renderedMarkers.length,
+    mismatches: renderedMarkers.filter((marker) => marker.isMismatch).length,
     encoding,
   };
 }
@@ -576,14 +736,28 @@ async function main(): Promise<void> {
   const options = parseArgs(process.argv.slice(2));
   const inputDir = path.resolve(options.inputDir);
   const outputDir = path.resolve(options.outputDir);
+  const svgDirCandidate = path.join(inputDir, "svg");
+  let svgDir = inputDir;
 
   logger.log("Process started");
   logger.log(`Input directory: ${inputDir}`);
   logger.log(`Output directory: ${outputDir}`);
   logger.log(`Concurrency: ${options.concurrency}`);
 
+  try {
+    const svgDirStats = await stat(svgDirCandidate);
+    if (svgDirStats.isDirectory()) {
+      svgDir = svgDirCandidate;
+    }
+  } catch {
+    svgDir = inputDir;
+  }
+
+  logger.log(`SVG directory: ${svgDir}`);
+
+  const descriptions = await loadDescriptionIndex(inputDir, logger);
   await mkdir(outputDir, { recursive: true });
-  const entries = await readdir(inputDir, { withFileTypes: true });
+  const entries = await readdir(svgDir, { withFileTypes: true });
   let files = entries
     .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".svg"))
     .map((entry) => entry.name)
@@ -613,6 +787,7 @@ async function main(): Promise<void> {
   let success = 0;
   let failed = 0;
   let totalMarkers = 0;
+  let totalMismatches = 0;
   let lastProgressLength = 0;
 
   const updateProgressLine = (): void => {
@@ -625,18 +800,19 @@ async function main(): Promise<void> {
   updateProgressLine();
 
   await runWithConcurrency(files, options.concurrency, async (fileName, index, total) => {
-    const svgPath = path.join(inputDir, fileName);
+    const svgPath = path.join(svgDir, fileName);
     const outName = `${path.parse(fileName).name}.docx`;
     const outputPath = path.join(outputDir, outName);
     const start = Date.now();
 
     try {
-      const result = await convertSvgToDocx(svgPath, outputPath);
+      const result = await convertSvgToDocx(svgPath, outputPath, descriptions);
       success += 1;
       totalMarkers += result.markers;
+      totalMismatches += result.mismatches;
       const elapsedMs = Date.now() - start;
       logger.log(
-        `[${index + 1}/${total}] OK ${fileName} -> ${outName} | markers=${result.markers} | encoding=${result.encoding} | ${elapsedMs}ms`,
+        `[${index + 1}/${total}] OK ${fileName} -> ${outName} | markers=${result.markers} | mismatches=${result.mismatches} | encoding=${result.encoding} | ${elapsedMs}ms`,
       );
     } catch (error) {
       failed += 1;
@@ -650,7 +826,7 @@ async function main(): Promise<void> {
   });
 
   process.stdout.write("\n");
-  const summary = `Готово. успешно=${success}, провально=${failed}, всего_маркеров=${totalMarkers}`;
+  const summary = `Готово. успешно=${success}, провально=${failed}, всего_маркеров=${totalMarkers}, всего_несовпадений=${totalMismatches}`;
   logger.log(summary);
   logger.log("Process finished");
   await logger.close();
