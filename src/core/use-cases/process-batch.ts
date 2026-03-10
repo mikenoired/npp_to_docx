@@ -4,6 +4,8 @@ import path from "node:path";
 import sharp from "sharp";
 
 import type { BatchProgress, BatchResult, LoggerLike, ProcessBatchOptions } from "../contracts";
+import type { SearchMarkerRecord } from "../search/index";
+import { writeSearchIndex } from "../search/index";
 import { loadDescriptionIndex } from "../services/pls-db";
 import { convertSvgToDocx } from "./convert-svg-to-docx";
 
@@ -104,6 +106,7 @@ export async function processBatch(
   let failed = 0;
   let totalMarkers = 0;
   let totalMismatches = 0;
+  const searchRecords: SearchMarkerRecord[] = [];
 
   const emitProgress = (): void => {
     const line = renderProgressBar(completed, files.length, success, failed, startedAt);
@@ -131,6 +134,7 @@ export async function processBatch(
       success += 1;
       totalMarkers += result.markers;
       totalMismatches += result.mismatches;
+      searchRecords.push(...result.searchRecords);
       const elapsedMs = Date.now() - start;
       logger.log(
         `[${index + 1}/${total}] OK ${fileName} -> ${outName} | markers=${result.markers} | mismatches=${result.mismatches} | encoding=${result.encoding} | ${elapsedMs}ms`,
@@ -145,6 +149,8 @@ export async function processBatch(
       emitProgress();
     }
   });
+
+  await writeSearchIndex(inputDir, outputDir, searchRecords, logger);
 
   const summary = `Готово. успешно=${success}, провально=${failed}, всего_маркеров=${totalMarkers}, всего_несовпадений=${totalMismatches}`;
   logger.log(summary);

@@ -1,7 +1,9 @@
 import { readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
 
 import sharp from "sharp";
 
+import type { SearchMarkerRecord } from "../search/index";
 import { buildDocx } from "../services/docx-builder";
 import { buildOverlaySvg, projectMarkers } from "../services/marker-rendering";
 import { type DescriptionIndex, lookupDescription } from "../services/pls-db";
@@ -11,7 +13,7 @@ export async function convertSvgToDocx(
   svgPath: string,
   outputPath: string,
   descriptions: DescriptionIndex,
-): Promise<{ markers: number; mismatches: number; encoding: string }> {
+): Promise<{ markers: number; mismatches: number; encoding: string; searchRecords: SearchMarkerRecord[] }> {
   const rawBuffer = await readFile(svgPath);
   const { content: svgContent, encoding } = decodeSvgBuffer(rawBuffer);
   const svgForRender = toUtf8Xml(svgContent);
@@ -44,5 +46,15 @@ export async function convertSvgToDocx(
     markers: renderedMarkers.length,
     mismatches: renderedMarkers.filter((marker) => marker.isMismatch).length,
     encoding,
+    searchRecords: renderedMarkers
+      .filter((marker) => typeof marker.submodel === "string" && marker.submodel.trim().length > 0)
+      .map((marker) => ({
+        frameName: path.basename(svgPath),
+        markerIndex: marker.index,
+        submodel: marker.submodel ?? "",
+        kks: marker.kks,
+        title: marker.title,
+        description: marker.description,
+      })),
   };
 }

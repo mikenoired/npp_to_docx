@@ -47,3 +47,35 @@ export type JobLogsResponse = {
   id: string;
   logs: string[];
 };
+
+export type SearchSubmodelOption = {
+  submodel: string;
+  count: number;
+};
+
+export type SearchResultItem = {
+  frameName: string;
+  markerIndex: number;
+  submodel: string;
+  kks?: string;
+  title: string;
+  description?: string;
+};
+
+export type SearchStatusResponse = {
+  ready: boolean;
+  indexExists: boolean;
+  recordsCount: number;
+  submodelsCount: number;
+  missingFiles: string[];
+  message: string;
+};
+
+export type SearchSubmodelsResponse = {
+  items: SearchSubmodelOption[];
+};
+
+export type SearchResultsResponse = {
+  submodel: string;
+  items: SearchResultItem[];
+};
