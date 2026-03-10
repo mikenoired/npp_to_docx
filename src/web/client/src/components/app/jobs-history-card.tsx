@@ -1,5 +1,5 @@
 import type { JobDto } from "../../../../../shared/api";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { JobProgressBar } from "./job-progress-bar";
 
 type JobsHistoryCardProps = {

@@ -42,6 +42,25 @@ bun run start:web
 
 Web-режим поднимает локальный HTTP server с React UI и API для запуска обработки. По умолчанию используется `http://127.0.0.1:3000`.
 
+## Dev-режим
+
+Одна команда для frontend и backend:
+
+```bash
+bun run dev:web
+```
+
+По умолчанию:
+
+- frontend: `http://127.0.0.1:5173`
+- backend API: `http://127.0.0.1:3300`
+
+Если нужно сменить порты:
+
+```bash
+DEV_WEB_SERVER_PORT=3400 DEV_WEB_UI_PORT=5174 bun run dev:web
+```
+
 ## Использование
 
 ### CLI
@@ -90,6 +109,28 @@ bun run build:bins
 ./dist/npp-cli --match 4UJ --limit 1
 ./dist/npp-web
 ```
+
+## Упаковка для запуска двойным кликом
+
+```bash
+bun run package:target
+```
+
+После этого появится папка `target`:
+
+- `target/NppToDocx.app` — основной файл для запуска двойным кликом
+- `target/input` — входные данные
+- `target/output` — выходные файлы
+- `target/logs` — лог web-сервера
+- `target/npp-cli` — CLI бинарник для терминала
+
+Для обычного пользователя достаточно открыть:
+
+```text
+target/NppToDocx.app
+```
+
+Приложение поднимет локальный сервер и откроет браузер автоматически.
 
 ## Полезные опции
 

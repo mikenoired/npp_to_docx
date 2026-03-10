@@ -5,7 +5,10 @@ import { cn } from "../../lib/utils";
 function TabsList({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      className={cn("inline-flex items-center rounded-xl border border-slate-200 bg-white p-1 gap-2 shadow-sm", className)}
+      className={cn(
+        "inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-1 shadow-sm",
+        className,
+      )}
       {...props}
     />
   );

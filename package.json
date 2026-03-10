@@ -7,6 +7,7 @@
     "start": "bun run src/cli/main.ts",
     "start:cli": "bun run src/cli/main.ts",
     "start:web": "bun run src/web/server/main.ts",
+    "dev:web": "bun run src/scripts/dev-web.ts",
     "dev:web:server": "bun --hot src/web/server/main.ts",
     "dev:web:ui": "vite",
     "build:web:ui": "vite build",
@@ -14,6 +15,7 @@
     "build:cli:bin": "bun build src/cli/main.ts --compile --target=bun-darwin-arm64 --outfile dist/npp-cli",
     "build:web:bin": "bun run build:web:ui && bun run build:web:embed && bun build src/web/server/main.ts --compile --target=bun-darwin-arm64 --outfile dist/npp-web",
     "build:bins": "bun run build:cli:bin && bun run build:web:bin",
+    "package:target": "bun run src/scripts/package-target.ts",
     "lint": "biome check .",
     "format": "biome format --write .",
     "check": "bunx tsc --noEmit && biome check ."
