@@ -1,4 +1,4 @@
-import type { BatchProgress, BatchResult, ProcessBatchOptions } from "../core/contracts";
+import type { BatchProgress, BatchResult, ProcessBatchOptions } from "../core/contracts.js";
 
 export type JobStatus = "queued" | "running" | "done" | "failed";
 
@@ -17,8 +17,10 @@ export type JobDto = {
 
 export type AppConfigResponse = {
   defaults: {
+    workspaceDir: string;
     inputDir: string;
     outputDir: string;
+    logsDir: string;
     concurrency: number;
   };
 };
@@ -78,4 +80,35 @@ export type SearchSubmodelsResponse = {
 export type SearchResultsResponse = {
   submodel: string;
   items: SearchResultItem[];
+};
+
+export type SearchStatusRequest = {
+  inputDir?: string;
+  outputDir?: string;
+};
+
+export type SearchSubmodelsRequest = {
+  outputDir?: string;
+  query?: string;
+};
+
+export type SearchResultsRequest = {
+  outputDir?: string;
+  submodel: string;
+};
+
+export type SelectDirectoryRequest = {
+  title?: string;
+  defaultPath?: string;
+};
+
+export type AppApi = {
+  getConfig(): Promise<AppConfigResponse>;
+  prepareDb(payload: PrepareDbRequest): Promise<PrepareDbResponse>;
+  createJob(payload: CreateJobRequest): Promise<CreateJobResponse>;
+  listJobs(): Promise<JobsResponse>;
+  getSearchStatus(payload: SearchStatusRequest): Promise<SearchStatusResponse>;
+  listSearchSubmodels(payload: SearchSubmodelsRequest): Promise<SearchSubmodelsResponse>;
+  searchBySubmodel(payload: SearchResultsRequest): Promise<SearchResultsResponse>;
+  selectDirectory(payload: SelectDirectoryRequest): Promise<string | undefined>;
 };

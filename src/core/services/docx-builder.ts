@@ -12,7 +12,7 @@ import {
   WidthType,
 } from "docx";
 
-import type { RenderedMarker } from "../contracts";
+import type { RenderedMarker } from "../contracts.js";
 
 function makeCell(
   text: string,

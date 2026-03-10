@@ -1,7 +1,7 @@
 import iconv from "iconv-lite";
 import sax from "sax";
 
-import type { ParsedSvg, Point, RawMarker } from "../contracts";
+import type { ParsedSvg, Point, RawMarker } from "../contracts.js";
 
 type ElementCtx = {
   name: string;

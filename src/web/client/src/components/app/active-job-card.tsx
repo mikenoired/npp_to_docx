@@ -9,12 +9,12 @@ export function ActiveJobCard({ activeJob }: { activeJob?: JobDto }) {
       </CardHeader>
       <CardContent className="space-y-4">
         {!activeJob ? (
-          <div className="rounded-lg border border-dashed border-slate-300 px-4 py-6 text-sm text-slate-500">
+          <div className="rounded-lg border border-dashed border-[color:var(--border-strong)] px-4 py-6 text-sm text-[color:var(--text-soft)]">
             Запусков пока нет.
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="grid gap-2 text-sm text-slate-700">
+            <div className="grid gap-2 text-sm text-[color:var(--text-muted)]">
               <div>
                 <span className="font-semibold">ID:</span> {activeJob.id}
               </div>
@@ -28,14 +28,16 @@ export function ActiveJobCard({ activeJob }: { activeJob?: JobDto }) {
                 </div>
               ) : null}
               {activeJob.result ? (
-                <div className="rounded-lg bg-slate-950 px-3 py-2 text-slate-50">{activeJob.result.summary}</div>
+                <div className="rounded-lg bg-[var(--panel-strong)] px-3 py-2 text-[var(--panel-strong-text)]">
+                  {activeJob.result.summary}
+                </div>
               ) : null}
               {activeJob.error ? (
                 <div className="rounded-lg bg-rose-100 px-3 py-2 text-rose-700">{activeJob.error}</div>
               ) : null}
             </div>
-            <div className="max-h-72 overflow-auto rounded-xl bg-slate-950">
-              <pre className="whitespace-pre max-w-80 p-4 text-xs leading-6 text-slate-100">
+            <div className="max-h-72 overflow-auto rounded-xl bg-[var(--panel-strong)]">
+              <pre className="whitespace-pre max-w-80 p-4 text-xs leading-6 text-[var(--panel-strong-text)]">
                 {(activeJob.logs ?? []).join("\n") || activeJob.progress?.line || "Логи появятся после старта"}
               </pre>
             </div>

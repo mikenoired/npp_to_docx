@@ -1,4 +1,4 @@
-import type { RawMarker, RenderedMarker } from "../contracts";
+import type { RawMarker, RenderedMarker } from "../contracts.js";
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));

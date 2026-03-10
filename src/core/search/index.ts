@@ -1,7 +1,7 @@
-import { access, readFile, writeFile } from "node:fs/promises";
+import { access, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import type { LoggerLike } from "../contracts";
+import type { LoggerLike } from "../contracts.js";
 
 export type SearchMarkerRecord = {
   frameName: string;
@@ -19,6 +19,16 @@ export type SearchIndexData = {
   records: SearchMarkerRecord[];
 };
 
+export class InvalidSearchIndexError extends Error {
+  constructor(
+    message: string,
+    public readonly filePath: string,
+  ) {
+    super(message);
+    this.name = "InvalidSearchIndexError";
+  }
+}
+
 function normalizeText(value: string): string {
   return value.trim().toLowerCase();
 }
@@ -34,6 +44,7 @@ export async function writeSearchIndex(
   logger?: LoggerLike,
 ): Promise<string> {
   const filePath = getSearchIndexPath(outputDir);
+  const tempFilePath = `${filePath}.tmp`;
   const payload: SearchIndexData = {
     createdAt: new Date().toISOString(),
     inputDir,
@@ -49,7 +60,8 @@ export async function writeSearchIndex(
       }),
   };
 
-  await writeFile(filePath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+  await writeFile(tempFilePath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+  await rename(tempFilePath, filePath);
   logger?.log(`Search index created: ${path.basename(filePath)} | records=${payload.records.length}`);
   return filePath;
 }
@@ -66,7 +78,14 @@ export async function hasSearchIndex(outputDir: string): Promise<boolean> {
 export async function readSearchIndex(outputDir: string): Promise<SearchIndexData> {
   const filePath = getSearchIndexPath(outputDir);
   const content = await readFile(filePath, "utf8");
-  return JSON.parse(content) as SearchIndexData;
+  try {
+    return JSON.parse(content) as SearchIndexData;
+  } catch {
+    throw new InvalidSearchIndexError(
+      `Поисковый индекс поврежден: ${path.basename(filePath)}. Перезапустите обработку для пересоздания индекса.`,
+      filePath,
+    );
+  }
 }
 
 export async function findMissingSearchFiles(inputDir: string, outputDir: string): Promise<string[]> {

@@ -17,6 +17,8 @@ type HomeTabProps = {
   onConcurrencyChange(value: string): void;
   onMatchChange(value: string): void;
   onLimitChange(value: string): void;
+  onSelectInputDir(): void;
+  onSelectOutputDir(): void;
   onPrepareDb(): void;
   onRunJob(): void;
   onSelectJob(id: string): void;
@@ -38,6 +40,8 @@ export function HomeTab(props: HomeTabProps) {
           onConcurrencyChange={props.onConcurrencyChange}
           onMatchChange={props.onMatchChange}
           onLimitChange={props.onLimitChange}
+          onSelectInputDir={props.onSelectInputDir}
+          onSelectOutputDir={props.onSelectOutputDir}
           onPrepareDb={props.onPrepareDb}
           onRunJob={props.onRunJob}
         />

@@ -14,9 +14,9 @@ export function JobsHistoryCard({ jobs, onSelectJob }: JobsHistoryCardProps) {
         <CardTitle>История обработок</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="overflow-hidden rounded-xl border border-slate-200">
+        <div className="overflow-hidden rounded-xl border border-[color:var(--border)]">
           <table className="w-full border-collapse text-sm">
-            <thead className="bg-slate-100 text-left text-slate-700">
+            <thead className="bg-[var(--panel-subtle)] text-left text-[color:var(--text-muted)]">
               <tr>
                 <th className="px-4 py-3">Код процесса</th>
                 <th className="px-4 py-3">Статус</th>
@@ -29,7 +29,7 @@ export function JobsHistoryCard({ jobs, onSelectJob }: JobsHistoryCardProps) {
               {jobs.map((job) => (
                 <tr
                   key={job.id}
-                  className="cursor-pointer border-t border-slate-200 bg-white hover:bg-slate-50"
+                  className="cursor-pointer border-t border-[color:var(--border)] bg-[var(--panel-solid)] hover:bg-[var(--panel-subtle)]"
                   onClick={() => onSelectJob(job.id)}
                 >
                   <td className="px-4 py-3 font-mono text-xs">{job.id.slice(0, 8)}</td>

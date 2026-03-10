@@ -3,11 +3,11 @@ import path from "node:path";
 
 import sharp from "sharp";
 
-import type { BatchProgress, BatchResult, LoggerLike, ProcessBatchOptions } from "../contracts";
-import type { SearchMarkerRecord } from "../search/index";
-import { writeSearchIndex } from "../search/index";
-import { loadDescriptionIndex } from "../services/pls-db";
-import { convertSvgToDocx } from "./convert-svg-to-docx";
+import type { BatchProgress, BatchResult, LoggerLike, ProcessBatchOptions } from "../contracts.js";
+import type { SearchMarkerRecord } from "../search/index.js";
+import { writeSearchIndex } from "../search/index.js";
+import { loadDescriptionIndex } from "../services/pls-db.js";
+import { convertSvgToDocx } from "./convert-svg-to-docx.js";
 
 function renderProgressBar(done: number, total: number, success: number, failed: number, startTs: number): string {
   const width = 28;

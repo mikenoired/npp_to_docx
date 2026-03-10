@@ -3,7 +3,7 @@ import path from "node:path";
 
 import iconv from "iconv-lite";
 
-import type { LoggerLike } from "../contracts";
+import type { LoggerLike } from "../contracts.js";
 
 const CSV_BOM = "\uFEFF";
 const DEFAULT_CSV_SEPARATOR = ",";

@@ -45,19 +45,23 @@ export function SearchSubmodelCard({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
-        <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-          <div className="font-semibold text-slate-900">{searchStatus?.message ?? "Проверяем индекс поиска..."}</div>
+        <div className="rounded-xl border border-[color:var(--border)] bg-[var(--panel-subtle)] px-4 py-3 text-sm text-[color:var(--text-muted)]">
+          <div className="font-semibold text-[color:var(--text)]">
+            {searchStatus?.message ?? "Проверяем индекс поиска..."}
+          </div>
           {searchStatus?.ready ? (
-            <div className="mt-1 text-slate-600">
+            <div className="mt-1 text-[color:var(--text-muted)]">
               Индекс найден: записей {searchStatus.recordsCount}, подмоделей {searchStatus.submodelsCount}.
             </div>
           ) : searchStatus?.missingFiles.length ? (
-            <div className="mt-2 text-slate-600">Не хватает файлов: {searchStatus.missingFiles.join(", ")}</div>
+            <div className="mt-2 text-[color:var(--text-muted)]">
+              Не хватает файлов: {searchStatus.missingFiles.join(", ")}
+            </div>
           ) : null}
         </div>
 
         <div className="grid gap-4 md:grid-cols-[1fr_auto]">
-          <label className="grid gap-2 text-sm font-medium text-slate-700" htmlFor="submodel-search">
+          <label className="grid gap-2 text-sm font-medium text-[color:var(--text-muted)]" htmlFor="submodel-search">
             Подмодель
             <Input
               id="submodel-search"
@@ -83,9 +87,9 @@ export function SearchSubmodelCard({
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-slate-200">
+        <div className="overflow-hidden rounded-xl border border-[color:var(--border)]">
           <table className="w-full border-collapse text-sm">
-            <thead className="bg-slate-100 text-left text-slate-700">
+            <thead className="bg-[var(--panel-subtle)] text-left text-[color:var(--text-muted)]">
               <tr>
                 <th className="px-4 py-3">Видеокадр</th>
                 <th className="px-4 py-3">№ привязки</th>
@@ -96,16 +100,19 @@ export function SearchSubmodelCard({
             <tbody>
               {pagedSearchResults.length > 0 ? (
                 pagedSearchResults.map((item) => (
-                  <tr key={`${item.frameName}-${item.markerIndex}`} className="border-t border-slate-200 bg-white">
-                    <td className="px-4 py-3 font-medium text-slate-900">{item.frameName}</td>
+                  <tr
+                    key={`${item.frameName}-${item.markerIndex}`}
+                    className="border-t border-[color:var(--border)] bg-[var(--panel-solid)]"
+                  >
+                    <td className="px-4 py-3 font-medium text-[color:var(--text)]">{item.frameName}</td>
                     <td className="px-4 py-3">{item.markerIndex}</td>
                     <td className="px-4 py-3">{item.kks ?? item.title}</td>
                     <td className="px-4 py-3">{item.description ?? "—"}</td>
                   </tr>
                 ))
               ) : (
-                <tr className="border-t border-slate-200 bg-white">
-                  <td className="px-4 py-6 text-slate-500" colSpan={4}>
+                <tr className="border-t border-[color:var(--border)] bg-[var(--panel-solid)]">
+                  <td className="px-4 py-6 text-[color:var(--text-soft)]" colSpan={4}>
                     {searchStatus?.ready
                       ? "Выберите подмодель и запустите поиск."
                       : "Поиск станет доступен после успешной обработки и построения индекса."}
@@ -117,7 +124,7 @@ export function SearchSubmodelCard({
         </div>
 
         {searchResults.length > SEARCH_RESULTS_PAGE_SIZE ? (
-          <div className="flex flex-col gap-3 text-sm text-slate-600 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-3 text-sm text-[color:var(--text-muted)] md:flex-row md:items-center md:justify-between">
             <div>
               Показаны {pagedSearchResults.length} из {searchResults.length}. Страница {searchPage} из{" "}
               {searchTotalPages}.

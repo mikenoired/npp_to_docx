@@ -1,6 +1,6 @@
 import { createWriteStream, type WriteStream } from "node:fs";
 
-import type { LoggerLike } from "../contracts";
+import type { LoggerLike } from "../contracts.js";
 
 export class FileLogger implements LoggerLike {
   private stream: WriteStream;

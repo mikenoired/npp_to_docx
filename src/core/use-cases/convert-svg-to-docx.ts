@@ -3,11 +3,11 @@ import path from "node:path";
 
 import sharp from "sharp";
 
-import type { SearchMarkerRecord } from "../search/index";
-import { buildDocx } from "../services/docx-builder";
-import { buildOverlaySvg, projectMarkers } from "../services/marker-rendering";
-import { type DescriptionIndex, lookupDescription } from "../services/pls-db";
-import { decodeSvgBuffer, parseMarkers, toUtf8Xml } from "../services/svg-parser";
+import type { SearchMarkerRecord } from "../search/index.js";
+import { buildDocx } from "../services/docx-builder.js";
+import { buildOverlaySvg, projectMarkers } from "../services/marker-rendering.js";
+import { type DescriptionIndex, lookupDescription } from "../services/pls-db.js";
+import { decodeSvgBuffer, parseMarkers, toUtf8Xml } from "../services/svg-parser.js";
 
 export async function convertSvgToDocx(
   svgPath: string,
