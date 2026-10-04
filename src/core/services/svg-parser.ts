@@ -27,16 +27,41 @@ export function decodeSvgBuffer(buffer: Buffer): { content: string; encoding: st
   const prolog = buffer.subarray(0, 512).toString("latin1");
   const encodingMatch = prolog.match(/encoding\s*=\s*["']([^"']+)["']/i);
   const requested = normalizeEncoding(encodingMatch?.[1] ?? "utf-8");
-  const encoding = iconv.encodingExists(requested) ? requested : "utf-8";
+  let encoding = iconv.encodingExists(requested) ? requested : "utf-8";
+  if (encoding === "utf-8") {
+    try {
+      new TextDecoder("utf-8", { fatal: true }).decode(buffer);
+    } catch {
+      encoding = "windows-1251";
+    }
+  }
   const content = iconv.decode(buffer, encoding);
   return { content, encoding };
 }
 
 export function toUtf8Xml(svgContent: string): string {
-  if (/^<\?xml/i.test(svgContent)) {
-    return svgContent.replace(/(<\?xml[^>]*encoding\s*=\s*["'])[^"']+(["'][^>]*\?>)/i, "$1UTF-8$2");
+  let content = svgContent.replace(/(<\?xml[^>]*encoding\s*=\s*["'])[^"']+(["'][^>]*\?>)/i, "$1UTF-8$2");
+  content = content.replace(
+    /&#(?:x([0-9a-f]+)|(\d+));/gi,
+    (entity, hex: string | undefined, decimal: string | undefined) => {
+      const code = hex ? Number.parseInt(hex, 16) : Number(decimal);
+      return code === 9 ||
+        code === 10 ||
+        code === 13 ||
+        (code >= 32 && code <= 0xd7ff) ||
+        (code >= 0xe000 && code <= 0xfffd) ||
+        (code >= 0x10000 && code <= 0x10ffff)
+        ? entity
+        : "";
+    },
+  );
+  const namespaces = { rt: "http://www.rts.co.at/2001/XMLSchema/RtSvgPL", xlink: "http://www.w3.org/1999/xlink" };
+  for (const [prefix, uri] of Object.entries(namespaces)) {
+    if (!new RegExp(`xmlns:${prefix}\\s*=`).test(content)) {
+      content = content.replace(/<svg\b/i, `<svg xmlns:${prefix}="${uri}"`);
+    }
   }
-  return svgContent;
+  return content;
 }
 
 function parseNumeric(value: string | undefined): number | undefined {
@@ -258,8 +283,9 @@ function parseMarkersWithSax(svgContent: string): ParsedSvg {
       parent.firstChildPoint = nodePoint;
     }
 
-    if (node.titleText !== undefined && node.name !== "svg") {
-      const title = cleanTitle(node.titleText);
+    const dynamicKks = pickMarkerKks(node.dynValues, "");
+    if ((node.titleText !== undefined || dynamicKks !== undefined) && node.name !== "svg") {
+      const title = cleanTitle(node.titleText ?? dynamicKks ?? "");
       const kks = pickMarkerKks(node.dynValues, title);
       const submodel = normalizeIdentity(getAttr(node.attrs, "xlink:href", "href"));
 

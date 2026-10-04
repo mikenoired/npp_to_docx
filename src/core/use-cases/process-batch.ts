@@ -1,4 +1,4 @@
-import { mkdir, readdir, stat } from "node:fs/promises";
+import { mkdir, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import sharp from "sharp";
@@ -51,7 +51,7 @@ export async function processBatch(
   const inputDir = path.resolve(options.inputDir);
   const outputDir = path.resolve(options.outputDir);
   const svgDirCandidate = path.join(inputDir, "svg");
-  let svgDir = inputDir;
+  let svgDir = options.svgDir ? path.resolve(options.svgDir) : inputDir;
 
   logger.log(`Input directory: ${inputDir}`);
   logger.log(`Output directory: ${outputDir}`);
@@ -59,11 +59,11 @@ export async function processBatch(
 
   try {
     const svgDirStats = await stat(svgDirCandidate);
-    if (svgDirStats.isDirectory()) {
+    if (!options.svgDir && svgDirStats.isDirectory()) {
       svgDir = svgDirCandidate;
     }
   } catch {
-    svgDir = inputDir;
+    if (!options.svgDir) svgDir = inputDir;
   }
 
   logger.log(`SVG directory: ${svgDir}`);
@@ -107,6 +107,7 @@ export async function processBatch(
   let totalMarkers = 0;
   let totalMismatches = 0;
   const searchRecords: SearchMarkerRecord[] = [];
+  const frameReports: Array<{ frame: string; markers?: number; missingResources?: string[]; error?: string }> = [];
 
   const emitProgress = (): void => {
     const line = renderProgressBar(completed, files.length, success, failed, startedAt);
@@ -131,6 +132,9 @@ export async function processBatch(
 
     try {
       const result = await convertSvgToDocx(svgPath, outputPath, descriptions);
+      frameReports.push({ frame: fileName, markers: result.markers, missingResources: result.missingResources });
+      if (result.missingResources.length)
+        logger.log(`WARNING ${fileName}: missing submodels: ${result.missingResources.join(", ")}`);
       success += 1;
       totalMarkers += result.markers;
       totalMismatches += result.mismatches;
@@ -143,6 +147,7 @@ export async function processBatch(
       failed += 1;
       const elapsedMs = Date.now() - start;
       const message = error instanceof Error ? error.message : String(error);
+      frameReports.push({ frame: fileName, error: message });
       logger.log(`[${index + 1}/${total}] FAIL ${fileName} | ${elapsedMs}ms | ${message}`);
     } finally {
       completed += 1;
@@ -150,6 +155,14 @@ export async function processBatch(
     }
   });
 
+  await writeFile(
+    path.join(outputDir, "passport-report.json"),
+    JSON.stringify(
+      frameReports.sort((a, b) => a.frame.localeCompare(b.frame)),
+      null,
+      2,
+    ),
+  );
   await writeSearchIndex(inputDir, outputDir, searchRecords, logger);
 
   const summary = `Готово. успешно=${success}, провально=${failed}, всего_маркеров=${totalMarkers}, всего_несовпадений=${totalMismatches}`;

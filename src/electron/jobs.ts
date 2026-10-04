@@ -43,6 +43,7 @@ function normalizeJob(job: JobState): JobDto {
 function normalizeOptions(payload: CreateJobRequest): ProcessBatchOptions {
   return {
     inputDir: payload.inputDir ?? "input",
+    svgDir: payload.svgDir,
     outputDir: payload.outputDir ?? "output",
     concurrency: payload.concurrency ?? getDefaultConcurrency(),
     match: payload.match,

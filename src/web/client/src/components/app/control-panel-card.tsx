@@ -7,11 +7,14 @@ import { Input } from "../ui/input";
 type ControlPanelCardProps = {
   busy: boolean;
   inputDir: string;
+  svgDir: string;
   outputDir: string;
   concurrency: string;
   match: string;
   limit: string;
   onInputDirChange(value: string): void;
+  onSvgDirChange(value: string): void;
+  onSelectSvgDir(): void;
   onOutputDirChange(value: string): void;
   onConcurrencyChange(value: string): void;
   onMatchChange(value: string): void;
@@ -47,6 +50,25 @@ export function ControlPanelCard(props: ControlPanelCardProps) {
               Выбрать
             </Button>
           </div>
+        </label>
+        <label
+          className="grid gap-2 text-sm font-medium text-[color:var(--text-muted)] md:col-span-2"
+          htmlFor="svg-dir"
+        >
+          Папка кадров SVG
+          <div className="flex gap-2">
+            <Input
+              id="svg-dir"
+              value={props.svgDir}
+              onChange={(event) => props.onSvgDirChange(event.target.value)}
+              placeholder="Необязательно — по умолчанию input/svg"
+            />
+            <Button variant="outline" type="button" onClick={props.onSelectSvgDir}>
+              <FolderOpen className="h-4 w-4" />
+              Выбрать
+            </Button>
+          </div>
+          <span>Распакуйте NPP_models.zip и выберите NPP_models. База описаний берётся из входной директории.</span>
         </label>
         <label className="grid gap-2 text-sm font-medium text-[color:var(--text-muted)]" htmlFor="output-dir">
           Директория на выходе
@@ -95,7 +117,7 @@ export function ControlPanelCard(props: ControlPanelCardProps) {
           </Button>
           <Button disabled={props.busy} onClick={props.onRunJob}>
             {props.busy ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-            Запустить обработку
+            Создать паспорта
           </Button>
         </div>
       </CardContent>

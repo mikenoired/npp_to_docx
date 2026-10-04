@@ -6,6 +6,7 @@ function printHelp(): void {
 
 Опции:
   --input <dir>         Путь до корневой папки input с dmp/csv и подпапкой svg (по умолчанию: input)
+  --svg <dir>           Отдельная папка кадров (например распакованная NPP_models)
   --output <dir>        Путь до папки, где будут готовые DOCX-файлы (по умолчанию: output)
   --concurrency <n>     Кол-во паралельных обработок (по умолчанию: ядра процессора / 2, макс. 6)
   --match <text>        Обработать только те svg, которые содержать некоторый текст
@@ -29,6 +30,10 @@ export function parseArgs(argv: string[]): ProcessBatchOptions {
     if (arg === "--input" && argv[index + 1]) {
       options.inputDir = argv[index + 1];
       index += 1;
+      continue;
+    }
+    if (arg === "--svg" && argv[index + 1]) {
+      options.svgDir = argv[++index];
       continue;
     }
     if (arg === "--output" && argv[index + 1]) {

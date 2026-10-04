@@ -37,6 +37,7 @@ export default function App() {
   });
   const [activeTab, setActiveTab] = useState<AppTab>("home");
   const [inputDir, setInputDir] = useState("input");
+  const [svgDir, setSvgDir] = useState("");
   const [outputDir, setOutputDir] = useState("output");
   const [concurrency, setConcurrency] = useState("2");
   const [match, setMatch] = useState("");
@@ -91,6 +92,7 @@ export default function App() {
     try {
       const data = (await getDesktopApi().createJob({
         inputDir,
+        svgDir: svgDir || undefined,
         outputDir,
         concurrency: Number.parseInt(concurrency, 10) || 1,
         match: match || undefined,
@@ -105,10 +107,15 @@ export default function App() {
     }
   }
 
-  async function pickDirectory(kind: "input" | "output") {
+  async function pickDirectory(kind: "input" | "output" | "svg") {
     const selected = await getDesktopApi().selectDirectory({
-      title: kind === "input" ? "Выберите входную директорию" : "Выберите выходную директорию",
-      defaultPath: kind === "input" ? inputDir : outputDir,
+      title:
+        kind === "svg"
+          ? "Выберите папку кадров SVG"
+          : kind === "input"
+            ? "Выберите входную директорию"
+            : "Выберите выходную директорию",
+      defaultPath: kind === "svg" ? svgDir || inputDir : kind === "input" ? inputDir : outputDir,
     });
 
     if (!selected) {
@@ -120,6 +127,10 @@ export default function App() {
       return;
     }
 
+    if (kind === "svg") {
+      setSvgDir(selected);
+      return;
+    }
     setOutputDir(selected);
   }
 
@@ -241,6 +252,9 @@ export default function App() {
         <HomeTab
           busy={busy}
           inputDir={inputDir}
+          svgDir={svgDir}
+          onSvgDirChange={setSvgDir}
+          onSelectSvgDir={() => void pickDirectory("svg")}
           outputDir={outputDir}
           concurrency={concurrency}
           match={match}

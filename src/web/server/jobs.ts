@@ -57,6 +57,7 @@ async function startJob(job: JobState): Promise<void> {
 function normalizeOptions(payload: CreateJobRequest): ProcessBatchOptions {
   return {
     inputDir: payload.inputDir ?? "input",
+    svgDir: payload.svgDir,
     outputDir: payload.outputDir ?? "output",
     concurrency: payload.concurrency ?? getDefaultConcurrency(),
     match: payload.match,

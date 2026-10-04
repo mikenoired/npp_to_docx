@@ -6,6 +6,7 @@ import { JobsHistoryCard } from "./jobs-history-card";
 type HomeTabProps = {
   busy: boolean;
   inputDir: string;
+  svgDir: string;
   outputDir: string;
   concurrency: string;
   match: string;
@@ -13,6 +14,8 @@ type HomeTabProps = {
   jobs: JobDto[];
   activeJob?: JobDto;
   onInputDirChange(value: string): void;
+  onSvgDirChange(value: string): void;
+  onSelectSvgDir(): void;
   onOutputDirChange(value: string): void;
   onConcurrencyChange(value: string): void;
   onMatchChange(value: string): void;
@@ -31,6 +34,9 @@ export function HomeTab(props: HomeTabProps) {
         <ControlPanelCard
           busy={props.busy}
           inputDir={props.inputDir}
+          svgDir={props.svgDir}
+          onSvgDirChange={props.onSvgDirChange}
+          onSelectSvgDir={props.onSelectSvgDir}
           outputDir={props.outputDir}
           concurrency={props.concurrency}
           match={props.match}
