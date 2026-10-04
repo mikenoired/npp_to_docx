@@ -75,6 +75,7 @@ export class DesktopBackend {
 
     const job = this.jobManager.createJob({
       inputDir: payload.inputDir ?? (await this.getAppPaths()).inputDir,
+      svgDir: payload.svgDir,
       outputDir: payload.outputDir ?? (await this.getAppPaths()).outputDir,
       concurrency: payload.concurrency ?? getDefaultConcurrency(),
       match: payload.match,

@@ -89,12 +89,8 @@ export async function readSearchIndex(outputDir: string): Promise<SearchIndexDat
 }
 
 export async function findMissingSearchFiles(inputDir: string, outputDir: string): Promise<string[]> {
-  const requiredPaths = [
-    { path: path.join(inputDir, "PLS_ANA_CONF.dmp"), label: "PLS_ANA_CONF.dmp" },
-    { path: path.join(inputDir, "PLS_BIN_CONF.dmp"), label: "PLS_BIN_CONF.dmp" },
-    { path: path.join(inputDir, "svg"), label: "input/svg" },
-    { path: getSearchIndexPath(outputDir), label: "search-index.json" },
-  ];
+  const requiredPaths = [{ path: getSearchIndexPath(outputDir), label: "search-index.json" }];
+  void inputDir;
 
   const missing: string[] = [];
   for (const item of requiredPaths) {

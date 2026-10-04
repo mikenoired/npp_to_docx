@@ -1,5 +1,6 @@
 export type ProcessBatchOptions = {
   inputDir: string;
+  svgDir?: string;
   outputDir: string;
   concurrency: number;
   match?: string;

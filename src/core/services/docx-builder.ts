@@ -1,8 +1,10 @@
 import {
   AlignmentType,
   Document,
+  HeadingLevel,
   ImageRun,
   Packer,
+  PageOrientation,
   Paragraph,
   Table,
   TableCell,
@@ -44,6 +46,7 @@ function buildLegendTable(markers: RenderedMarker[]): Table {
 
   const rows = [
     new TableRow({
+      tableHeader: true,
       children: [
         makeCell("№", columnWidths[0], { alignment: AlignmentType.CENTER, bold: true }),
         makeCell("KKS", columnWidths[1], { bold: true }),
@@ -83,12 +86,22 @@ export async function buildDocx(
   width: number,
   height: number,
   markers: RenderedMarker[],
+  passport: { frameName: string; missingResources: string[] } = { frameName: "", missingResources: [] },
 ): Promise<Buffer> {
-  const maxWidth = 900;
-  const imageWidth = width > maxWidth ? maxWidth : width;
+  const maxWidth = 960;
+  const imageWidth = Math.min(width, maxWidth, (400 * width) / height);
   const imageHeight = Math.max(1, Math.round((height / width) * imageWidth));
 
   const children: Array<Paragraph | Table> = [
+    new Paragraph({ text: `Паспорт кадра ${passport.frameName}`, heading: HeadingLevel.TITLE }),
+    new Paragraph({ text: `Элементов: ${markers.length}. Номера на схеме соответствуют строкам таблицы.` }),
+    ...(passport.missingResources.length
+      ? [
+          new Paragraph({
+            text: `Отсутствуют изображения подмоделей: ${passport.missingResources.join(", ")}. На схеме они обозначены прямоугольниками с крестом.`,
+          }),
+        ]
+      : []),
     new Paragraph({
       alignment: AlignmentType.CENTER,
       children: [
@@ -106,7 +119,7 @@ export async function buildDocx(
   ];
 
   if (markers.length === 0) {
-    children.push(new Paragraph({ children: [new TextRun("Элементов с title не найдено")] }));
+    children.push(new Paragraph({ children: [new TextRun("Элементов с title, KKS или PointID не найдено")] }));
   } else {
     children.push(buildLegendTable(markers));
 
@@ -137,6 +150,12 @@ export async function buildDocx(
   const doc = new Document({
     sections: [
       {
+        properties: {
+          page: {
+            size: { orientation: PageOrientation.LANDSCAPE, width: 11906, height: 16838 },
+            margin: { top: 720, bottom: 720, left: 720, right: 720 },
+          },
+        },
         children,
       },
     ],

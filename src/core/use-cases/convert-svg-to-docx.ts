@@ -8,15 +8,22 @@ import { buildDocx } from "../services/docx-builder.js";
 import { buildOverlaySvg, projectMarkers } from "../services/marker-rendering.js";
 import { type DescriptionIndex, lookupDescription } from "../services/pls-db.js";
 import { decodeSvgBuffer, parseMarkers, toUtf8Xml } from "../services/svg-parser.js";
+import { prepareSvgResources } from "../services/svg-resources.js";
 
 export async function convertSvgToDocx(
   svgPath: string,
   outputPath: string,
   descriptions: DescriptionIndex,
-): Promise<{ markers: number; mismatches: number; encoding: string; searchRecords: SearchMarkerRecord[] }> {
+): Promise<{
+  markers: number;
+  mismatches: number;
+  encoding: string;
+  searchRecords: SearchMarkerRecord[];
+  missingResources: string[];
+}> {
   const rawBuffer = await readFile(svgPath);
   const { content: svgContent, encoding } = decodeSvgBuffer(rawBuffer);
-  const svgForRender = toUtf8Xml(svgContent);
+  const { svg: svgForRender, missingResources } = await prepareSvgResources(toUtf8Xml(svgContent), svgPath);
 
   const parsed = parseMarkers(svgContent);
   const enrichedMarkers = parsed.markers.map((marker) => ({
@@ -39,13 +46,17 @@ export async function convertSvgToDocx(
     .png()
     .toBuffer();
 
-  const docxBuffer = await buildDocx(compositedPng, width, height, renderedMarkers);
+  const docxBuffer = await buildDocx(compositedPng, width, height, renderedMarkers, {
+    frameName: path.basename(svgPath),
+    missingResources,
+  });
   await writeFile(outputPath, docxBuffer);
 
   return {
     markers: renderedMarkers.length,
     mismatches: renderedMarkers.filter((marker) => marker.isMismatch).length,
     encoding,
+    missingResources,
     searchRecords: renderedMarkers
       .filter((marker) => typeof marker.submodel === "string" && marker.submodel.trim().length > 0)
       .map((marker) => ({
