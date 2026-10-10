@@ -1,86 +1,33 @@
+use crate::theme::{self, Palette};
 use anyhow::{Context as _, Result};
 use directories::{ProjectDirs, UserDirs};
 use gpui::{Context, prelude::*, *};
 use gpui_component::{
-    ActiveTheme, Disableable, Root, Theme, ThemeMode,
+    ActiveTheme, Disableable, Icon, IconName, Root, Sizable,
     button::{Button, ButtonVariants},
-    input::{Input, InputState},
+    input::{Input, InputEvent, InputState},
 };
 use npp_core::batch::{self, BatchResult, Options, Progress, SearchIndex, SearchRecord};
 use serde::{Deserialize, Serialize};
 use std::{
+    collections::VecDeque,
     fs,
     io::Write,
     path::PathBuf,
     sync::mpsc,
-    time::{Duration, SystemTime, UNIX_EPOCH},
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
-#[derive(Default, Clone, Serialize, Deserialize)]
-#[serde(default, rename_all = "camelCase")]
-struct Settings {
-    input_dir: String,
-    svg_dir: String,
-    output_dir: String,
-    dark: bool,
-}
-
-fn settings_path() -> PathBuf {
-    ProjectDirs::from("local", "npp", "NppToDocx")
-        .map(|p| p.config_dir().join("settings.json"))
-        .unwrap_or_else(|| PathBuf::from("settings.json"))
-}
-
-fn workspace() -> PathBuf {
-    UserDirs::new()
-        .and_then(|p| p.document_dir().map(PathBuf::from))
-        .unwrap_or_else(|| std::env::current_dir().unwrap_or_default())
-        .join("npp_to_docx")
-}
-
-impl Settings {
-    fn load() -> Self {
-        let mut settings: Self = fs::read(settings_path())
-            .ok()
-            .and_then(|b| serde_json::from_slice(&b).ok())
-            .unwrap_or_default();
-        if settings.input_dir.is_empty() {
-            settings.input_dir = workspace().join("input").to_string_lossy().into();
-        }
-        if settings.output_dir.is_empty() {
-            settings.output_dir = workspace().join("output").to_string_lossy().into();
-        }
-        settings
-    }
-    fn save(&self) -> Result<()> {
-        let path = settings_path();
-        if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent)?;
-        }
-        fs::write(path, serde_json::to_vec_pretty(self)?)?;
-        Ok(())
-    }
-}
+mod model;
+mod views;
+use model::{Catalog, Job, Manifest, Settings, count, duration, workspace};
+actions!(desktop, [CreatePassports, FindFrame, ShowRuns]);
 
 enum WorkerEvent {
     Progress(Progress),
     Done(std::result::Result<BatchResult, String>),
     Prepared(std::result::Result<(), String>),
 }
-
-struct Job {
-    id: String,
-    options: Options,
-    status: String,
-    completed: usize,
-    total: usize,
-    success: usize,
-    failed: usize,
-    result: Option<BatchResult>,
-    error: Option<String>,
-    logs: Vec<String>,
-}
-
 struct Desktop {
     input: Entity<InputState>,
     svg: Entity<InputState>,
@@ -90,17 +37,31 @@ struct Desktop {
     limit: Entity<InputState>,
     query: Entity<InputState>,
     settings: Settings,
+    focus: FocusHandle,
     tab: usize,
     busy: bool,
+    preparing: bool,
+    advanced: bool,
+    show_logs: bool,
     message: String,
+    message_error: bool,
     jobs: Vec<Job>,
-    active: Option<usize>,
+    running: Option<usize>,
+    selected_job: Option<usize>,
     receiver: Option<mpsc::Receiver<WorkerEvent>>,
-    index: Option<SearchIndex>,
+    inspection: Option<mpsc::Receiver<(u64, Manifest, Option<Catalog>)>>,
+    inspection_due: Option<Instant>,
+    revision: u64,
+    manifest: Option<Manifest>,
+    catalog: Option<Catalog>,
     results: Vec<SearchRecord>,
+    groups: Vec<std::ops::Range<usize>>,
+    expanded_frame: Option<usize>,
+    searched: bool,
     page: usize,
+    last_tick: Instant,
+    last_history_save: Instant,
 }
-
 fn field(
     value: String,
     placeholder: &str,
@@ -113,55 +74,104 @@ fn field(
         input
     })
 }
-
 impl Desktop {
     fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
         let settings = Settings::load();
-        Theme::change(
-            if settings.dark {
-                ThemeMode::Dark
-            } else {
-                ThemeMode::Light
-            },
-            Some(window),
-            cx,
-        );
+        theme::apply(settings.dark, window, cx);
+        let jobs = Job::load();
         let mut app = Self {
             input: field(
                 settings.input_dir.clone(),
-                "Папка с DMP или CSV",
+                "Папка с PLS_ANA_CONF и PLS_BIN_CONF",
                 window,
                 cx,
             ),
             svg: field(
                 settings.svg_dir.clone(),
-                "Необязательно: отдельная папка кадров",
+                "Автоматически: из входной папки",
                 window,
                 cx,
             ),
-            output: field(settings.output_dir.clone(), "Готовые документы", window, cx),
-            concurrency: field(
-                batch::default_concurrency().to_string(),
-                "Например, 2",
+            output: field(settings.output_dir.clone(), "Папка для DOCX", window, cx),
+            concurrency: field(settings.concurrency.to_string(), "1–256", window, cx),
+            filter: field(settings.filter.clone(), "Все SVG", window, cx),
+            limit: field(settings.limit.clone(), "Без лимита", window, cx),
+            query: field(
+                String::new(),
+                "Имя подмодели, например DS_ana.svg",
                 window,
                 cx,
             ),
-            filter: field(String::new(), "Например, 4UJ", window, cx),
-            limit: field(String::new(), "Все кадры", window, cx),
-            query: field(String::new(), "Например, DS_ana.svg", window, cx),
+            advanced: !settings.filter.is_empty() || !settings.limit.is_empty(),
             settings,
+            focus: cx.focus_handle(),
             tab: 0,
             busy: false,
+            preparing: false,
+            show_logs: false,
             message: String::new(),
-            jobs: Vec::new(),
-            active: None,
+            message_error: false,
+            selected_job: jobs.len().checked_sub(1),
+            jobs,
+            running: None,
             receiver: None,
-            index: None,
+            inspection: None,
+            inspection_due: None,
+            revision: 0,
+            manifest: None,
+            catalog: None,
             results: Vec::new(),
+            groups: Vec::new(),
+            expanded_frame: None,
+            searched: false,
             page: 0,
+            last_tick: Instant::now(),
+            last_history_save: Instant::now(),
         };
-        app.reload_search(cx);
-        cx.observe(&app.query, |_, _, cx| cx.notify()).detach();
+        for (i, entity) in [
+            app.input.clone(),
+            app.svg.clone(),
+            app.output.clone(),
+            app.concurrency.clone(),
+            app.filter.clone(),
+            app.limit.clone(),
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            cx.subscribe(&entity, move |app, _, event: &InputEvent, cx| {
+                if matches!(event, InputEvent::Change) {
+                    if i == 2 {
+                        app.catalog = None;
+                        app.results.clear();
+                        app.groups.clear();
+                        app.expanded_frame = None;
+                        app.searched = false;
+                    }
+                    app.schedule_inspection();
+                    cx.notify();
+                }
+            })
+            .detach();
+        }
+        cx.subscribe_in(
+            &app.query,
+            window,
+            |app, _, event: &InputEvent, window, cx| match event {
+                InputEvent::Change => {
+                    app.searched = false;
+                    app.results.clear();
+                    app.groups.clear();
+                    app.expanded_frame = None;
+                    app.page = 0;
+                    cx.notify();
+                }
+                InputEvent::PressEnter { .. } => app.search(window, cx),
+                _ => {}
+            },
+        )
+        .detach();
+        app.schedule_inspection();
         cx.spawn(async move |this, cx| {
             loop {
                 cx.background_executor()
@@ -175,57 +185,89 @@ impl Desktop {
         .detach();
         app
     }
-
     fn value(input: &Entity<InputState>, cx: &App) -> String {
         input.read(cx).value().to_string()
     }
-
     fn persist(&mut self, cx: &App) -> Result<()> {
         self.settings.input_dir = Self::value(&self.input, cx);
         self.settings.svg_dir = Self::value(&self.svg, cx);
         self.settings.output_dir = Self::value(&self.output, cx);
+        self.settings.filter = Self::value(&self.filter, cx);
+        self.settings.limit = Self::value(&self.limit, cx);
+        if let Ok(n) = Self::value(&self.concurrency, cx).trim().parse::<usize>()
+            && (1..=256).contains(&n)
+        {
+            self.settings.concurrency = n;
+        }
         self.settings.save()
     }
-
     fn options(&self, cx: &App) -> Result<Options> {
         let svg = Self::value(&self.svg, cx);
         let filter = Self::value(&self.filter, cx);
         let limit = Self::value(&self.limit, cx);
         let concurrency = Self::value(&self.concurrency, cx)
+            .trim()
             .parse::<usize>()
-            .context("Введите число параллельных обработок от 1 до 256")?;
+            .context("Введите число одновременных обработок от 1 до 256.")?;
         anyhow::ensure!(
             (1..=256).contains(&concurrency),
-            "Число параллельных обработок должно быть от 1 до 256"
+            "Число обработок должно быть от 1 до 256."
         );
         let limit = if limit.trim().is_empty() {
             None
         } else {
-            let limit = limit
+            let n = limit
                 .trim()
                 .parse::<usize>()
-                .context("Лимит должен быть положительным числом")?;
-            anyhow::ensure!(limit > 0, "Лимит должен быть положительным числом");
-            Some(limit)
+                .context("Лимит должен быть положительным числом.")?;
+            anyhow::ensure!(n > 0, "Лимит должен быть больше нуля.");
+            Some(n)
         };
         Ok(Options {
-            input_dir: Self::value(&self.input, cx).into(),
-            svg_dir: if svg.trim().is_empty() {
-                None
-            } else {
-                Some(svg.into())
-            },
-            output_dir: Self::value(&self.output, cx).into(),
+            input_dir: Self::value(&self.input, cx).trim().into(),
+            svg_dir: (!svg.trim().is_empty()).then(|| svg.trim().into()),
+            output_dir: Self::value(&self.output, cx).trim().into(),
             concurrency,
-            r#match: if filter.is_empty() {
-                None
-            } else {
-                Some(filter)
-            },
+            r#match: (!filter.is_empty()).then_some(filter),
             limit,
         })
     }
-
+    fn schedule_inspection(&mut self) {
+        self.revision += 1;
+        self.manifest = None;
+        self.inspection_due = Some(Instant::now() + Duration::from_millis(250));
+    }
+    fn inspect(&mut self, cx: &App) {
+        self.inspection_due = None;
+        if let Err(e) = self.persist(cx) {
+            self.message = format!("Не удалось сохранить настройки: {e}");
+            self.message_error = true;
+        }
+        if let Ok(options) = self.options(cx) {
+            let revision = self.revision;
+            let (sender, receiver) = mpsc::channel();
+            self.inspection = Some(receiver);
+            std::thread::spawn(move || {
+                let (manifest, catalog) = Manifest::inspect(&options);
+                let _ = sender.send((revision, manifest, catalog));
+            });
+        }
+    }
+    fn error(&mut self, message: impl Into<String>, cx: &mut Context<Self>) {
+        self.message = message.into();
+        self.message_error = true;
+        cx.notify();
+    }
+    fn navigate(&mut self, tab: usize, window: &mut Window, cx: &mut Context<Self>) {
+        self.tab = tab;
+        self.message.clear();
+        if tab == 1 {
+            self.query.read(cx).focus_handle(cx).focus(window);
+        } else {
+            self.focus.focus(window);
+        }
+        cx.notify();
+    }
     fn start(&mut self, prepare: bool, cx: &mut Context<Self>) {
         if self.busy {
             return;
@@ -236,14 +278,21 @@ impl Desktop {
         }) {
             Ok(o) => o,
             Err(e) => {
-                self.message = e.to_string();
-                cx.notify();
+                self.error(e.to_string(), cx);
                 return;
             }
         };
+        if !prepare && !self.manifest.as_ref().is_some_and(Manifest::ready) {
+            self.error(
+                "Проверьте исходные данные: нужны SVG и обе базы описаний.",
+                cx,
+            );
+            return;
+        }
         let (sender, receiver) = mpsc::channel();
         self.receiver = Some(receiver);
         self.busy = true;
+        self.preparing = prepare;
         self.message.clear();
         if prepare {
             std::thread::spawn(move || {
@@ -258,26 +307,44 @@ impl Desktop {
                 .unwrap_or_default()
                 .as_millis()
                 .to_string();
-            self.active = Some(self.jobs.len());
+            let log_path = workspace().join("logs").join(format!("{id}.log"));
+            let total = self
+                .manifest
+                .as_ref()
+                .map(|m| m.selected)
+                .unwrap_or_default();
+            self.show_logs = false;
+            if self.jobs.len() >= 30 {
+                self.jobs.drain(..self.jobs.len() - 29);
+            }
+            self.running = Some(self.jobs.len());
+            self.selected_job = self.running;
             self.jobs.push(Job {
-                id: id.clone(),
+                id,
+                label: chrono::Local::now().format("%d.%m.%Y · %H:%M").to_string(),
                 options: options.clone(),
                 status: "Выполняется".into(),
                 completed: 0,
-                total: 0,
+                total,
                 success: 0,
                 failed: 0,
+                warnings: 0,
                 result: None,
                 error: None,
-                logs: Vec::new(),
+                logs: VecDeque::new(),
+                log_path: log_path.clone(),
+                elapsed_ms: 0,
+                started: Some(Instant::now()),
             });
+            if let Err(e) = Job::save(&self.jobs) {
+                self.error(format!("Не удалось сохранить историю: {e}"), cx);
+            }
             std::thread::spawn(move || {
-                let logs_dir = workspace().join("logs");
                 let result = (|| -> Result<BatchResult> {
-                    fs::create_dir_all(logs_dir.clone())?;
-                    let file = std::sync::Mutex::new(fs::File::create(
-                        logs_dir.join(format!("{id}.log")),
-                    )?);
+                    if let Some(parent) = log_path.parent() {
+                        fs::create_dir_all(parent)?;
+                    }
+                    let file = std::sync::Mutex::new(fs::File::create(log_path)?);
                     batch::process(&options, &|event| {
                         if let Progress::Log(line) = &event {
                             let _ = writeln!(file.lock().unwrap(), "{line}");
@@ -291,25 +358,45 @@ impl Desktop {
         }
         cx.notify();
     }
-
     fn poll(&mut self, cx: &mut Context<Self>) {
+        let mut changed = false;
+        if self.inspection_due.is_some_and(|due| Instant::now() >= due) && !self.busy {
+            self.inspect(cx);
+            changed = true;
+        }
+        if let Some((revision, manifest, catalog)) =
+            self.inspection.as_ref().and_then(|r| r.try_recv().ok())
+        {
+            self.inspection = None;
+            if revision == self.revision {
+                self.manifest = Some(manifest);
+                self.catalog = catalog;
+                self.results.clear();
+                self.groups.clear();
+                self.expanded_frame = None;
+                self.searched = false;
+                self.page = 0;
+                changed = true;
+            }
+        }
         let events: Vec<_> = self
             .receiver
             .as_ref()
             .map(|r| r.try_iter().collect())
             .unwrap_or_default();
-        if events.is_empty() {
-            return;
-        }
+        changed |= !events.is_empty();
         for event in events {
             match event {
                 WorkerEvent::Progress(event) => {
-                    if let Some(job) = self.jobs.last_mut() {
+                    if let Some(job) = self.running.and_then(|i| self.jobs.get_mut(i)) {
                         match event {
                             Progress::Log(line) => {
-                                job.logs.push(line);
-                                if job.logs.len() > 1000 {
-                                    job.logs.remove(0);
+                                if line.starts_with("WARNING ") {
+                                    job.warnings += 1;
+                                }
+                                job.logs.push_back(line);
+                                if job.logs.len() > 300 {
+                                    job.logs.pop_front();
                                 }
                             }
                             Progress::Counts {
@@ -318,7 +405,6 @@ impl Desktop {
                                 success,
                                 failed,
                             } => {
-                                // Worker messages can arrive out of order.
                                 job.completed = job.completed.max(completed);
                                 job.total = total;
                                 job.success = job.success.max(success);
@@ -330,7 +416,9 @@ impl Desktop {
                 WorkerEvent::Done(result) => {
                     self.busy = false;
                     self.receiver = None;
-                    if let Some(job) = self.jobs.last_mut() {
+                    if let Some(job) = self.running.take().and_then(|i| self.jobs.get_mut(i)) {
+                        job.elapsed_ms = job.elapsed().as_millis() as u64;
+                        job.started = None;
                         match result {
                             Ok(result) => {
                                 job.status = if result.failed == 0 {
@@ -345,46 +433,78 @@ impl Desktop {
                                 job.status = "Ошибка".into();
                                 job.error = Some(error.clone());
                                 self.message = error;
+                                self.message_error = true;
                             }
                         }
                     }
-                    self.reload_search(cx);
+                    if let Err(e) = Job::save(&self.jobs) {
+                        self.error(format!("Не удалось сохранить историю: {e}"), cx);
+                    }
+                    self.schedule_inspection();
                 }
                 WorkerEvent::Prepared(result) => {
                     self.busy = false;
+                    self.preparing = false;
                     self.receiver = None;
-                    self.message = result
-                        .map(|_| "База данных подготовлена".to_string())
-                        .unwrap_or_else(|e| e);
+                    match result {
+                        Ok(()) => {
+                            self.message = "CSV готовы. Можно создавать паспорта.".into();
+                            self.message_error = false;
+                        }
+                        Err(error) => {
+                            self.message = error;
+                            self.message_error = true;
+                        }
+                    }
+                    self.schedule_inspection();
                 }
             }
         }
-        cx.notify();
-    }
-
-    fn reload_search(&mut self, cx: &App) {
-        self.index = SearchIndex::read(&PathBuf::from(Self::value(&self.output, cx))).ok();
-        self.results.clear();
-        self.page = 0;
-    }
-
-    fn search(&mut self, cx: &mut Context<Self>) {
-        match SearchIndex::read(&PathBuf::from(Self::value(&self.output, cx))) {
-            Ok(index) => {
-                self.results = index.search(&Self::value(&self.query, cx));
-                self.index = Some(index);
-                self.page = 0;
-                self.message.clear();
+        if self.busy && self.last_tick.elapsed() >= Duration::from_secs(1) {
+            self.last_tick = Instant::now();
+            changed = true;
+        }
+        if self.running.is_some() && self.last_history_save.elapsed() >= Duration::from_secs(5) {
+            if let Some(job) = self.running.and_then(|i| self.jobs.get_mut(i)) {
+                job.elapsed_ms = job.elapsed().as_millis() as u64;
             }
-            Err(error) => {
-                self.message = error.to_string();
-                self.index = None;
-                self.results.clear();
+            if let Err(e) = Job::save(&self.jobs) {
+                self.error(format!("Не удалось сохранить историю: {e}"), cx);
             }
+            self.last_history_save = Instant::now();
+        }
+        if changed {
+            cx.notify();
+        }
+    }
+    fn search(&mut self, _window: &mut Window, cx: &mut Context<Self>) {
+        let query = Self::value(&self.query, cx);
+        if query.trim().is_empty() {
+            self.error("Введите имя подмодели или выберите её в списке.", cx);
+            return;
+        }
+        if let Some(catalog) = &self.catalog {
+            self.results = catalog.index.search(&query);
+            self.groups.clear();
+            self.expanded_frame = None;
+            for (i, record) in self.results.iter().enumerate() {
+                if i == 0 || record.frame_name != self.results[i - 1].frame_name {
+                    self.groups.push(i..i + 1);
+                } else if let Some(group) = self.groups.last_mut() {
+                    group.end = i + 1;
+                }
+            }
+            self.searched = true;
+            self.page = 0;
+            self.message.clear();
+        } else {
+            self.error(
+                "В выбранной папке пока нет индекса. Создайте паспорта, затем повторите поиск.",
+                cx,
+            );
         }
         cx.notify();
     }
-
     fn choose(&mut self, which: usize, window: &mut Window, cx: &mut Context<Self>) {
         let picker = cx.prompt_for_paths(PathPromptOptions {
             files: false,
@@ -406,414 +526,83 @@ impl Desktop {
                             input.update(cx, |input, cx| {
                                 input.set_value(path.to_string_lossy().to_string(), window, cx)
                             });
-                            if let Err(error) = app.persist(cx) {
-                                app.message = error.to_string();
+                            if let Err(e) = app.persist(cx) {
+                                app.error(e.to_string(), cx);
                             }
-                            if which == 2 {
-                                app.reload_search(cx);
-                            }
+                            app.schedule_inspection();
                         }
                     }
                     Ok(Ok(None)) => {}
-                    Ok(Err(error)) => app.message = error.to_string(),
-                    Err(error) => app.message = error.to_string(),
+                    Ok(Err(error)) => app.error(error.to_string(), cx),
+                    Err(error) => app.error(error.to_string(), cx),
                 }
                 cx.notify();
             });
         })
         .detach();
     }
-
-    fn directory(
-        &self,
-        label: &str,
-        input: &Entity<InputState>,
-        which: usize,
-        cx: &Context<Self>,
-    ) -> impl IntoElement {
-        div()
-            .flex()
-            .flex_col()
-            .gap_2()
-            .child(label.to_string())
-            .child(
-                div()
-                    .flex()
-                    .gap_2()
-                    .child(div().flex_1().child(Input::new(input).disabled(self.busy)))
-                    .child(
-                        Button::new(("choose", which))
-                            .label("Выбрать")
-                            .disabled(self.busy)
-                            .on_click(
-                                cx.listener(move |app, _, window, cx| {
-                                    app.choose(which, window, cx)
-                                }),
-                            ),
-                    ),
-            )
-    }
-
-    fn home(&self, cx: &Context<Self>) -> impl IntoElement {
-        let theme = cx.theme();
-        let active = self.active.and_then(|i| self.jobs.get(i));
-        let mut body = div()
-            .flex()
-            .flex_col()
-            .gap_5()
-            .child(self.directory("Входная папка с базой", &self.input, 0, cx))
-            .child(self.directory("Папка SVG (если отличается от входной)", &self.svg, 1, cx))
-            .child(self.directory("Выходная папка", &self.output, 2, cx))
-            .child(
-                div().flex().gap_4().children([
-                    div()
-                        .flex_1()
-                        .flex()
-                        .flex_col()
-                        .gap_2()
-                        .child("Обработок одновременно")
-                        .child(Input::new(&self.concurrency).disabled(self.busy)),
-                    div()
-                        .flex_1()
-                        .flex()
-                        .flex_col()
-                        .gap_2()
-                        .child("Совпадение в имени файла")
-                        .child(Input::new(&self.filter).disabled(self.busy)),
-                    div()
-                        .flex_1()
-                        .flex()
-                        .flex_col()
-                        .gap_2()
-                        .child("Лимит кадров")
-                        .child(Input::new(&self.limit).disabled(self.busy)),
-                ]),
-            )
-            .child(
-                div()
-                    .flex()
-                    .gap_3()
-                    .child(
-                        Button::new("prepare")
-                            .label("Подготовить базу данных")
-                            .disabled(self.busy)
-                            .on_click(cx.listener(|app, _, _, cx| app.start(true, cx))),
-                    )
-                    .child(
-                        Button::new("convert")
-                            .primary()
-                            .label(if self.busy {
-                                "Обработка…"
-                            } else {
-                                "Запустить обработку"
-                            })
-                            .disabled(self.busy)
-                            .on_click(cx.listener(|app, _, _, cx| app.start(false, cx))),
-                    ),
-            )
-            .child(div().h(px(1.0)).bg(theme.border));
-        if let Some(job) = active {
-            let total = job.total.max(1) as f32;
-            body = body.child(
-                div()
-                    .flex()
-                    .flex_col()
-                    .gap_2()
-                    .child(format!(
-                        "{} · {}/{} · успешно {} · ошибок {}",
-                        job.status, job.completed, job.total, job.success, job.failed
-                    ))
-                    .child(
-                        div()
-                            .flex()
-                            .h(px(10.0))
-                            .w_full()
-                            .bg(theme.muted)
-                            .rounded_md()
-                            .child(
-                                div()
-                                    .h_full()
-                                    .w(relative(job.success as f32 / total))
-                                    .bg(rgb(0x29966c)),
-                            )
-                            .child(
-                                div()
-                                    .h_full()
-                                    .w(relative(job.failed as f32 / total))
-                                    .bg(rgb(0xd62828)),
-                            ),
-                    )
-                    .children(job.result.as_ref().map(|r| div().child(r.summary.clone())))
-                    .children(
-                        job.error
-                            .as_ref()
-                            .map(|e| div().text_color(rgb(0xd62828)).child(e.clone())),
-                    )
-                    .child(
-                        div()
-                            .id("logs")
-                            .max_h(px(200.0))
-                            .overflow_y_scroll()
-                            .p_3()
-                            .bg(theme.muted)
-                            .text_sm()
-                            .children(
-                                job.logs
-                                    .iter()
-                                    .rev()
-                                    .take(80)
-                                    .map(|line| div().child(line.clone())),
-                            ),
-                    ),
-            );
+    fn reveal(&mut self, path: PathBuf, cx: &mut Context<Self>) {
+        if path.exists() {
+            cx.reveal_path(&path);
+        } else {
+            self.error(format!("Файл или папка не найдены: {}", path.display()), cx);
         }
-        body.child(div().text_lg().child("История обработок"))
-            .children(self.jobs.iter().enumerate().rev().map(|(i, job)| {
-                Button::new(("job", i))
-                    .label(format!(
-                        "{} · {} · {}",
-                        job.id,
-                        job.status,
-                        job.options.input_dir.display()
-                    ))
-                    .on_click(cx.listener(move |app, _, _, cx| {
-                        app.active = Some(i);
-                        cx.notify();
-                    }))
-            }))
-    }
-
-    fn search_tab(&self, cx: &Context<Self>) -> impl IntoElement {
-        let query = Self::value(&self.query, cx);
-        let suggestions = self
-            .index
-            .as_ref()
-            .map(|i| i.submodels(&query))
-            .unwrap_or_default();
-        let pages = self.results.len().div_ceil(20).max(1);
-        let mut body = div()
-            .flex()
-            .flex_col()
-            .gap_4()
-            .child("Поиск по подмодели")
-            .child(
-                self.index
-                    .as_ref()
-                    .map(|i| {
-                        format!(
-                            "Индекс готов: {} записей, {} подмоделей",
-                            i.records.len(),
-                            i.submodels("").len()
-                        )
-                    })
-                    .unwrap_or("Запустите обработку для создания индекса поиска".into()),
-            )
-            .child(
-                div()
-                    .flex()
-                    .gap_3()
-                    .child(div().flex_1().child(Input::new(&self.query)))
-                    .child(
-                        Button::new("search")
-                            .primary()
-                            .label("Показать видеокадры")
-                            .on_click(cx.listener(|app, _, _, cx| app.search(cx))),
-                    ),
-            )
-            .child(
-                div().flex().flex_wrap().gap_2().children(
-                    suggestions
-                        .into_iter()
-                        .take(12)
-                        .enumerate()
-                        .map(|(i, (name, count))| {
-                            Button::new(("suggestion", i))
-                                .label(format!("{name} ({count})"))
-                                .on_click(cx.listener(move |app, _, window, cx| {
-                                    app.query.update(cx, |input, cx| {
-                                        input.set_value(name.clone(), window, cx)
-                                    });
-                                    app.search(cx);
-                                }))
-                        }),
-                ),
-            )
-            .child(
-                div()
-                    .flex()
-                    .gap_3()
-                    .py_2()
-                    .border_b_1()
-                    .border_color(cx.theme().border)
-                    .child(div().w(px(200.0)).child("Видеокадр"))
-                    .child(div().w(px(80.0)).child("№"))
-                    .child(div().w(px(220.0)).child("KKS"))
-                    .child(div().flex_1().child("Описание")),
-            );
-        for record in self.results.iter().skip(self.page * 20).take(20) {
-            body = body.child(
-                div()
-                    .flex()
-                    .gap_3()
-                    .py_2()
-                    .border_b_1()
-                    .border_color(cx.theme().border)
-                    .child(div().w(px(200.0)).child(record.frame_name.clone()))
-                    .child(div().w(px(80.0)).child(record.marker_index.to_string()))
-                    .child(
-                        div()
-                            .w(px(220.0))
-                            .child(record.kks.clone().unwrap_or(record.title.clone())),
-                    )
-                    .child(
-                        div()
-                            .flex_1()
-                            .child(record.description.clone().unwrap_or("—".into())),
-                    ),
-            );
-        }
-        if self.results.is_empty() {
-            body = body.child("Совпадений нет. Выберите подмодель и выполните поиск.");
-        }
-        body.child(
-            div()
-                .flex()
-                .gap_3()
-                .items_center()
-                .child(
-                    Button::new("previous")
-                        .label("Назад")
-                        .disabled(self.page == 0)
-                        .on_click(cx.listener(|app, _, _, cx| {
-                            app.page = app.page.saturating_sub(1);
-                            cx.notify();
-                        })),
-                )
-                .child(format!(
-                    "Страница {} из {pages} · {} записей",
-                    self.page + 1,
-                    self.results.len()
-                ))
-                .child(
-                    Button::new("next")
-                        .label("Вперёд")
-                        .disabled(self.page + 1 >= pages)
-                        .on_click(cx.listener(|app, _, _, cx| {
-                            app.page += 1;
-                            cx.notify();
-                        })),
-                ),
-        )
     }
 }
-
+impl Focusable for Desktop {
+    fn focus_handle(&self, _cx: &App) -> FocusHandle {
+        self.focus.clone()
+    }
+}
 impl Render for Desktop {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let background = cx.theme().background;
-        let foreground = cx.theme().foreground;
-        div()
-            .id("desktop")
-            .size_full()
-            .overflow_y_scroll()
-            .bg(background)
-            .text_color(foreground)
-            .p_6()
-            .child(
-                div()
-                    .max_w(px(1200.0))
-                    .mx_auto()
-                    .flex()
-                    .flex_col()
-                    .gap_6()
-                    .child(
-                        div()
-                            .flex()
-                            .items_center()
-                            .gap_3()
-                            .child(div().text_2xl().flex_1().child("npp_to_docx"))
-                            .child(Button::new("home").label("Главная").on_click(cx.listener(
-                                |app, _, _, cx| {
-                                    app.tab = 0;
-                                    cx.notify();
-                                },
-                            )))
-                            .child(
-                                Button::new("search-tab")
-                                    .label("Поиск")
-                                    .on_click(cx.listener(|app, _, _, cx| {
-                                        app.tab = 1;
-                                        app.reload_search(cx);
-                                        cx.notify();
-                                    })),
-                            )
-                            .child(
-                                Button::new("theme")
-                                    .label(if self.settings.dark {
-                                        "Светлая тема"
-                                    } else {
-                                        "Тёмная тема"
-                                    })
-                                    .on_click(cx.listener(|app, _, window, cx| {
-                                        app.settings.dark = !app.settings.dark;
-                                        Theme::change(
-                                            if app.settings.dark {
-                                                ThemeMode::Dark
-                                            } else {
-                                                ThemeMode::Light
-                                            },
-                                            Some(window),
-                                            cx,
-                                        );
-                                        if let Err(error) = app.persist(cx) {
-                                            app.message = error.to_string();
-                                        }
-                                        cx.notify();
-                                    })),
-                            ),
-                    )
-                    .children(
-                        (!self.message.is_empty())
-                            .then(|| div().p_3().bg(cx.theme().muted).child(self.message.clone())),
-                    )
-                    .child(if self.tab == 0 {
-                        self.home(cx).into_any_element()
-                    } else {
-                        self.search_tab(cx).into_any_element()
-                    }),
-            )
+        self.shell(cx)
     }
 }
-
 pub fn run() -> Result<()> {
-    Application::new().run(|cx| {
-        gpui_component::init(cx);
-        let bounds = Bounds::centered(None, size(px(1100.0), px(850.0)), cx);
-        let result = cx.open_window(
-            WindowOptions {
-                window_bounds: Some(WindowBounds::Windowed(bounds)),
-                window_min_size: Some(size(px(800.0), px(600.0))),
-                titlebar: Some(TitlebarOptions {
-                    title: Some("NppToDocx".into()),
+    Application::new()
+        .with_assets(crate::assets::Assets)
+        .run(|cx| {
+            gpui_component::init(cx);
+            gpui_component::set_locale("ru");
+            let primary = if cfg!(target_os = "macos") {
+                "cmd"
+            } else {
+                "ctrl"
+            };
+            cx.bind_keys([
+                KeyBinding::new(&format!("{primary}-1"), CreatePassports, Some("Desktop")),
+                KeyBinding::new(&format!("{primary}-2"), FindFrame, Some("Desktop")),
+                KeyBinding::new(&format!("{primary}-3"), ShowRuns, Some("Desktop")),
+            ]);
+            let bounds = Bounds::centered(None, size(px(1240.0), px(820.0)), cx);
+            let result = cx.open_window(
+                WindowOptions {
+                    window_bounds: Some(WindowBounds::Windowed(bounds)),
+                    window_min_size: Some(size(px(1020.0), px(680.0))),
+                    titlebar: Some(TitlebarOptions {
+                        title: Some("Паспорта кадров".into()),
+                        ..Default::default()
+                    }),
                     ..Default::default()
-                }),
-                ..Default::default()
-            },
-            |window, cx| {
-                let view = cx.new(|cx| Desktop::new(window, cx));
-                cx.new(|cx| Root::new(view, window, cx))
-            },
-        );
-        if let Err(error) = result {
-            eprintln!("Не удалось открыть окно: {error:#}");
-            cx.quit();
-        }
-        cx.on_window_closed(|cx| {
-            if cx.windows().is_empty() {
+                },
+                |window, cx| {
+                    let view = cx.new(|cx| Desktop::new(window, cx));
+                    view.read(cx).focus_handle(cx).focus(window);
+                    cx.new(|cx| Root::new(view, window, cx))
+                },
+            );
+            if let Err(error) = result {
+                eprintln!("Не удалось открыть окно: {error:#}");
                 cx.quit();
             }
-        })
-        .detach();
-        cx.activate(true);
-    });
+            cx.on_window_closed(|cx| {
+                if cx.windows().is_empty() {
+                    cx.quit();
+                }
+            })
+            .detach();
+            cx.activate(true);
+        });
     Ok(())
 }

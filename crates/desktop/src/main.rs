@@ -1,3 +1,5 @@
+mod assets;
+mod theme;
 mod ui;
 
 fn main() -> anyhow::Result<()> {
