@@ -3863,6 +3863,7 @@ dependencies = [
  "directories",
  "gpui",
  "gpui-component",
+ "libc",
  "npp-core",
  "serde",
  "serde_json",
