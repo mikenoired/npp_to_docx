@@ -47,7 +47,7 @@ def reports(directory):
     return json.loads((directory / "passport-report.json").read_text())
 
 
-def compare(reference, candidate, raster=False):
+def compare(reference, candidate, raster=False, max_raster_mae=10.0):
     expected = {p.name for p in reference.glob("*.docx")}
     actual = {p.name for p in candidate.glob("*.docx")}
     differences = []
@@ -83,8 +83,12 @@ def compare(reference, candidate, raster=False):
             stat = ImageStat.Stat(diff)
             metrics.append({"file": name, "mean_absolute_channel_error": statistics.mean(stat.mean),
                             "rms_channel_error": statistics.mean(stat.rms)})
+    raster_failures = [m for m in metrics if m["mean_absolute_channel_error"] > max_raster_mae]
     return {"semantic_pass": not differences, "docx_count": len(expected), "differences": differences,
+            "raster_pass": not raster_failures if raster else None,
             "raster": {"checked": len(metrics), "pixel_equality_required": False,
+                "max_allowed_per_image_mae": max_raster_mae,
+                "failures": raster_failures,
                 "mean_absolute_channel_error": statistics.mean(m["mean_absolute_channel_error"] for m in metrics) if metrics else None,
                 "worst": sorted(metrics,key=lambda m:m["mean_absolute_channel_error"],reverse=True)[:15]}}
 
@@ -94,11 +98,12 @@ if __name__ == "__main__":
     parser.add_argument("reference", type=Path)
     parser.add_argument("candidate", type=Path)
     parser.add_argument("--raster", action="store_true")
+    parser.add_argument("--max-raster-mae", type=float, default=10.0)
     parser.add_argument("--report", type=Path, default=Path("output/parity.json"))
     args = parser.parse_args()
-    result = compare(args.reference,args.candidate,args.raster)
+    result = compare(args.reference,args.candidate,args.raster,args.max_raster_mae)
     args.report.parent.mkdir(parents=True,exist_ok=True)
     args.report.write_text(json.dumps(result,ensure_ascii=False,indent=2))
     print(json.dumps({key: value for key,value in result.items() if key != "differences"},indent=2))
     print(f"Differences: {len(result['differences'])}. Report: {args.report}")
-    raise SystemExit(0 if result["semantic_pass"] else 1)
+    raise SystemExit(0 if result["semantic_pass"] and result["raster_pass"] is not False else 1)

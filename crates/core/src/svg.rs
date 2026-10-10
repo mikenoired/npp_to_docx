@@ -322,6 +322,7 @@ pub fn prepare_resources(content: &str, path: &Path) -> (String, Vec<String>) {
             if let Some(data) = data {
                 if lower.ends_with(".svg") {
                     let text = utf8_xml(&decode(&data).0);
+                    let text = normalize_paints(&text).unwrap_or(text);
                     let external = IMAGE.captures_iter(&text).any(|image| {
                         HREF.captures(&image[0]).is_some_and(|h| {
                             !h.get(1).or(h.get(2)).unwrap().as_str().starts_with("data:")
@@ -366,10 +367,76 @@ pub struct Renderer {
     options: usvg::Options<'static>,
 }
 
+// RtSvg exports symbolic palette names such as Col_Grey2 as SVG paint values.
+// librsvg ignores those invalid declarations and inherits the parent's paint;
+// usvg instead substitutes black. Remove invalid presentation attributes so
+// diagrams retain the reference renderer's inheritance behavior.
+fn normalize_paints(content: &str) -> Result<String> {
+    let mut reader = Reader::from_str(content);
+    let mut writer = Writer::new(Vec::new());
+    loop {
+        match reader.read_event()? {
+            event @ (Event::Start(_) | Event::Empty(_)) => {
+                let (tag, empty) = match event {
+                    Event::Start(tag) => (tag, false),
+                    Event::Empty(tag) => (tag, true),
+                    _ => unreachable!(),
+                };
+                let mut normalized = BytesStart::from_content(
+                    String::from_utf8_lossy(tag.as_ref()).into_owned(),
+                    tag.name().as_ref().len(),
+                );
+                normalized.clear_attributes();
+                for attr in tag.attributes().with_checks(false) {
+                    let attr = attr?;
+                    let raw = String::from_utf8_lossy(&attr.value);
+                    let value = quick_xml::escape::unescape(&raw).unwrap_or_else(|_| raw.clone());
+                    let key = attr.key.as_ref();
+                    let wide = matches!(
+                        value.as_ref(),
+                        "inherit"
+                            | "initial"
+                            | "unset"
+                            | "revert"
+                            | "revert-layer"
+                            | "currentColor"
+                    );
+                    let invalid = !wide
+                        && if key.eq_ignore_ascii_case(b"fill")
+                            || key.eq_ignore_ascii_case(b"stroke")
+                        {
+                            svgtypes::Paint::from_str(&value).is_err()
+                        } else if key.eq_ignore_ascii_case(b"color") {
+                            value.parse::<svgtypes::Color>().is_err()
+                        } else {
+                            false
+                        };
+                    if !invalid {
+                        normalized.push_attribute(attr);
+                    }
+                }
+                writer.write_event(if empty {
+                    Event::Empty(normalized)
+                } else {
+                    Event::Start(normalized)
+                })?;
+            }
+            Event::Eof => break,
+            event => writer.write_event(event)?,
+        }
+    }
+    Ok(String::from_utf8(writer.into_inner())?)
+}
+
 // resvg rasterizes each SVG image into a full-size intermediate surface. The
 // repeated missing-resource symbol is equivalent to a nested vector viewport,
 // so inline it rather than allocating a surface for every absent submodel.
 fn inline_placeholders(content: &str) -> Result<String> {
+    // Renaming image to svg could change type selectors in a stylesheet.
+    // Retain the original representation whenever a stylesheet is present.
+    if content.to_ascii_lowercase().contains("<style") {
+        return Ok(content.to_string());
+    }
     let uri = format!("data:image/svg+xml;base64,{}", STANDARD.encode(PLACEHOLDER));
     let shapes = PLACEHOLDER
         .split_once('>')
@@ -458,7 +525,8 @@ impl Default for Renderer {
 
 impl Renderer {
     pub fn render(&self, content: &str, parsed: &Parsed) -> Result<(Vec<u8>, u32, u32)> {
-        let content = inline_placeholders(content)?;
+        let content = normalize_paints(content)?;
+        let content = inline_placeholders(&content)?;
         let tree = usvg::Tree::from_str(&content, &self.options)
             .context("Не удалось разобрать SVG для отрисовки")?;
         let size = tree.size().to_int_size();
@@ -528,6 +596,32 @@ impl Renderer {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn symbolic_palette_names_inherit_instead_of_covering_text() -> Result<()> {
+        let svg = r#"<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" fill="none" stroke="black"><rect x="10" y="10" width="50" height="30" fill="Col_Grey2"/><g stroke="Col_Red"><line x1="70" y1="10" x2="70" y2="50"/></g></svg>"#;
+        let normalized = normalize_paints(svg)?;
+        assert!(!normalized.contains("Col_Grey2"));
+        let tree = usvg::Tree::from_str(&normalized, &usvg::Options::default())?;
+        let mut image = tiny_skia::Pixmap::new(100, 60).unwrap();
+        resvg::render(&tree, tiny_skia::Transform::identity(), &mut image.as_mut());
+        assert_eq!(image.pixel(30, 30).unwrap().alpha(), 0);
+        assert!(image.pixel(10, 20).unwrap().alpha() > 0);
+        assert!(image.pixel(70, 30).unwrap().alpha() > 0);
+        Ok(())
+    }
+    #[test]
+    fn image_stylesheets_keep_the_original_element_type() -> Result<()> {
+        let uri = format!("data:image/svg+xml;base64,{}", STANDARD.encode(PLACEHOLDER));
+        let source = format!(
+            r#"<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60"><style>image {{ display:none }}</style><image x="10" y="10" width="50" height="30" href="{uri}"/></svg>"#
+        );
+        let prepared = inline_placeholders(&normalize_paints(&source)?)?;
+        let tree = usvg::Tree::from_str(&prepared, &usvg::Options::default())?;
+        let mut image = tiny_skia::Pixmap::new(100, 60).unwrap();
+        resvg::render(&tree, tiny_skia::Transform::identity(), &mut image.as_mut());
+        assert_eq!(image.pixel(30, 30).unwrap().alpha(), 0);
+        Ok(())
+    }
     #[test]
     fn placeholder_viewport_preserves_aspect_ratio_and_transform() -> Result<()> {
         let uri = format!("data:image/svg+xml;base64,{}", STANDARD.encode(PLACEHOLDER));
