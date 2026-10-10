@@ -40,11 +40,11 @@ def document(path):
 
 def records(directory):
     data = json.loads((directory / "search-index.json").read_text())
-    return sorted(data["records"], key=lambda r: (r["frameName"], r["markerIndex"]))
+    return data["records"]
 
 
 def reports(directory):
-    return sorted(json.loads((directory / "passport-report.json").read_text()), key=lambda r: r["frame"])
+    return json.loads((directory / "passport-report.json").read_text())
 
 
 def compare(reference, candidate, raster=False):
