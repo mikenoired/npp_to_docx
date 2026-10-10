@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "timestamp": "2026-10-10T17:11:53.503558+03:00",
+  "timestamp": "2026-10-10T16:13:39.656187+03:00",
   "electron_source_commit": "fef9860c816f796c26442c68218461cf375eaa38",
-  "rust_source_commit": "73042f8859de0a93acf86b95e7b1a8c30d2ba1f1",
+  "rust_source_commit": "aee328b161842f160ed2998213252a6b87839d00",
   "dataset": {
     "sha256": "791daba1016a07b479bc4096b562829ebc93eed6c06f3af88f349e1e7e2986e4",
     "files": 1412,
@@ -29,27 +29,27 @@
     "rust": "Native release executable, CLI mode"
   },
   "electron": {
-    "conversion_ms": 87817.517875,
-    "conversion_rss_bytes": 925515776,
+    "conversion_ms": 81561.50979200001,
+    "conversion_rss_bytes": 1206370304,
     "application_bytes": 335370079,
     "build_clean_ms": 2952.5668339999997,
     "build_warm_ms": 1872.256834,
     "docx_bytes": 224281978
   },
   "rust": {
-    "conversion_ms": 46256.540583,
-    "conversion_rss_bytes": 189562880,
-    "application_bytes": 15566258,
+    "conversion_ms": 101093.03408299999,
+    "conversion_rss_bytes": 167739392,
+    "application_bytes": 15549442,
     "build_clean_ms": 196225.085208,
-    "build_warm_ms": 400.787625,
+    "build_warm_ms": 550.4158750000001,
     "docx_bytes": 237330066
   },
   "changes_percent": {
-    "conversion_ms": -47.3265224270608,
-    "conversion_rss_bytes": -79.51813627431889,
-    "application_bytes": -95.35848336666909,
+    "conversion_ms": 23.94698717668384,
+    "conversion_rss_bytes": -86.09553041517839,
+    "application_bytes": -95.36349752894921,
     "build_clean_ms": 6545.915105066848,
-    "build_warm_ms": -78.59334159065486,
+    "build_warm_ms": -70.60147598318234,
     "docx_bytes": 5.817715768495679
   },
   "validation": {
@@ -65,455 +65,452 @@
   },
   "ci": {
     "conclusion": "success",
-    "createdAt": "2026-10-10T13:53:37Z",
-    "databaseId": 38057475644,
-    "headSha": "73042f8859de0a93acf86b95e7b1a8c30d2ba1f1",
+    "headSha": "aee328b161842f160ed2998213252a6b87839d00",
     "jobs": [
       {
-        "completedAt": "2026-10-10T14:04:42Z",
+        "completedAt": "2026-10-10T13:06:01Z",
         "conclusion": "success",
-        "databaseId": 114228799006,
+        "databaseId": 114219184036,
         "name": "build (macos-latest)",
-        "startedAt": "2026-10-10T13:53:45Z",
+        "startedAt": "2026-10-10T13:02:34Z",
         "status": "completed",
         "steps": [
           {
-            "completedAt": "2026-10-10T13:53:48Z",
+            "completedAt": "2026-10-10T13:02:37Z",
             "conclusion": "success",
             "name": "Set up job",
             "number": 1,
-            "startedAt": "2026-10-10T13:53:46Z",
+            "startedAt": "2026-10-10T13:02:35Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T13:53:50Z",
+            "completedAt": "2026-10-10T13:02:39Z",
             "conclusion": "success",
             "name": "Run actions/checkout@v4",
             "number": 2,
-            "startedAt": "2026-10-10T13:53:48Z",
+            "startedAt": "2026-10-10T13:02:37Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T13:53:58Z",
+            "completedAt": "2026-10-10T13:02:48Z",
             "conclusion": "success",
             "name": "Run dtolnay/rust-toolchain@stable",
             "number": 3,
-            "startedAt": "2026-10-10T13:53:50Z",
+            "startedAt": "2026-10-10T13:02:39Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T13:53:59Z",
+            "completedAt": "2026-10-10T13:03:39Z",
             "conclusion": "success",
             "name": "Run Swatinem/rust-cache@v2",
             "number": 4,
-            "startedAt": "2026-10-10T13:53:58Z",
+            "startedAt": "2026-10-10T13:02:48Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T13:53:59Z",
+            "completedAt": "2026-10-10T13:03:39Z",
             "conclusion": "skipped",
             "name": "Linux desktop dependencies",
             "number": 5,
-            "startedAt": "2026-10-10T13:53:59Z",
+            "startedAt": "2026-10-10T13:03:39Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T13:53:59Z",
+            "completedAt": "2026-10-10T13:03:39Z",
             "conclusion": "skipped",
             "name": "Windows clang",
             "number": 6,
-            "startedAt": "2026-10-10T13:53:59Z",
+            "startedAt": "2026-10-10T13:03:39Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T13:53:59Z",
+            "completedAt": "2026-10-10T13:03:40Z",
             "conclusion": "success",
             "name": "Run cargo fmt --all --check",
             "number": 7,
-            "startedAt": "2026-10-10T13:53:59Z",
+            "startedAt": "2026-10-10T13:03:39Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T13:55:49Z",
+            "completedAt": "2026-10-10T13:03:56Z",
             "conclusion": "success",
             "name": "Run cargo clippy --locked --workspace --all-targets -- -D warnings",
             "number": 8,
-            "startedAt": "2026-10-10T13:53:59Z",
+            "startedAt": "2026-10-10T13:03:40Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T13:58:19Z",
+            "completedAt": "2026-10-10T13:04:11Z",
             "conclusion": "success",
             "name": "Run cargo test --locked --workspace",
             "number": 9,
-            "startedAt": "2026-10-10T13:55:49Z",
+            "startedAt": "2026-10-10T13:03:56Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:03:31Z",
+            "completedAt": "2026-10-10T13:05:52Z",
             "conclusion": "success",
             "name": "Run cargo build --release --locked --workspace",
             "number": 10,
-            "startedAt": "2026-10-10T13:58:19Z",
+            "startedAt": "2026-10-10T13:04:11Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:03:32Z",
+            "completedAt": "2026-10-10T13:05:53Z",
             "conclusion": "success",
             "name": "Run actions/setup-python@v5",
             "number": 11,
-            "startedAt": "2026-10-10T14:03:31Z",
+            "startedAt": "2026-10-10T13:05:52Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:03:34Z",
+            "completedAt": "2026-10-10T13:05:54Z",
             "conclusion": "success",
             "name": "Run python scripts/package.py",
             "number": 12,
-            "startedAt": "2026-10-10T14:03:32Z",
+            "startedAt": "2026-10-10T13:05:53Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:03:36Z",
+            "completedAt": "2026-10-10T13:05:57Z",
             "conclusion": "success",
             "name": "Run actions/upload-artifact@v4",
             "number": 13,
-            "startedAt": "2026-10-10T14:03:34Z",
+            "startedAt": "2026-10-10T13:05:54Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:03:37Z",
+            "completedAt": "2026-10-10T13:05:57Z",
             "conclusion": "success",
             "name": "Post Run actions/setup-python@v5",
             "number": 24,
-            "startedAt": "2026-10-10T14:03:36Z",
+            "startedAt": "2026-10-10T13:05:57Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:04:37Z",
+            "completedAt": "2026-10-10T13:05:57Z",
             "conclusion": "success",
             "name": "Post Run Swatinem/rust-cache@v2",
             "number": 25,
-            "startedAt": "2026-10-10T14:03:37Z",
+            "startedAt": "2026-10-10T13:05:57Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:04:38Z",
+            "completedAt": "2026-10-10T13:05:58Z",
             "conclusion": "success",
             "name": "Post Run actions/checkout@v4",
             "number": 26,
-            "startedAt": "2026-10-10T14:04:37Z",
+            "startedAt": "2026-10-10T13:05:57Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:04:41Z",
+            "completedAt": "2026-10-10T13:05:59Z",
             "conclusion": "success",
             "name": "Complete job",
             "number": 27,
-            "startedAt": "2026-10-10T14:04:38Z",
+            "startedAt": "2026-10-10T13:05:58Z",
             "status": "completed"
           }
         ],
-        "url": "https://github.com/mikenoired/npp_to_docx/actions/runs/38057475644/job/114228799006"
+        "url": "https://github.com/mikenoired/npp_to_docx/actions/runs/38054194643/job/114219184036"
       },
       {
-        "completedAt": "2026-10-10T14:02:41Z",
+        "completedAt": "2026-10-10T13:07:06Z",
         "conclusion": "success",
-        "databaseId": 114228799048,
-        "name": "build (ubuntu-24.04)",
-        "startedAt": "2026-10-10T13:53:41Z",
-        "status": "completed",
-        "steps": [
-          {
-            "completedAt": "2026-10-10T13:53:43Z",
-            "conclusion": "success",
-            "name": "Set up job",
-            "number": 1,
-            "startedAt": "2026-10-10T13:53:41Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T13:53:44Z",
-            "conclusion": "success",
-            "name": "Run actions/checkout@v4",
-            "number": 2,
-            "startedAt": "2026-10-10T13:53:43Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T13:53:46Z",
-            "conclusion": "success",
-            "name": "Run dtolnay/rust-toolchain@stable",
-            "number": 3,
-            "startedAt": "2026-10-10T13:53:44Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T13:53:46Z",
-            "conclusion": "success",
-            "name": "Run Swatinem/rust-cache@v2",
-            "number": 4,
-            "startedAt": "2026-10-10T13:53:46Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T13:54:07Z",
-            "conclusion": "success",
-            "name": "Linux desktop dependencies",
-            "number": 5,
-            "startedAt": "2026-10-10T13:53:46Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T13:54:07Z",
-            "conclusion": "skipped",
-            "name": "Windows clang",
-            "number": 6,
-            "startedAt": "2026-10-10T13:54:07Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T13:54:08Z",
-            "conclusion": "success",
-            "name": "Run cargo fmt --all --check",
-            "number": 7,
-            "startedAt": "2026-10-10T13:54:07Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T13:55:41Z",
-            "conclusion": "success",
-            "name": "Run cargo clippy --locked --workspace --all-targets -- -D warnings",
-            "number": 8,
-            "startedAt": "2026-10-10T13:54:08Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T13:57:45Z",
-            "conclusion": "success",
-            "name": "Run cargo test --locked --workspace",
-            "number": 9,
-            "startedAt": "2026-10-10T13:55:41Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T14:02:12Z",
-            "conclusion": "success",
-            "name": "Run cargo build --release --locked --workspace",
-            "number": 10,
-            "startedAt": "2026-10-10T13:57:45Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T14:02:13Z",
-            "conclusion": "success",
-            "name": "Run actions/setup-python@v5",
-            "number": 11,
-            "startedAt": "2026-10-10T14:02:12Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T14:02:16Z",
-            "conclusion": "success",
-            "name": "Run python scripts/package.py",
-            "number": 12,
-            "startedAt": "2026-10-10T14:02:13Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T14:02:18Z",
-            "conclusion": "success",
-            "name": "Run actions/upload-artifact@v4",
-            "number": 13,
-            "startedAt": "2026-10-10T14:02:16Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T14:02:18Z",
-            "conclusion": "success",
-            "name": "Post Run actions/setup-python@v5",
-            "number": 24,
-            "startedAt": "2026-10-10T14:02:18Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T14:02:40Z",
-            "conclusion": "success",
-            "name": "Post Run Swatinem/rust-cache@v2",
-            "number": 25,
-            "startedAt": "2026-10-10T14:02:18Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T14:02:40Z",
-            "conclusion": "success",
-            "name": "Post Run actions/checkout@v4",
-            "number": 26,
-            "startedAt": "2026-10-10T14:02:40Z",
-            "status": "completed"
-          },
-          {
-            "completedAt": "2026-10-10T14:02:40Z",
-            "conclusion": "success",
-            "name": "Complete job",
-            "number": 27,
-            "startedAt": "2026-10-10T14:02:40Z",
-            "status": "completed"
-          }
-        ],
-        "url": "https://github.com/mikenoired/npp_to_docx/actions/runs/38057475644/job/114228799048"
-      },
-      {
-        "completedAt": "2026-10-10T14:10:37Z",
-        "conclusion": "success",
-        "databaseId": 114228799094,
+        "databaseId": 114219184226,
         "name": "build (windows-latest)",
-        "startedAt": "2026-10-10T13:53:41Z",
+        "startedAt": "2026-10-10T13:02:29Z",
         "status": "completed",
         "steps": [
           {
-            "completedAt": "2026-10-10T13:53:44Z",
+            "completedAt": "2026-10-10T13:02:31Z",
             "conclusion": "success",
             "name": "Set up job",
             "number": 1,
-            "startedAt": "2026-10-10T13:53:42Z",
+            "startedAt": "2026-10-10T13:02:29Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T13:53:51Z",
+            "completedAt": "2026-10-10T13:02:38Z",
             "conclusion": "success",
             "name": "Run actions/checkout@v4",
             "number": 2,
-            "startedAt": "2026-10-10T13:53:44Z",
+            "startedAt": "2026-10-10T13:02:31Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T13:54:11Z",
+            "completedAt": "2026-10-10T13:03:03Z",
             "conclusion": "success",
             "name": "Run dtolnay/rust-toolchain@stable",
             "number": 3,
-            "startedAt": "2026-10-10T13:53:51Z",
+            "startedAt": "2026-10-10T13:02:38Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T13:54:14Z",
+            "completedAt": "2026-10-10T13:04:00Z",
             "conclusion": "success",
             "name": "Run Swatinem/rust-cache@v2",
             "number": 4,
-            "startedAt": "2026-10-10T13:54:11Z",
+            "startedAt": "2026-10-10T13:03:03Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T13:54:14Z",
+            "completedAt": "2026-10-10T13:04:00Z",
             "conclusion": "skipped",
             "name": "Linux desktop dependencies",
             "number": 5,
-            "startedAt": "2026-10-10T13:54:14Z",
+            "startedAt": "2026-10-10T13:04:00Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T13:54:14Z",
+            "completedAt": "2026-10-10T13:04:00Z",
             "conclusion": "success",
             "name": "Windows clang",
             "number": 6,
-            "startedAt": "2026-10-10T13:54:14Z",
+            "startedAt": "2026-10-10T13:04:00Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T13:54:18Z",
+            "completedAt": "2026-10-10T13:04:01Z",
             "conclusion": "success",
             "name": "Run cargo fmt --all --check",
             "number": 7,
-            "startedAt": "2026-10-10T13:54:14Z",
+            "startedAt": "2026-10-10T13:04:00Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T13:57:30Z",
+            "completedAt": "2026-10-10T13:04:35Z",
             "conclusion": "success",
             "name": "Run cargo clippy --locked --workspace --all-targets -- -D warnings",
             "number": 8,
-            "startedAt": "2026-10-10T13:54:18Z",
+            "startedAt": "2026-10-10T13:04:01Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:01:19Z",
+            "completedAt": "2026-10-10T13:04:47Z",
             "conclusion": "success",
             "name": "Run cargo test --locked --workspace",
             "number": 9,
-            "startedAt": "2026-10-10T13:57:30Z",
+            "startedAt": "2026-10-10T13:04:35Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:09:37Z",
+            "completedAt": "2026-10-10T13:06:56Z",
             "conclusion": "success",
             "name": "Run cargo build --release --locked --workspace",
             "number": 10,
-            "startedAt": "2026-10-10T14:01:19Z",
+            "startedAt": "2026-10-10T13:04:47Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:09:37Z",
+            "completedAt": "2026-10-10T13:06:56Z",
             "conclusion": "success",
             "name": "Run actions/setup-python@v5",
             "number": 11,
-            "startedAt": "2026-10-10T14:09:37Z",
+            "startedAt": "2026-10-10T13:06:56Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:09:39Z",
+            "completedAt": "2026-10-10T13:07:00Z",
             "conclusion": "success",
             "name": "Run python scripts/package.py",
             "number": 12,
-            "startedAt": "2026-10-10T14:09:37Z",
+            "startedAt": "2026-10-10T13:06:56Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:09:41Z",
+            "completedAt": "2026-10-10T13:07:03Z",
             "conclusion": "success",
             "name": "Run actions/upload-artifact@v4",
             "number": 13,
-            "startedAt": "2026-10-10T14:09:39Z",
+            "startedAt": "2026-10-10T13:07:00Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:09:41Z",
+            "completedAt": "2026-10-10T13:07:03Z",
             "conclusion": "success",
             "name": "Post Run actions/setup-python@v5",
             "number": 24,
-            "startedAt": "2026-10-10T14:09:41Z",
+            "startedAt": "2026-10-10T13:07:03Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:10:33Z",
+            "completedAt": "2026-10-10T13:07:03Z",
             "conclusion": "success",
             "name": "Post Run Swatinem/rust-cache@v2",
             "number": 25,
-            "startedAt": "2026-10-10T14:09:41Z",
+            "startedAt": "2026-10-10T13:07:03Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:10:35Z",
+            "completedAt": "2026-10-10T13:07:05Z",
             "conclusion": "success",
             "name": "Post Run actions/checkout@v4",
             "number": 26,
-            "startedAt": "2026-10-10T14:10:33Z",
+            "startedAt": "2026-10-10T13:07:03Z",
             "status": "completed"
           },
           {
-            "completedAt": "2026-10-10T14:10:35Z",
+            "completedAt": "2026-10-10T13:07:05Z",
             "conclusion": "success",
             "name": "Complete job",
             "number": 27,
-            "startedAt": "2026-10-10T14:10:35Z",
+            "startedAt": "2026-10-10T13:07:05Z",
             "status": "completed"
           }
         ],
-        "url": "https://github.com/mikenoired/npp_to_docx/actions/runs/38057475644/job/114228799094"
+        "url": "https://github.com/mikenoired/npp_to_docx/actions/runs/38054194643/job/114219184226"
+      },
+      {
+        "completedAt": "2026-10-10T13:05:41Z",
+        "conclusion": "success",
+        "databaseId": 114219184231,
+        "name": "build (ubuntu-24.04)",
+        "startedAt": "2026-10-10T13:02:29Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-10T13:02:32Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-10T13:02:30Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:02:33Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-10-10T13:02:32Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:02:34Z",
+            "conclusion": "success",
+            "name": "Run dtolnay/rust-toolchain@stable",
+            "number": 3,
+            "startedAt": "2026-10-10T13:02:33Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:03:18Z",
+            "conclusion": "success",
+            "name": "Run Swatinem/rust-cache@v2",
+            "number": 4,
+            "startedAt": "2026-10-10T13:02:34Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:03:46Z",
+            "conclusion": "success",
+            "name": "Linux desktop dependencies",
+            "number": 5,
+            "startedAt": "2026-10-10T13:03:18Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:03:46Z",
+            "conclusion": "skipped",
+            "name": "Windows clang",
+            "number": 6,
+            "startedAt": "2026-10-10T13:03:46Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:03:47Z",
+            "conclusion": "success",
+            "name": "Run cargo fmt --all --check",
+            "number": 7,
+            "startedAt": "2026-10-10T13:03:46Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:03:55Z",
+            "conclusion": "success",
+            "name": "Run cargo clippy --locked --workspace --all-targets -- -D warnings",
+            "number": 8,
+            "startedAt": "2026-10-10T13:03:47Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:03:59Z",
+            "conclusion": "success",
+            "name": "Run cargo test --locked --workspace",
+            "number": 9,
+            "startedAt": "2026-10-10T13:03:55Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:05:32Z",
+            "conclusion": "success",
+            "name": "Run cargo build --release --locked --workspace",
+            "number": 10,
+            "startedAt": "2026-10-10T13:03:59Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:05:32Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 11,
+            "startedAt": "2026-10-10T13:05:32Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:05:36Z",
+            "conclusion": "success",
+            "name": "Run python scripts/package.py",
+            "number": 12,
+            "startedAt": "2026-10-10T13:05:32Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:05:38Z",
+            "conclusion": "success",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 13,
+            "startedAt": "2026-10-10T13:05:36Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:05:38Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 24,
+            "startedAt": "2026-10-10T13:05:38Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:05:38Z",
+            "conclusion": "success",
+            "name": "Post Run Swatinem/rust-cache@v2",
+            "number": 25,
+            "startedAt": "2026-10-10T13:05:38Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:05:38Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 26,
+            "startedAt": "2026-10-10T13:05:38Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-10T13:05:38Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 27,
+            "startedAt": "2026-10-10T13:05:38Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/mikenoired/npp_to_docx/actions/runs/38054194643/job/114219184231"
       }
     ],
     "status": "completed",
-    "updatedAt": "2026-10-10T14:10:37Z",
-    "url": "https://github.com/mikenoired/npp_to_docx/actions/runs/38057475644"
+    "url": "https://github.com/mikenoired/npp_to_docx/actions/runs/38054194643"
   },
   "notes": [
     "Three conversion runs per implementation, same prepared CSV files and concurrency=2.",
@@ -521,18 +518,6 @@
     "Clean Rust release build compiles third-party Rust dependencies; Electron uses prebuilt Electron and sharp distributions. Dependency installation is excluded.",
     "Warm build means a repeated command without source changes.",
     "Raster pixels are not identical: different renderers and font rasterizers. Every image must remain within the configured per-image tolerance; worst frames were visually inspected.",
-    "Rust macOS packaging creates app+ZIP; original Electron packaging created app+ZIP+DMG.",
-    "Clean build timings are the original migration measurements; conversion, packaging and warm Rust build were remeasured after font caching."
-  ],
-  "optimization": {
-    "previous_conversion_ms": 101093.03408299999,
-    "speedup_over_electron": 1.89848866275301,
-    "conversion_change_percent": -54.24359254563258,
-    "semantic_pass": true,
-    "pixel_identical_to_previous_rust": true,
-    "images_checked": 1410,
-    "png_bytes_identical_to_previous_rust": true,
-    "docx_bytes_identical_to_previous_rust": true,
-    "cause": "File-backed fonts were reopened and mapped per glyph. Selected font faces now share resident binary data within each batch."
-  }
+    "Rust macOS packaging creates app+ZIP; original Electron packaging created app+ZIP+DMG."
+  ]
 }

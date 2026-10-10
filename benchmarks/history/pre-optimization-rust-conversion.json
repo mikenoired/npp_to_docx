@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "implementation": "rust",
-  "commit": "73042f8859de0a93acf86b95e7b1a8c30d2ba1f1",
+  "commit": "aee328b161842f160ed2998213252a6b87839d00",
   "environment": {
     "os": "macOS-27.0.1-arm64-arm-64bit",
     "architecture": "arm64",
-    "timestamp": "2026-10-10T16:56:44.542869+03:00"
+    "timestamp": "2026-10-10T16:11:57.215754+03:00"
   },
   "metric": "conversion_prepared_csv",
   "command": [
@@ -14,34 +14,34 @@
     "--input",
     "input",
     "--output",
-    "output/rust-optimized",
+    "output/rust-reference",
     "--concurrency",
     "2",
     "--result-json",
-    "output/benchmarks/rust-optimized-result.json"
+    "output/benchmarks/rust-conversion-result.json"
   ],
   "samples": [
     {
-      "elapsed_ms": 46635.176625,
-      "peak_rss_bytes": 189562880,
+      "elapsed_ms": 121586.036458,
+      "peak_rss_bytes": 163774464,
       "exit_code": 0
     },
     {
-      "elapsed_ms": 46256.540583,
-      "peak_rss_bytes": 189317120,
+      "elapsed_ms": 101093.03408299999,
+      "peak_rss_bytes": 167739392,
       "exit_code": 0
     },
     {
-      "elapsed_ms": 44394.28120799999,
-      "peak_rss_bytes": 222691328,
+      "elapsed_ms": 99124.39804100001,
+      "peak_rss_bytes": 177995776,
       "exit_code": 0
     }
   ],
-  "median_elapsed_ms": 46256.540583,
-  "median_peak_rss_bytes": 189562880,
+  "median_elapsed_ms": 101093.03408299999,
+  "median_peak_rss_bytes": 167739392,
   "cwd": "/Users/mikevetkal/Documents/work/npp_to_docx",
-  "rust_source_sha256": "510857621a16e4fc394ffc53ef365097e66587a9d5dc8ff48dff40435e3bdd9f",
-  "source_commit": "73042f8859de0a93acf86b95e7b1a8c30d2ba1f1",
+  "rust_source_sha256": "900e359b185645f3b708cceade046569cd0079d88e42ea96d8d21414cac04fc5",
+  "source_commit": "aee328b161842f160ed2998213252a6b87839d00",
   "dataset": {
     "sha256": "791daba1016a07b479bc4096b562829ebc93eed6c06f3af88f349e1e7e2986e4",
     "files": 1412,

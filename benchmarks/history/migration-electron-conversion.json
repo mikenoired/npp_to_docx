@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "implementation": "electron",
-  "commit": "73042f8859de0a93acf86b95e7b1a8c30d2ba1f1",
+  "commit": "c853381134bf5e7bf98797fadb71d94862d32771",
   "environment": {
     "os": "macOS-27.0.1-arm64-arm-64bit",
     "architecture": "arm64",
-    "timestamp": "2026-10-10T17:02:19.173242+03:00"
+    "timestamp": "2026-10-10T15:25:55.217376+03:00"
   },
   "metric": "conversion_prepared_csv",
   "command": [
@@ -20,23 +20,23 @@
   ],
   "samples": [
     {
-      "elapsed_ms": 84944.81025000001,
-      "peak_rss_bytes": 834387968,
+      "elapsed_ms": 80355.387334,
+      "peak_rss_bytes": 1105330176,
       "exit_code": 0
     },
     {
-      "elapsed_ms": 87817.517875,
-      "peak_rss_bytes": 948420608,
+      "elapsed_ms": 81561.50979200001,
+      "peak_rss_bytes": 1244233728,
       "exit_code": 0
     },
     {
-      "elapsed_ms": 88350.439083,
-      "peak_rss_bytes": 925515776,
+      "elapsed_ms": 81973.57316700001,
+      "peak_rss_bytes": 1206370304,
       "exit_code": 0
     }
   ],
-  "median_elapsed_ms": 87817.517875,
-  "median_peak_rss_bytes": 925515776,
+  "median_elapsed_ms": 81561.50979200001,
+  "median_peak_rss_bytes": 1206370304,
   "cwd": "/Users/mikevetkal/Documents/work/npp_to_docx",
   "rust_source_sha256": null,
   "source_commit": "fef9860c816f796c26442c68218461cf375eaa38",
