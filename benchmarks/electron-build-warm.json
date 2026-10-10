@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "implementation": "electron",
+  "commit": "c853381134bf5e7bf98797fadb71d94862d32771",
+  "environment": {
+    "os": "macOS-27.0.1-arm64-arm-64bit",
+    "architecture": "arm64",
+    "timestamp": "2026-10-10T15:26:04.254277+03:00"
+  },
+  "metric": "build_warm_release",
+  "command": [
+    "npm",
+    "run",
+    "build"
+  ],
+  "samples": [
+    {
+      "elapsed_ms": 1872.256834,
+      "peak_rss_bytes": 405110784,
+      "exit_code": 0
+    },
+    {
+      "elapsed_ms": 1849.0926250000002,
+      "peak_rss_bytes": 405946368,
+      "exit_code": 0
+    },
+    {
+      "elapsed_ms": 1874.0069590000003,
+      "peak_rss_bytes": 413384704,
+      "exit_code": 0
+    }
+  ],
+  "median_elapsed_ms": 1872.256834,
+  "median_peak_rss_bytes": 405946368,
+  "cwd": "output/electron-baseline",
+  "rust_source_sha256": null,
+  "source_commit": "fef9860c816f796c26442c68218461cf375eaa38"
+}

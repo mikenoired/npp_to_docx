@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "implementation": "electron",
+  "commit": "c853381134bf5e7bf98797fadb71d94862d32771",
+  "environment": {
+    "os": "macOS-27.0.1-arm64-arm-64bit",
+    "architecture": "arm64",
+    "timestamp": "2026-10-10T15:25:55.217376+03:00"
+  },
+  "metric": "conversion_prepared_csv",
+  "command": [
+    "env",
+    "ELECTRON_RUN_AS_NODE=1",
+    "dist/mac-arm64/NppToDocx.app/Contents/MacOS/NppToDocx",
+    "scripts/electron_run.mjs",
+    "output/electron-baseline",
+    "input",
+    "output/electron-measurements",
+    "output/benchmarks/electron-runtime-result.json"
+  ],
+  "samples": [
+    {
+      "elapsed_ms": 80355.387334,
+      "peak_rss_bytes": 1105330176,
+      "exit_code": 0
+    },
+    {
+      "elapsed_ms": 81561.50979200001,
+      "peak_rss_bytes": 1244233728,
+      "exit_code": 0
+    },
+    {
+      "elapsed_ms": 81973.57316700001,
+      "peak_rss_bytes": 1206370304,
+      "exit_code": 0
+    }
+  ],
+  "median_elapsed_ms": 81561.50979200001,
+  "median_peak_rss_bytes": 1206370304,
+  "cwd": "/Users/mikevetkal/Documents/work/npp_to_docx",
+  "rust_source_sha256": null,
+  "source_commit": "fef9860c816f796c26442c68218461cf375eaa38",
+  "dataset": {
+    "sha256": "791daba1016a07b479bc4096b562829ebc93eed6c06f3af88f349e1e7e2986e4",
+    "files": 1412,
+    "svg_count": 1410,
+    "concurrency": 2,
+    "prepared_csv": true
+  }
+}
