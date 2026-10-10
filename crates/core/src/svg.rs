@@ -515,6 +515,36 @@ fn inline_placeholders(content: &str) -> Result<String> {
     Ok(String::from_utf8(writer.into_inner())?)
 }
 
+// Keep only fonts actually selected by a document in memory. File-backed
+// fontdb faces otherwise reopen and mmap the font for every glyph outline.
+// The shared database grows additively, so IDs in existing trees remain valid.
+struct FontCache {
+    database: std::sync::Arc<usvg::fontdb::Database>,
+    selected: std::collections::HashMap<usvg::Font, Option<usvg::fontdb::ID>>,
+    resident: std::collections::HashMap<usvg::fontdb::ID, usvg::fontdb::ID>,
+}
+
+impl FontCache {
+    fn make_resident(&mut self, id: usvg::fontdb::ID) -> usvg::fontdb::ID {
+        if let Some(resident) = self.resident.get(&id) {
+            return *resident;
+        }
+        let Some(mut face) = self.database.face(id).cloned() else {
+            return id;
+        };
+        let usvg::fontdb::Source::File(path) = &face.source else {
+            return id;
+        };
+        let Ok(bytes) = std::fs::read(path) else {
+            return id;
+        };
+        face.source = usvg::fontdb::Source::Binary(std::sync::Arc::new(bytes));
+        let resident = std::sync::Arc::make_mut(&mut self.database).push_face_info(face);
+        self.resident.insert(id, resident);
+        resident
+    }
+}
+
 impl Default for Renderer {
     fn default() -> Self {
         let mut options = usvg::Options::default();
@@ -523,7 +553,18 @@ impl Default for Renderer {
         // (RtSvg commonly exports AAP_Font3 and AAR_Font1). usvg's selector always
         // falls back to serif. Preserve the implicit Times default while matching
         // the reference renderer for explicit missing families.
-        options.font_resolver.select_font = Box::new(|font, database| {
+        let font_cache = std::sync::Arc::new(std::sync::Mutex::new(FontCache {
+            database: options.fontdb.clone(),
+            selected: Default::default(),
+            resident: Default::default(),
+        }));
+        let selection_cache = font_cache.clone();
+        options.font_resolver.select_font = Box::new(move |font, database| {
+            let mut cache = selection_cache.lock().unwrap();
+            if let Some(id) = cache.selected.get(font).copied() {
+                *database = cache.database.clone();
+                return id;
+            }
             let mut families: Vec<_> = font
                 .families()
                 .iter()
@@ -543,12 +584,24 @@ impl Default for Renderer {
                 usvg::fontdb::Family::SansSerif
             });
             families.push(usvg::fontdb::Family::Serif);
-            database.query(&usvg::fontdb::Query {
+            let id = cache.database.query(&usvg::fontdb::Query {
                 families: &families,
                 weight: usvg::fontdb::Weight(font.weight()),
                 stretch: font.stretch().into(),
                 style: font.style().into(),
-            })
+            });
+            let id = id.map(|id| cache.make_resident(id));
+            cache.selected.insert(font.clone(), id);
+            *database = cache.database.clone();
+            id
+        });
+        let fallback = usvg::FontResolver::default_fallback_selector();
+        options.font_resolver.select_fallback = Box::new(move |character, excluded, database| {
+            let mut cache = font_cache.lock().unwrap();
+            let id = fallback(character, excluded, &mut cache.database)
+                .map(|id| cache.make_resident(id));
+            *database = cache.database.clone();
+            id
         });
         Self { options }
     }
@@ -627,6 +680,45 @@ impl Renderer {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn resident_fonts_preserve_data_ids_and_parallel_rendering() -> Result<()> {
+        let renderer = Renderer::default();
+        let database = renderer.options.fontdb.clone();
+        if let Some(face) = database
+            .faces()
+            .find(|face| matches!(face.source, usvg::fontdb::Source::File(_)))
+        {
+            let original = face.id;
+            let mut cache = FontCache {
+                database: database.clone(),
+                selected: Default::default(),
+                resident: Default::default(),
+            };
+            let resident = cache.make_resident(original);
+            assert_ne!(original, resident);
+            assert_eq!(resident, cache.make_resident(original));
+            assert_eq!(cache.database.faces().count(), database.faces().count() + 1);
+            assert!(cache.database.face(original).is_some());
+            assert_eq!(
+                database.with_face_data(original, |bytes, index| (bytes.to_vec(), index)),
+                cache
+                    .database
+                    .with_face_data(resident, |bytes, index| (bytes.to_vec(), index)),
+            );
+        }
+        let source = r#"<svg xmlns="http://www.w3.org/2000/svg" width="180" height="70"><text x="5" y="25" font-family="sans-serif">Насос 42</text><text x="5" y="55" font-family="serif">Клапан 17</text></svg>"#;
+        let expected = renderer.render(source, &Parsed::default())?.0;
+        std::thread::scope(|scope| {
+            let handles: Vec<_> = (0..4)
+                .map(|_| scope.spawn(|| renderer.render(source, &Parsed::default()).unwrap().0))
+                .collect();
+            for handle in handles {
+                assert_eq!(handle.join().unwrap(), expected);
+            }
+        });
+        Ok(())
+    }
+
     #[test]
     fn unknown_fonts_use_sans_but_implicit_fonts_keep_serif() -> Result<()> {
         let renderer = Renderer::default();

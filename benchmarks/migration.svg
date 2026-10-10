@@ -7,39 +7,39 @@
 <path d="M80 215H1720" stroke="#d4dee5"/>
 <text x="80" y="285" font-size="27">Обработка всего набора</text>
 <text x="80" y="350" font-size="24">Electron</text>
-<rect x="80" y="365" width="346.92" height="34" rx="4" fill="#bd7440"/>
-<text x="80" y="435" font-size="30">81.56 с</text>
+<rect x="80" y="365" width="430.00" height="34" rx="4" fill="#bd7440"/>
+<text x="80" y="435" font-size="30">87.82 с</text>
 <text x="80" y="480" font-size="24">Rust + GPUI</text>
-<rect x="80" y="495" width="430.00" height="34" rx="4" fill="#276d94"/>
-<text x="80" y="565" font-size="30">101.09 с</text>
-<text x="80" y="640" font-size="29">Рост 23.9%</text>
+<rect x="80" y="495" width="226.50" height="34" rx="4" fill="#276d94"/>
+<text x="80" y="565" font-size="30">46.26 с</text>
+<text x="80" y="640" font-size="29">Снижение 47.3%</text>
 <text x="640" y="285" font-size="27">Пиковая память обработки</text>
 <text x="640" y="350" font-size="24">Electron</text>
 <rect x="640" y="365" width="430.00" height="34" rx="4" fill="#bd7440"/>
-<text x="640" y="435" font-size="30">1206.37 МБ</text>
+<text x="640" y="435" font-size="30">925.52 МБ</text>
 <text x="640" y="480" font-size="24">Rust + GPUI</text>
-<rect x="640" y="495" width="59.79" height="34" rx="4" fill="#276d94"/>
-<text x="640" y="565" font-size="30">167.74 МБ</text>
-<text x="640" y="640" font-size="29">Снижение 86.1%</text>
+<rect x="640" y="495" width="88.07" height="34" rx="4" fill="#276d94"/>
+<text x="640" y="565" font-size="30">189.56 МБ</text>
+<text x="640" y="640" font-size="29">Снижение 79.5%</text>
 <text x="1200" y="285" font-size="27">Размер приложения</text>
 <text x="1200" y="350" font-size="24">Electron</text>
 <rect x="1200" y="365" width="430.00" height="34" rx="4" fill="#bd7440"/>
 <text x="1200" y="435" font-size="30">335.37 МБ</text>
 <text x="1200" y="480" font-size="24">Rust + GPUI</text>
-<rect x="1200" y="495" width="19.94" height="34" rx="4" fill="#276d94"/>
-<text x="1200" y="565" font-size="30">15.55 МБ</text>
+<rect x="1200" y="495" width="19.96" height="34" rx="4" fill="#276d94"/>
+<text x="1200" y="565" font-size="30">15.57 МБ</text>
 <text x="1200" y="640" font-size="29">Снижение 95.4%</text>
 <path d="M80 690H1720" stroke="#d4dee5"/>
 <text x="80" y="745" font-size="30">Сборка release без установки зависимостей</text>
 <text x="80" y="800" font-size="24">Измерение</text>
 <text x="880" y="800" font-size="24">Electron</text>
 <text x="1230" y="800" font-size="24">Rust + GPUI</text>
-<text x="80" y="855" font-size="24">Чистая сборка (один прогон)</text>
+<text x="80" y="855" font-size="24">Чистая сборка (исходный замер)</text>
 <text x="880" y="855" font-size="26">2.95 с</text>
 <text x="1230" y="855" font-size="26">196.23 с</text>
 <text x="80" y="915" font-size="24">Повторная сборка без изменений</text>
 <text x="880" y="915" font-size="26">1.87 с</text>
-<text x="1230" y="915" font-size="26">0.55 с</text>
+<text x="1230" y="915" font-size="26">0.40 с</text>
 <path d="M80 955H1720" stroke="#d4dee5"/>
 <text x="80" y="1010" font-size="24">Проверка результата: 1410 DOCX, таблицы, описания KKS и индекс поиска совпадают.</text>
 <text x="80" y="1055" font-size="21">Сглаживание изображений у resvg и librsvg отличается; растровая проверка сохранена отдельно.</text>
