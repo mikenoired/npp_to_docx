@@ -519,6 +519,37 @@ impl Default for Renderer {
     fn default() -> Self {
         let mut options = usvg::Options::default();
         options.fontdb_mut().load_system_fonts();
+        // Pango/librsvg falls back to sans-serif for an explicit unknown family
+        // (RtSvg commonly exports AAP_Font3 and AAR_Font1). usvg's selector always
+        // falls back to serif. Preserve the implicit Times default while matching
+        // the reference renderer for explicit missing families.
+        options.font_resolver.select_font = Box::new(|font, database| {
+            let mut families: Vec<_> = font
+                .families()
+                .iter()
+                .map(|family| match family {
+                    usvg::FontFamily::Named(name) => usvg::fontdb::Family::Name(name),
+                    usvg::FontFamily::Serif => usvg::fontdb::Family::Serif,
+                    usvg::FontFamily::SansSerif => usvg::fontdb::Family::SansSerif,
+                    usvg::FontFamily::Cursive => usvg::fontdb::Family::Cursive,
+                    usvg::FontFamily::Fantasy => usvg::fontdb::Family::Fantasy,
+                    usvg::FontFamily::Monospace => usvg::fontdb::Family::Monospace,
+                })
+                .collect();
+            let implicit_serif = font.families().iter().any(|family|matches!(family,usvg::FontFamily::Named(name) if name.eq_ignore_ascii_case("Times New Roman")));
+            families.push(if implicit_serif {
+                usvg::fontdb::Family::Serif
+            } else {
+                usvg::fontdb::Family::SansSerif
+            });
+            families.push(usvg::fontdb::Family::Serif);
+            database.query(&usvg::fontdb::Query {
+                families: &families,
+                weight: usvg::fontdb::Weight(font.weight()),
+                stretch: font.stretch().into(),
+                style: font.style().into(),
+            })
+        });
         Self { options }
     }
 }
@@ -596,6 +627,22 @@ impl Renderer {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn unknown_fonts_use_sans_but_implicit_fonts_keep_serif() -> Result<()> {
+        let renderer = Renderer::default();
+        let draw = |family: &str| -> Result<Vec<u8>> {
+            let content = format!(
+                r#"<svg xmlns="http://www.w3.org/2000/svg" width="150" height="60"><text x="5" y="30" font-size="20" {family}>Насос 42</text></svg>"#
+            );
+            Ok(renderer.render(&content, &Parsed::default())?.0)
+        };
+        assert_eq!(
+            draw(r#"font-family="NppUnknownFontForRegression""#)?,
+            draw(r#"font-family="sans-serif""#)?
+        );
+        assert_eq!(draw("")?, draw(r#"font-family="serif""#)?);
+        Ok(())
+    }
     #[test]
     fn symbolic_palette_names_inherit_instead_of_covering_text() -> Result<()> {
         let svg = r#"<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" fill="none" stroke="black"><rect x="10" y="10" width="50" height="30" fill="Col_Grey2"/><g stroke="Col_Red"><line x1="70" y1="10" x2="70" y2="50"/></g></svg>"#;

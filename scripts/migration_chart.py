@@ -36,7 +36,7 @@ for panel,(title,key,divisor,unit) in enumerate(metrics):
 line(690)
 text(80,745,'Сборка release без установки зависимостей',30)
 text(80,800,'Измерение',24);text(880,800,'Electron',24);text(1230,800,'Rust + GPUI',24)
-for y,label,key in [(855,'Чистая сборка (один прогон)','build_clean_ms'),(915,'Повторная сборка (медиана)','build_warm_ms')]:
+for y,label,key in [(855,'Чистая сборка (один прогон)','build_clean_ms'),(915,'Повторная сборка без изменений','build_warm_ms')]:
     text(80,y,label,24)
     text(880,y,f"{data['electron'][key]/1000:.2f} с",26)
     text(1230,y,f"{data['rust'][key]/1000:.2f} с",26)
