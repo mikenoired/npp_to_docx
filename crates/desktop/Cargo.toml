@@ -6,6 +6,7 @@ license.workspace = true
 
 [dependencies]
 anyhow = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
 clap = { version = "4", features = ["derive"] }
 directories = "6"
 gpui = "=0.2.2"

@@ -3860,6 +3860,7 @@ name = "npp-to-docx"
 version = "2.0.0"
 dependencies = [
  "anyhow",
+ "chrono",
  "clap",
  "directories",
  "gpui",
