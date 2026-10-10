@@ -22,6 +22,7 @@ parser.add_argument("--runs",type=int,default=3)
 parser.add_argument("--output",type=Path,required=True)
 parser.add_argument("--input",type=Path)
 parser.add_argument("--artifact",type=Path)
+parser.add_argument("--cwd",type=Path)
 parser.add_argument("command",nargs=argparse.REMAINDER)
 args = parser.parse_args()
 command = args.command[1:] if args.command[:1]==["--"] else args.command
@@ -30,7 +31,7 @@ samples = []
 for run in range(args.runs):
     timed = ["/usr/bin/time","-l",*command] if sys.platform=="darwin" else ["/usr/bin/time","-v",*command] if sys.platform.startswith("linux") else command
     start = time.perf_counter()
-    result = subprocess.run(timed,capture_output=True,text=True)
+    result = subprocess.run(timed,capture_output=True,text=True,cwd=args.cwd)
     elapsed = (time.perf_counter()-start)*1000
     args.output.with_suffix(f".run{run+1}.stdout.log").write_text(result.stdout)
     args.output.with_suffix(f".run{run+1}.stderr.log").write_text(result.stderr)
@@ -44,6 +45,12 @@ report = {"schema_version":1,"implementation":args.implementation,"commit":subpr
     "metric":args.metric,"command":command,"samples":samples,
     "median_elapsed_ms":statistics.median(s["elapsed_ms"] for s in samples),
     "median_peak_rss_bytes":statistics.median(s["peak_rss_bytes"] for s in samples) if all(s["peak_rss_bytes"] is not None for s in samples) else None}
+report["cwd"] = str(args.cwd or Path.cwd())
+source_digest = hashlib.sha256()
+for path in sorted([Path("Cargo.toml"),Path("Cargo.lock"),*Path("crates").rglob("*.rs"),*Path("crates").rglob("*.xml"),*Path("crates").rglob("Cargo.toml")]):
+    source_digest.update(str(path).encode());source_digest.update(path.read_bytes())
+report["rust_source_sha256"] = source_digest.hexdigest() if args.implementation=="rust" else None
+report["source_commit"] = "fef9860c816f796c26442c68218461cf375eaa38" if args.implementation=="electron" else report["commit"]
 if args.input:
     digest = hashlib.sha256()
     files = sorted(p for p in args.input.rglob("*") if p.is_file() and p.suffix.lower() in [".svg",".csv"])

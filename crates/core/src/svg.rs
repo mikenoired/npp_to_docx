@@ -2,8 +2,8 @@ use anyhow::{Context, Result, bail};
 use base64::{Engine, engine::general_purpose::STANDARD};
 use encoding_rs::{Encoding, UTF_8, WINDOWS_1251};
 use quick_xml::{
-    Reader,
-    events::{BytesStart, Event},
+    Reader, Writer,
+    events::{BytesEnd, BytesStart, Event},
 };
 use regex::{Captures, Regex};
 use resvg::{tiny_skia, usvg};
@@ -366,6 +366,88 @@ pub struct Renderer {
     options: usvg::Options<'static>,
 }
 
+// resvg rasterizes each SVG image into a full-size intermediate surface. The
+// repeated missing-resource symbol is equivalent to a nested vector viewport,
+// so inline it rather than allocating a surface for every absent submodel.
+fn inline_placeholders(content: &str) -> Result<String> {
+    let uri = format!("data:image/svg+xml;base64,{}", STANDARD.encode(PLACEHOLDER));
+    let shapes = PLACEHOLDER
+        .split_once('>')
+        .unwrap()
+        .1
+        .strip_suffix("</svg>")
+        .unwrap();
+    let mut reader = Reader::from_str(content);
+    let mut writer = Writer::new(Vec::new());
+    let mut replaced = Vec::new();
+    loop {
+        match reader.read_event()? {
+            event @ (Event::Start(_) | Event::Empty(_)) => {
+                let (tag, empty) = match event {
+                    Event::Start(tag) => (tag, false),
+                    Event::Empty(tag) => (tag, true),
+                    _ => unreachable!(),
+                };
+                let has_transform = tag
+                    .attributes()
+                    .with_checks(false)
+                    .filter_map(|a| a.ok())
+                    .any(|a| {
+                        a.key.as_ref().eq_ignore_ascii_case(b"transform")
+                            || (a.key.as_ref().eq_ignore_ascii_case(b"style")
+                                && String::from_utf8_lossy(&a.value).contains("transform"))
+                    });
+                let is_placeholder = !has_transform
+                    && tag.name().as_ref().eq_ignore_ascii_case(b"image")
+                    && tag
+                        .attributes()
+                        .with_checks(false)
+                        .filter_map(|a| a.ok())
+                        .any(|a| {
+                            (a.key.as_ref().eq_ignore_ascii_case(b"href")
+                                || a.key.as_ref().eq_ignore_ascii_case(b"xlink:href"))
+                                && a.value.as_ref() == uri.as_bytes()
+                        });
+                if is_placeholder {
+                    let mut viewport = BytesStart::new("svg");
+                    for attr in tag.attributes().with_checks(false) {
+                        let attr = attr?;
+                        if ![b"href".as_slice(), b"xlink:href", b"viewBox"]
+                            .iter()
+                            .any(|key| attr.key.as_ref().eq_ignore_ascii_case(key))
+                        {
+                            viewport.push_attribute(attr);
+                        }
+                    }
+                    viewport.push_attribute(("viewBox", "0 0 100 100"));
+                    writer.write_event(Event::Start(viewport))?;
+                    writer.get_mut().extend_from_slice(shapes.as_bytes());
+                    if empty {
+                        writer.write_event(Event::End(BytesEnd::new("svg")))?;
+                    } else {
+                        replaced.push(true);
+                    }
+                } else if empty {
+                    writer.write_event(Event::Empty(tag))?;
+                } else {
+                    writer.write_event(Event::Start(tag))?;
+                    replaced.push(false);
+                }
+            }
+            Event::End(tag) => {
+                if replaced.pop() == Some(true) {
+                    writer.write_event(Event::End(BytesEnd::new("svg")))?;
+                } else {
+                    writer.write_event(Event::End(tag))?;
+                }
+            }
+            Event::Eof => break,
+            event => writer.write_event(event)?,
+        }
+    }
+    Ok(String::from_utf8(writer.into_inner())?)
+}
+
 impl Default for Renderer {
     fn default() -> Self {
         let mut options = usvg::Options::default();
@@ -376,7 +458,8 @@ impl Default for Renderer {
 
 impl Renderer {
     pub fn render(&self, content: &str, parsed: &Parsed) -> Result<(Vec<u8>, u32, u32)> {
-        let tree = usvg::Tree::from_str(content, &self.options)
+        let content = inline_placeholders(content)?;
+        let tree = usvg::Tree::from_str(&content, &self.options)
             .context("Не удалось разобрать SVG для отрисовки")?;
         let size = tree.size().to_int_size();
         if u64::from(size.width()) * u64::from(size.height()) > 100_000_000 {
@@ -437,13 +520,53 @@ impl Renderer {
             tiny_skia::Transform::identity(),
             &mut image.as_mut(),
         );
-        Ok((image.encode_png()?, size.width(), size.height()))
+        let png = image.encode_png()?;
+        Ok((png, size.width(), size.height()))
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn placeholder_viewport_preserves_aspect_ratio_and_transform() -> Result<()> {
+        let uri = format!("data:image/svg+xml;base64,{}", STANDARD.encode(PLACEHOLDER));
+        for body in [
+            format!(r#"<image x="10" y="5" width="50" height="30" href="{uri}"/>"#),
+            format!(
+                r#"<image x="10" y="5" width="50" height="30" transform="translate(10 5)" href="{uri}"><title>K</title></image>"#
+            ),
+            format!(
+                r#"<image x="10" y="5" width="50" height="30" preserveAspectRatio="none" href="{uri}"/>"#
+            ),
+        ] {
+            let source = format!(
+                r#"<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60">{body}</svg>"#
+            );
+            let inline = inline_placeholders(&source)?;
+            let options = usvg::Options::default();
+            let raster = |text: &str| -> Result<_> {
+                let tree = usvg::Tree::from_str(text, &options)?;
+                let mut image = tiny_skia::Pixmap::new(100, 60).unwrap();
+                resvg::render(&tree, tiny_skia::Transform::identity(), &mut image.as_mut());
+                Ok(image)
+            };
+            let a = raster(&source)?;
+            let b = raster(&inline)?;
+            let mean_error = a
+                .data()
+                .iter()
+                .zip(b.data())
+                .map(|(a, b)| a.abs_diff(*b) as f64)
+                .sum::<f64>()
+                / a.data().len() as f64;
+            assert!(
+                mean_error < 2.0,
+                "Viewport changed symbol layout: {mean_error}"
+            );
+        }
+        Ok(())
+    }
     #[test]
     fn nested_marker_order_and_identity_priorities() -> Result<()> {
         let parsed = parse(

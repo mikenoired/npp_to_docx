@@ -17,6 +17,15 @@ use std::{
     time::Instant,
 };
 
+fn filename_compare(left: &str, right: &str) -> std::cmp::Ordering {
+    static COLLATOR: std::sync::LazyLock<icu_collator::CollatorBorrowed<'static>> =
+        std::sync::LazyLock::new(|| {
+            icu_collator::Collator::try_new(Default::default(), Default::default())
+                .expect("Compiled ICU collation data")
+        });
+    COLLATOR.compare(left, right)
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Options {
@@ -108,7 +117,7 @@ impl SearchIndex {
             }
         }
         let mut counts: Vec<_> = counts.into_iter().collect();
-        counts.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
+        counts.sort_by(|a, b| b.1.cmp(&a.1).then(filename_compare(&a.0, &b.0)));
         counts
     }
 }
@@ -149,7 +158,12 @@ pub fn process(options: &Options, progress: &(impl Fn(Progress) + Sync)) -> Resu
         .map(|entry| entry.path())
         .filter(|p| p.extension().is_some_and(|e| e.eq_ignore_ascii_case("svg")))
         .collect();
-    files.sort_by_key(|p| p.file_name().unwrap().to_string_lossy().to_lowercase());
+    files.sort_by(|a, b| {
+        filename_compare(
+            &a.file_name().unwrap().to_string_lossy(),
+            &b.file_name().unwrap().to_string_lossy(),
+        )
+    });
     if let Some(needle) = &options.r#match {
         let needle = needle.to_lowercase();
         files.retain(|p| {
@@ -222,16 +236,14 @@ pub fn process(options: &Options, progress: &(impl Fn(Progress) + Sync)) -> Resu
         counts
     }).collect());
     let mut reports = reports.into_inner().unwrap();
-    reports.sort_by(|a, b| a.frame.cmp(&b.frame));
+    reports.sort_by(|a, b| filename_compare(&a.frame, &b.frame));
     fs::write(
         output.join("passport-report.json"),
         serde_json::to_vec_pretty(&reports)?,
     )?;
     let mut records = records.into_inner().unwrap();
     records.sort_by(|a, b| {
-        a.frame_name
-            .cmp(&b.frame_name)
-            .then(a.marker_index.cmp(&b.marker_index))
+        filename_compare(&a.frame_name, &b.frame_name).then(a.marker_index.cmp(&b.marker_index))
     });
     let index = SearchIndex {
         created_at: chrono::Utc::now().to_rfc3339(),
@@ -260,6 +272,27 @@ pub fn process(options: &Options, progress: &(impl Fn(Progress) + Sync)) -> Resu
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn filename_order_matches_electron_locale_compare() {
+        let mut names = [
+            "4SPPB0_1.svg",
+            "4SPPB.svg",
+            "4SPPB_AZ_1.svg",
+            "0TLR.svg",
+            "0_PCP.svg",
+        ];
+        names.sort_by(|a, b| filename_compare(a, b));
+        assert_eq!(
+            names,
+            [
+                "0_PCP.svg",
+                "0TLR.svg",
+                "4SPPB_AZ_1.svg",
+                "4SPPB.svg",
+                "4SPPB0_1.svg"
+            ]
+        );
+    }
     #[test]
     fn errors_are_isolated_and_index_is_searchable() -> Result<()> {
         let tmp = tempfile::tempdir()?;
