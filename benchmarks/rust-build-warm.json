@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "implementation": "rust",
+  "commit": "aee328b161842f160ed2998213252a6b87839d00",
+  "environment": {
+    "os": "macOS-27.0.1-arm64-arm-64bit",
+    "architecture": "arm64",
+    "timestamp": "2026-10-10T16:06:32.463279+03:00"
+  },
+  "metric": "build_warm_release",
+  "command": [
+    "cargo",
+    "build",
+    "--release",
+    "--locked",
+    "--workspace"
+  ],
+  "samples": [
+    {
+      "elapsed_ms": 1338.961458,
+      "peak_rss_bytes": 160940032,
+      "exit_code": 0
+    },
+    {
+      "elapsed_ms": 540.8533749999999,
+      "peak_rss_bytes": 179044352,
+      "exit_code": 0
+    },
+    {
+      "elapsed_ms": 550.4158750000001,
+      "peak_rss_bytes": 178143232,
+      "exit_code": 0
+    }
+  ],
+  "median_elapsed_ms": 550.4158750000001,
+  "median_peak_rss_bytes": 178143232,
+  "cwd": "/Users/mikevetkal/Documents/work/npp_to_docx",
+  "rust_source_sha256": "900e359b185645f3b708cceade046569cd0079d88e42ea96d8d21414cac04fc5",
+  "source_commit": "aee328b161842f160ed2998213252a6b87839d00"
+}

@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "implementation": "rust",
+  "commit": "aee328b161842f160ed2998213252a6b87839d00",
+  "environment": {
+    "os": "macOS-27.0.1-arm64-arm-64bit",
+    "architecture": "arm64",
+    "timestamp": "2026-10-10T16:11:57.215754+03:00"
+  },
+  "metric": "conversion_prepared_csv",
+  "command": [
+    "target/release/npp-to-docx",
+    "convert",
+    "--input",
+    "input",
+    "--output",
+    "output/rust-reference",
+    "--concurrency",
+    "2",
+    "--result-json",
+    "output/benchmarks/rust-conversion-result.json"
+  ],
+  "samples": [
+    {
+      "elapsed_ms": 121586.036458,
+      "peak_rss_bytes": 163774464,
+      "exit_code": 0
+    },
+    {
+      "elapsed_ms": 101093.03408299999,
+      "peak_rss_bytes": 167739392,
+      "exit_code": 0
+    },
+    {
+      "elapsed_ms": 99124.39804100001,
+      "peak_rss_bytes": 177995776,
+      "exit_code": 0
+    }
+  ],
+  "median_elapsed_ms": 101093.03408299999,
+  "median_peak_rss_bytes": 167739392,
+  "cwd": "/Users/mikevetkal/Documents/work/npp_to_docx",
+  "rust_source_sha256": "900e359b185645f3b708cceade046569cd0079d88e42ea96d8d21414cac04fc5",
+  "source_commit": "aee328b161842f160ed2998213252a6b87839d00",
+  "dataset": {
+    "sha256": "791daba1016a07b479bc4096b562829ebc93eed6c06f3af88f349e1e7e2986e4",
+    "files": 1412,
+    "svg_count": 1410,
+    "concurrency": 2,
+    "prepared_csv": true
+  }
+}
