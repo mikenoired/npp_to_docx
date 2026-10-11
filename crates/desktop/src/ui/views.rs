@@ -136,26 +136,7 @@ impl Desktop {
                         1 => self.search_page(cx).into_any_element(),
                         2 => self.history_page(cx).into_any_element(),
                         _ => self.home(cx).into_any_element(),
-                    })
-                    .child(
-                        div()
-                            .h(px(30.0))
-                            .flex_none()
-                            .flex()
-                            .items_center()
-                            .justify_between()
-                            .px_6()
-                            .border_t_1()
-                            .border_color(p.line)
-                            .text_size(px(11.0))
-                            .text_color(p.muted)
-                            .child("Паспорта SVG-кадров · KKS · Подмодели")
-                            .child(if self.busy {
-                                "Обработка идёт в фоне"
-                            } else {
-                                "Готов к работе"
-                            }),
-                    ),
+                    }),
             )
     }
 
@@ -186,7 +167,7 @@ impl Desktop {
             );
         }
         div()
-            .w(px(192.0))
+            .w(px(196.0))
             .flex_none()
             .h_full()
             .bg(p.surface)
@@ -196,47 +177,27 @@ impl Desktop {
             .flex_col()
             .p_4()
             .child(
-                div()
-                    .flex()
-                    .items_center()
-                    .gap_3()
-                    .pt_3()
-                    .pb_8()
-                    .child(
-                        div()
-                            .w(px(32.0))
-                            .h(px(38.0))
-                            .flex()
-                            .items_center()
-                            .justify_center()
-                            .border_1()
-                            .border_color(p.accent)
-                            .rounded(px(5.0))
-                            .text_color(p.accent)
-                            .child(Icon::new(IconName::File).size(px(20.0))),
-                    )
-                    .child(
-                        div()
-                            .flex()
-                            .flex_col()
-                            .gap_1()
-                            .child(
-                                div()
-                                    .font_family(theme::display_font())
-                                    .text_size(px(18.0))
-                                    .font_weight(FontWeight::SEMIBOLD)
-                                    .child("Паспорта"),
-                            )
-                            .child(
-                                div()
-                                    .font_family(cx.theme().mono_font_family.clone())
-                                    .text_size(px(10.0))
-                                    .text_color(p.muted)
-                                    .child("SVG → DOCX"),
-                            ),
-                    ),
+                div().flex().items_center().gap_3().pt_3().pb_8().child(
+                    div()
+                        .flex()
+                        .flex_col()
+                        .gap_1()
+                        .child(
+                            div()
+                                .font_family(theme::display_font())
+                                .text_size(px(18.0))
+                                .font_weight(FontWeight::SEMIBOLD)
+                                .child("Паспорта"),
+                        )
+                        .child(
+                            div()
+                                .font_family(cx.theme().mono_font_family.clone())
+                                .text_size(px(10.0))
+                                .text_color(p.muted)
+                                .child("SVG → DOCX"),
+                        ),
+                ),
             )
-            .child(hint("РАБОЧАЯ ОБЛАСТЬ", p).mb_3().text_size(px(10.0)))
             .child(nav)
             .when(self.busy, |v| {
                 v.child(
@@ -308,7 +269,6 @@ impl Desktop {
                                 cx.notify();
                             })),
                     )
-                    .child(hint(format!("Версия {}", env!("CARGO_PKG_VERSION")), p).px_2())
                     .when(cfg!(debug_assertions), |v| {
                         v.child(badge("Отладочная сборка", p.warning, p))
                     }),
@@ -317,13 +277,10 @@ impl Desktop {
 
     fn page_header(&self, cx: &Context<Self>) -> impl IntoElement {
         let p = Palette::new(self.settings.dark);
-        let (title, description) = match self.tab {
-            1 => (
-                "Найти кадр",
-                "Кадры, в которых используется выбранная подмодель",
-            ),
-            2 => ("Журнал запусков", "Результаты обработки и полные логи"),
-            _ => ("Новый пакет", "Создание паспортов из SVG и базы описаний"),
+        let title = match self.tab {
+            1 => "Найти кадр",
+            2 => "Журнал запусков",
+            _ => "Новый пакет",
         };
         let status = if self.tab == 0 {
             match &self.manifest {
@@ -362,18 +319,13 @@ impl Desktop {
             .justify_between()
             .gap_4()
             .child(
-                div()
-                    .flex()
-                    .flex_col()
-                    .gap_1()
-                    .child(
-                        div()
-                            .font_family(theme::display_font())
-                            .text_size(px(24.0))
-                            .font_weight(FontWeight::SEMIBOLD)
-                            .child(title),
-                    )
-                    .child(hint(description, p)),
+                div().flex().flex_col().gap_1().child(
+                    div()
+                        .font_family(theme::display_font())
+                        .text_size(px(24.0))
+                        .font_weight(FontWeight::SEMIBOLD)
+                        .child(title),
+                ),
             )
             .child(status)
     }
@@ -534,7 +486,7 @@ impl Desktop {
                 .child(Button::new("convert").primary().icon(IconName::ArrowRight)
                     .label(if self.busy && !self.preparing { "Создание паспортов…" } else { "Создать паспорта" })
                     .disabled(!can_start).on_click(cx.listener(|app, _, _, cx| app.start(false, cx)))));
-        let mut page = div()
+        let page = div()
             .id("home-scroll")
             .flex_1()
             .min_h(px(0.0))
@@ -544,28 +496,6 @@ impl Desktop {
             .flex()
             .flex_col()
             .gap_5();
-        if cfg!(debug_assertions) {
-            page = page.child(
-                surface(p)
-                    .p_3()
-                    .border_color(p.warning)
-                    .flex()
-                    .items_start()
-                    .gap_3()
-                    .child(Icon::new(IconName::TriangleAlert).text_color(p.warning))
-                    .child(
-                        div()
-                            .flex()
-                            .flex_col()
-                            .gap_1()
-                            .child("Отладочная сборка обрабатывает схемы значительно медленнее.")
-                            .child(hint(
-                                "Для работы: cargo run --release --locked -p npp-to-docx",
-                                p,
-                            )),
-                    ),
-            );
-        }
         page.child(
             div()
                 .flex()
@@ -587,18 +517,7 @@ impl Desktop {
 
     fn package(&self, cx: &Context<Self>) -> impl IntoElement {
         let p = Palette::new(self.settings.dark);
-        let mut panel = surface(p).flex().flex_col().child(
-            div()
-                .px_4()
-                .py_3()
-                .border_b_1()
-                .border_color(p.line)
-                .flex()
-                .items_center()
-                .justify_between()
-                .child(heading("Состав пакета"))
-                .child(badge("SVG → DOCX", p.accent, p)),
-        );
+        let mut panel = surface(p).flex().flex_col();
         if let Some(m) = &self.manifest {
             panel = panel.child(
                 div()
@@ -611,6 +530,7 @@ impl Desktop {
                         div()
                             .font_family(cx.theme().mono_font_family.clone())
                             .text_size(px(28.0))
+                            .line_height(px(28.0))
                             .font_weight(FontWeight::MEDIUM)
                             .child(count(m.selected)),
                     )
@@ -697,11 +617,7 @@ impl Desktop {
                             .truncate()
                             .font_family(cx.theme().mono_font_family.clone())
                             .text_size(px(11.0))
-                            .text_color(p.muted)
-                            .child(format!(
-                                "Папка: {}",
-                                m.svg_dir.file_name().unwrap_or_default().to_string_lossy()
-                            )),
+                            .text_color(p.muted),
                     ),
             );
             for name in m.frames.iter().take(5) {
@@ -752,25 +668,7 @@ impl Desktop {
                 p,
             )));
         }
-        panel.child(
-            div()
-                .p_4()
-                .mt_3()
-                .border_t_1()
-                .border_color(p.line)
-                .bg(p.inset)
-                .flex()
-                .flex_col()
-                .gap_2()
-                .child(hint("В КАЖДОМ ПАСПОРТЕ", p).text_size(px(10.0)))
-                .child(
-                    div()
-                        .text_size(px(12.0))
-                        .child("Схема с номерами элементов"),
-                )
-                .child(div().text_size(px(12.0)).child("KKS, описания и подмодели"))
-                .child(hint("Поисковый индекс сохраняется рядом.", p)),
-        )
+        panel
     }
 
     fn job_panel(&self, index: usize, detailed: bool, cx: &Context<Self>) -> impl IntoElement {
