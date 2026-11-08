@@ -1,2 +1,2 @@
 # Preserve vendor SVG bytes (Windows-1251, CRLF and original spacing) for inventory hashes.
-assets/submodels/*.svg -text whitespace=-blank-at-eol,-blank-at-eof
+assets/submodels/*.svg -text -whitespace
