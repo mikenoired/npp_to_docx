@@ -1,0 +1,85 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 150 50" width="150" height="50" id="obj_sinus">
+  <desc>Синус здоровья передачи данных</desc>
+  <rt:model comment="Служебная подмодель ПОРТАЛа" revision="4.0-6.0">
+    <rt:param name="InVal" datatype="double" value="0" comment="Значение входной переменной [-1; 1]"/> 
+    <rt:var name="SinColor" datatype="uint" arraysize="30" comment="цвета столбиков"/> 
+    <rt:var name="SinVal" datatype="float" arraysize="30" comment="высота столбиков"/> 
+    <rt:sub>Sub Calculate()
+If (InVal &lt; -1.0) Then
+	InVal = -1.0
+ElseIf (InVal &gt; 1.0) Then
+	InVal = 1.0
+End If
+Dim i As Integer
+For i = 1 to 29
+	SinVal(30 - i) = SinVal(29 - i)
+	SinColor(30 - i) = SinColor(29 - i)
+Next i
+SinVal(0) = -0.5 - 0.45 * InVal
+If (SinVal(0) == SinVal(1)) &amp;&amp; (SinVal(1) == SinVal(2)) Then
+	SinColor(0) = 0xff
+	SinColor(1) = 0xff
+	SinColor(2) = 0xff
+Else
+	SinColor(0) = 0xff00
+End If
+Dim o As RtSvgObj
+For i = 0 To 29
+	o = GR_sinus.get_Child(i)
+	o.fill = SinColor(i)
+	o.rt_filly = SinVal(i)
+Next i
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">Dim i As Integer
+Dim o As RtSvgObj
+For i = 0 To 29
+	o = GR_sinus.get_Child(i)
+	o.fill = 0xcdcdcd
+	o.rt_filly = -0.01
+	SinVal(i) = -1.0
+	SinColor(i) = 0xcdcdcd
+Next i</rt:event>
+    <rt:event type="OnResize">edge.stroke_width = 2</rt:event>
+    <rt:cycleTrigger name="MoveSin" cycle="1" unit="second">
+      <rt:code>Calculate()</rt:code>
+    </rt:cycleTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="150" height="50" rx="0" ry="0" id="body" fill="Col_Grey2" stroke="none"/> 
+  <g id="GR_sinus" stroke="none">
+    <rect x="145" y="0" width="5" height="50" rx="0" ry="0" id="bar0" fill="Col_Green"/> 
+    <rect x="140" y="0" width="5" height="50" rx="0" ry="0" id="bar1" fill="Col_Green"/> 
+    <rect x="135" y="0" width="5" height="50" rx="0" ry="0" id="bar2" fill="Col_Green"/> 
+    <rect x="130" y="0" width="5" height="50" rx="0" ry="0" id="bar3" fill="Col_Green"/> 
+    <rect x="125" y="0" width="5" height="50" rx="0" ry="0" id="bar4" fill="Col_Green"/> 
+    <rect x="120" y="0" width="5" height="50" rx="0" ry="0" id="bar5" fill="Col_Green"/> 
+    <rect x="115" y="0" width="5" height="50" rx="0" ry="0" id="bar6" fill="Col_Green"/> 
+    <rect x="110" y="0" width="5" height="50" rx="0" ry="0" id="bar7" fill="Col_Green"/> 
+    <rect x="105" y="0" width="5" height="50" rx="0" ry="0" id="bar8" fill="Col_Green"/> 
+    <rect x="100" y="0" width="5" height="50" rx="0" ry="0" id="bar9" fill="Col_Green"/> 
+    <rect x="95" y="0" width="5" height="50" rx="0" ry="0" id="bar10" fill="Col_Green"/> 
+    <rect x="90" y="0" width="5" height="50" rx="0" ry="0" id="bar11" fill="Col_Green"/> 
+    <rect x="85" y="0" width="5" height="50" rx="0" ry="0" id="bar12" fill="Col_Green"/> 
+    <rect x="80" y="0" width="5" height="50" rx="0" ry="0" id="bar13" fill="Col_Green"/> 
+    <rect x="75" y="0" width="5" height="50" rx="0" ry="0" id="bar14" fill="Col_Green"/> 
+    <rect x="70" y="0" width="5" height="50" rx="0" ry="0" id="bar15" fill="Col_Green"/> 
+    <rect x="65" y="0" width="5" height="50" rx="0" ry="0" id="bar16" fill="Col_Green"/> 
+    <rect x="60" y="0" width="5" height="50" rx="0" ry="0" id="bar17" fill="Col_Green"/> 
+    <rect x="55" y="0" width="5" height="50" rx="0" ry="0" id="bar18" fill="Col_Green"/> 
+    <rect x="50" y="0" width="5" height="50" rx="0" ry="0" id="bar19" fill="Col_Green"/> 
+    <rect x="45" y="0" width="5" height="50" rx="0" ry="0" id="bar20" fill="Col_Green"/> 
+    <rect x="40" y="0" width="5" height="50" rx="0" ry="0" id="bar21" fill="Col_Green"/> 
+    <rect x="35" y="0" width="5" height="50" rx="0" ry="0" id="bar22" fill="Col_Green"/> 
+    <rect x="30" y="0" width="5" height="50" rx="0" ry="0" id="bar23" fill="Col_Green"/> 
+    <rect x="25" y="0" width="5" height="50" rx="0" ry="0" id="bar24" fill="Col_Green"/> 
+    <rect x="20" y="0" width="5" height="50" rx="0" ry="0" id="bar25" fill="Col_Green"/> 
+    <rect x="15" y="0" width="5" height="50" rx="0" ry="0" id="bar26" fill="Col_Green"/> 
+    <rect x="10" y="0" width="5" height="50" rx="0" ry="0" id="bar27" fill="Col_Green"/> 
+    <rect x="5" y="0" width="5" height="50" rx="0" ry="0" id="bar28" fill="Col_Green"/> 
+    <rect x="0" y="0" width="5" height="50" rx="0" ry="0" id="bar29" fill="Col_Green"/> 
+  </g>
+  <g id="edge" fill="none" stroke-width="2">
+    <polyline points="0,50 150,50 150,0" id="rb_line" stroke="Col_Grey1"/> 
+    <polyline points="0,50 0,0 150,0" id="lu_line" stroke="Col_Grey5"/> 
+  </g>
+</svg>

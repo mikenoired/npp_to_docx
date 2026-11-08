@@ -1,0 +1,96 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="-10 -10 20 20" width="20" height="20" id="TPTS_AETE">
+  <desc>Канальный оператор AETE</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="4.0">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS канального оператора"/> 
+    <rt:var name="F0" datatype="PlsPVBin" comment="F0"/> 
+    <rt:var name="F1" datatype="PlsPVBin" comment="F1"/> 
+    <rt:var name="F2" datatype="PlsPVBin" comment="F2"/> 
+    <rt:var name="F3" datatype="PlsPVBin" comment="F3"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="Err_Inval" datatype="uint" value="0" comment="счетчик ошибок"/> 
+    <rt:var name="F_Qual" datatype="ushort" value="3" comment="Общее качество сигналов"/> 
+    <rt:sub>Sub Calc_Stat()
+Err_Inval = 0
+F_Qual = 3
+If F0 != Nothing Then
+	If F0.Value  &gt; 0 Then
+		Err_Inval = 3
+		Exit Sub
+	End If
+	F_Qual = F_Qual &amp; F0.Quality
+End If
+If F1 != Nothing Then
+	If F1.Value  &gt; 0 Then
+		Err_Inval = 3
+		Exit Sub
+	End If
+	F_Qual = F_Qual &amp; F1.Quality
+End If
+If F2 != Nothing Then
+	If F2.Value  &gt; 0 Then
+		Err_Inval = 3
+		Exit Sub
+	End If
+	F_Qual = F_Qual &amp; F2.Quality
+End If
+If F3 != Nothing Then
+	If F3.Value  &gt; 0 Then
+		Err_Inval = 3
+	End If
+	F_Qual = F_Qual &amp; F3.Quality
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (KKS != &quot;NULL&quot;) Then
+	F0 = BIN(KKS + &quot;_F0&quot;)
+	F1 = BIN(KKS + &quot;_F1&quot;)
+	F2 = BIN(KKS + &quot;_F2&quot;)
+	F3 = BIN(KKS + &quot;_F3&quot;)
+End If</rt:event>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChInputs">
+      <rt:chgItem>F0</rt:chgItem>
+      <rt:chgItem>F1</rt:chgItem>
+      <rt:chgItem>F2</rt:chgItem>
+      <rt:chgItem>F3</rt:chgItem>
+      <rt:code>Calc_Stat()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <image x="-7.5" y="-7.5" width="15" height="15" xlink:href="bool_indicator.svg">
+    <rt:dyn type="Stat" mode="onchange" value="(Err_Inval &gt; 0)"/> 
+    <rt:dyn type="Qual" mode="onchange" value="(F0 != nothing) &amp;&amp; (F_Qual &gt; 0)" trans="bt">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="3"/> 
+    </rt:dyn>
+  </image>
+  <rect x="-10" y="-10" width="20" height="20" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="1">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="-10" y="-10" width="20" height="20" rx="0" ry="0" id="Sel_Area" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If F0 != nothing Then
+	If VIS.ModelExists(False, &quot;wd_TPTS_AETE_6&quot;) Then
+		Open_ws_wf_wi(&quot;wd_TPTS_AETE_6&quot;, KKS, False)
+	Else
+		Open_ws_wf_wi(&quot;wd_TPTS_AETE&quot;, KKS, False)
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnRightClick">If F0 != nothing Then
+	If VIS.ModelExists(False, &quot;wd_TPTS_AETE_6&quot;) Then
+		LoadPopUpMenu(KKS + &quot;|AEEd|wd_TPTS_AETE_6 &quot; + KKS)
+	Else
+		LoadPopUpMenu(KKS + &quot;|AEEd|wd_TPTS_AETE &quot; + KKS)
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+  </rect>
+</svg>

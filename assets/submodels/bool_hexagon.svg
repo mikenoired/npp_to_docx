@@ -1,0 +1,57 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 60 70" width="60" height="70" id="bool_hexagon">
+  <desc>Индикатор в виде шестиугольника</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.0">
+    <rt:param name="Stat" datatype="boolean" value="False" comment="значение сигнала"/> 
+    <rt:param name="Qual" datatype="ubyte" value="3" comment="качество сигнала"/> 
+    <rt:param name="Col_ON" datatype="string" value="Col_Yellow" comment="цвет для индикации состояния True"/> 
+    <rt:param name="Col_OFF" datatype="string" value="Col_Green" comment="цвет для индикации состояния False"/> 
+    <rt:param name="T_String" datatype="string" value="" comment="текстовая строка"/> 
+    <rt:param name="T_Color" datatype="string" value="black" comment="цвет текста"/> 
+    <rt:param name="T_Font" datatype="string" value="inherit" comment="шрифт"/> 
+    <rt:param name="T_Size" datatype="float" value="15" comment="размер шрифта"/> 
+    <rt:param name="T_Style" datatype="string" value="normal" comment="стиль"/> 
+    <rt:param name="T_Weight" datatype="string" value="normal" comment="толщина букв шрифта"/> 
+    <rt:param name="DimIt" datatype="boolean" value="false" comment="Приглушить палитру - сделать фон полупрозрачным."/> 
+    <rt:param name="Grad_Style" datatype="boolean" value="false" comment="Индикатор имеет градиентную заливку - объёмный фон"/> 
+    <rt:sub>Sub BGColor()
+If Qual == PLS_QUAL_BAD Then
+	body.fill = Color_Inval
+Else
+	If Stat Then
+		body.fill = Col_ON
+	Else
+		body.fill = Col_OFF
+	End If
+End If
+End Sub</rt:sub>
+    <rt:event type="OnClick">ShowMessage(&quot;Это индикатор\nдля локальной переменной.&quot;, 5)</rt:event>
+    <rt:event type="OnRightClick">ShowMessage(&quot;Для локальных переменных\nменю не предусмотрено.&quot;, 5)</rt:event>
+    <rt:event type="OnInitialize">txt_string.y = 35 + (T_Size / 2.0)</rt:event>
+    <rt:changeTrigger name="MyTrig">
+      <rt:chgItem>Stat</rt:chgItem>
+      <rt:chgItem>Qual</rt:chgItem>
+      <rt:code>BGColor()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <polygon points="0,17.5 30,0 60,17.5 60,52.5 30,70 0,52.5" id="backgr" fill="url(#Circle_LeftFront)" stroke="none">
+    <rt:dyn type="visibility" mode="onchange" value="Grad_Style" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </polygon>
+  <polygon points="0,17.5 30,0 60,17.5 60,52.5 30,70 0,52.5" id="body" fill="Col_Green" fill-opacity="0.5" stroke="Col_Grey5" stroke-width="2">
+    <rt:dyn type="fill-opacity" mode="onchange" value="DimIt &amp;&amp; (Qual != PLS_QUAL_BAD)" trans="bd">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0.5"/> 
+    </rt:dyn>
+  </polygon>
+  <text x="30" y="42.5" id="txt_string" fill="black" font-size="15" font-style="normal" font-weight="normal" text-anchor="middle">
+    <rt:dyn type="font-size" mode="constant" value="T_Size"/> 
+    <rt:dyn type="text" mode="onchange" value="T_String"/> 
+    <rt:dyn type="fill" mode="constant" value="T_Color"/> 
+    <rt:dyn type="font-family" mode="constant" value="T_Font"/> 
+    <rt:dyn type="font-style" mode="constant" value="T_Style"/> 
+    <rt:dyn type="font-weight" mode="constant" value="T_Weight"/> 
+ТЕКСТ</text>
+</svg>

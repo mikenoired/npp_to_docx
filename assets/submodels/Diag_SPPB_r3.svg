@@ -1,0 +1,75 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 800 600" width="800" height="600" id="Diag_SPPB_r3">
+  <rt:model modelversion="7.2.0.23" comment="Создано VNIIAES-ASUTP\geskin 25.10.2012 17:08:46">
+    <rt:param name="PointID1" datatype="string" comment="KKS времени сервера"/> 
+    <rt:param name="PointID2" datatype="int" comment="Время срабатывания" value="200"/> 
+    <rt:var name="pv_BIN" datatype="PlsPVBin" comment="Бинарная сигнал"/> 	
+    <rt:var name="HasError" datatype="boolean" value="false" comment="При иницализации произошла ошибка"/> 	
+    <rt:var name="vis" datatype="boolean" comment=""/> 
+    <rt:var name="Time_String" datatype="string" comment="Variable Time_string"/> 
+    <rt:var name="delta_time_AZ" datatype="int" comment="Variable delta_time_AZ"/> 
+    <rt:var name="second" datatype="int" comment=""/> 
+    <rt:var name="minute" datatype="int" comment=""/> 
+    <rt:var name="hour" datatype="int" comment="Variable hours"/> 
+    <rt:var name="second_st" datatype="string" comment=""/> 
+    <rt:var name="minute_st" datatype="string" comment=""/> 
+    <rt:var name="hour_st" datatype="string" comment="Variable hours_st"/> 
+    <rt:sub>Sub test_sig()
+	if (!HasError) then
+		delta_time_AZ=Fix(DateDiff(Now(), pv_BIN.FieldTime))
+		minute=(delta_time_AZ/60)%60
+		hour=((delta_time_AZ/60)/60)
+	
+		if(hour&lt;10) then 
+			hour_st=&apos;0&apos;+ CStr(hour)
+		else
+			hour_st=CStr(hour)
+		end if
+
+		if(minute&lt;10) then 
+			minute_st=&apos;0&apos;+ CStr(minute)
+		else
+			minute_st=CStr(minute)
+		end if
+	
+		Time_String = hour_st + &quot; час &quot; + minute_st + &quot; мин &quot;	
+		Time_String = delta_time_AZ
+		
+		if delta_time_AZ &gt; PointID2 then
+			vis = True
+		else
+			vis = False
+		end if
+	end if
+	End sub</rt:sub>
+
+    <rt:event type="OnInitialize">Set pv_BIN = BIN(PointID1)
+	If pv_BIN == Nothing Then
+		HasError = true
+	End If
+	</rt:event>
+	
+	
+    <rt:cycleTrigger name="cyc" cycle="1" unit="second">
+      <rt:code>test_sig()</rt:code>
+    </rt:cycleTrigger>
+  </rt:model>
+  <g>
+    <rt:dyn type="visibility" mode="onchange" value="vis" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rect x="37" y="47" width="728" height="441" rx="0" ry="0" fill="white" stroke="red" stroke-width="5"/> 
+    <text x="266" y="115" fill="red" font-size="40">!ВНИМАНИЕ!</text>
+    <rect x="282" y="399" width="211" height="35" rx="0" ry="0" id="body" fill="black" stroke="none"/> 
+    <text x="391" y="422.5" id="Cur_step" fill="red" font-size="19" font-weight="bold" text-anchor="middle">
+      <rt:dyn type="text" mode="onchange" value="Time_String"/> 
+000 час 00 мин</text>
+    <circle cx="396.876" cy="207.469" r="51" fill="Col_Red"/> 
+    <text x="67" y="347.5" fill="red" font-size="40">НЕТ СВЯЗИ С ЗАДАЧЕЙ СППБ</text>
+    <line x1="62" y1="279" x2="738" y2="279" stroke="Col_Red" stroke-width="5"/> 
+    <line x1="62" y1="383" x2="738" y2="383" stroke="Col_Red" stroke-width="5"/> 
+    <line x1="60.5" y1="278.5" x2="60.5" y2="382.5" stroke="Col_Red" stroke-width="5"/> 
+    <line x1="737.5" y1="278.5" x2="737.5" y2="382.5" stroke="Col_Red" stroke-width="5"/> 
+  </g>
+</svg>

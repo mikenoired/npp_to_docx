@@ -1,0 +1,136 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 200 25" width="200" height="25" id="obj721_station_alarms" font-family="AAP_Font3" font-size="15" font-weight="bold">
+  <desc>Статистика станции</desc>
+  <rt:model comment="служебная подмодель для ПОРТАЛа 7.2.1" revision="6.1">
+    <rt:param name="Station_Nr" datatype="int" value="-1" comment="Номер станции"/> 
+    <rt:var name="Is_NotAcked" datatype="boolean" comment="Данные о том, что сигнализация не сквитирована" arraysize="9"/> 
+    <rt:var name="Is_Active" datatype="boolean" comment="Данные о том, что сигнализации этого уровня есть" arraysize="8"/> 
+    <rt:var name="BoundType" datatype="byte" arraysize="8" comment="Тип нарушения границы"/> 
+    <rt:var name="Model_ID" datatype="string" value="-" comment="Идентификатор видеокадра"/> 
+    <rt:var name="My_Station" datatype="PlsStation" comment="Станция"/> 
+    <rt:sub>Sub Connect_Station()
+If Station_Nr &gt; 1 Then
+	My_Station = RTAPLS.Station(Station_Nr)
+	Model_ID = Mid(My_Station.StationId,6)
+	Ind_al_0.visibility = &quot;visible&quot;
+	Ind_al_1.visibility = &quot;visible&quot;
+	Ind_al_2.visibility = &quot;visible&quot;
+	Ind_al_3.visibility = &quot;visible&quot;
+	Ind_al_4.visibility = &quot;visible&quot;
+	Ind_al_5.visibility = &quot;visible&quot;
+	Ind_al_6.visibility = &quot;visible&quot;
+	Ind_al_7.visibility = &quot;visible&quot;
+Else
+	Model_ID = &quot;&quot;
+	Ind_al_0.visibility = &quot;hidden&quot;
+	Ind_al_1.visibility = &quot;hidden&quot;
+	Ind_al_2.visibility = &quot;hidden&quot;
+	Ind_al_3.visibility = &quot;hidden&quot;
+	Ind_al_4.visibility = &quot;hidden&quot;
+	Ind_al_5.visibility = &quot;hidden&quot;
+	Ind_al_6.visibility = &quot;hidden&quot;
+	Ind_al_7.visibility = &quot;hidden&quot;
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Get_St_Statistics()
+If My_Station != Nothing Then
+	Dim AlCounters(9) As Int
+	Dim i As Byte
+	If (Left(My_Station.StationId, 4) == &quot;0000&quot;) Then	//это корень
+		PRJSPEC.GetStationStatistics(Station_Nr, true, false, true, AlCounters, Is_NotAcked, BoundType)
+		&apos;Station_Nr, true - перебираем всех детей
+		&apos;false = проверяем только своих детей, true = смотрим собственную статистику
+	Else
+		PRJSPEC.GetStationStatistics(Station_Nr, false, false, true, AlCounters, Is_NotAcked, BoundType)
+		&apos;Station_Nr, false - смотрим свои данные
+		&apos;false = игнорируется, true = смотрим собственную статистику
+	End If
+	For i = 0 To 7
+		Is_Active(i) = (AlCounters(i) &gt; 0)
+	Next i	
+End If
+End Sub</rt:sub>
+    <rt:cycleTrigger name="Refresh_me" cycle="1" unit="second">
+      <rt:condition>Station_Nr &gt; 0</rt:condition>
+      <rt:code>Get_St_Statistics()</rt:code>
+    </rt:cycleTrigger>
+    <rt:changeTrigger name="Ch_StNr">
+      <rt:chgItem>Station_Nr</rt:chgItem>
+      <rt:code>Connect_Station()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <image x="2.5" y="17.5" width="20" height="5" xlink:href="aux721_al_level_indicator.svg" id="Ind_al_7">
+    <rt:dyn type="Is_NotAcked" mode="cyclic" value="Is_NotAcked(7)"/> 
+    <rt:dyn type="Is_Active" mode="cyclic" value="Is_Active(7)"/> 
+    <rt:dyn type="BoundType" mode="cyclic" value="BoundType(7)"/> 
+    <rt:dyn type="Alarm_level" mode="constant" value="7"/> 
+  </image>
+  <image x="27.5" y="17.5" width="20" height="5" xlink:href="aux721_al_level_indicator.svg" id="Ind_al_6">
+    <rt:dyn type="Is_NotAcked" mode="cyclic" value="Is_NotAcked(6)"/> 
+    <rt:dyn type="Is_Active" mode="cyclic" value="Is_Active(6)"/> 
+    <rt:dyn type="BoundType" mode="cyclic" value="BoundType(6)"/> 
+    <rt:dyn type="Alarm_level" mode="constant" value="6"/> 
+  </image>
+  <image x="52.5" y="17.5" width="20" height="5" xlink:href="aux721_al_level_indicator.svg" id="Ind_al_5">
+    <rt:dyn type="Is_NotAcked" mode="cyclic" value="Is_NotAcked(5)"/> 
+    <rt:dyn type="Is_Active" mode="cyclic" value="Is_Active(5)"/> 
+    <rt:dyn type="BoundType" mode="cyclic" value="BoundType(5)"/> 
+    <rt:dyn type="Alarm_level" mode="constant" value="5"/> 
+  </image>
+  <image x="77.5" y="17.5" width="20" height="5" xlink:href="aux721_al_level_indicator.svg" id="Ind_al_4">
+    <rt:dyn type="Is_NotAcked" mode="cyclic" value="Is_NotAcked(4)"/> 
+    <rt:dyn type="Is_Active" mode="cyclic" value="Is_Active(4)"/> 
+    <rt:dyn type="BoundType" mode="cyclic" value="BoundType(4)"/> 
+    <rt:dyn type="Alarm_level" mode="constant" value="4"/> 
+  </image>
+  <image x="102.5" y="17.5" width="20" height="5" xlink:href="aux721_al_level_indicator.svg" id="Ind_al_3">
+    <rt:dyn type="Is_NotAcked" mode="cyclic" value="Is_NotAcked(3)"/> 
+    <rt:dyn type="Is_Active" mode="cyclic" value="Is_Active(3)"/> 
+    <rt:dyn type="BoundType" mode="cyclic" value="BoundType(3)"/> 
+    <rt:dyn type="Alarm_level" mode="constant" value="3"/> 
+  </image>
+  <image x="127.5" y="17.5" width="20" height="5" xlink:href="aux721_al_level_indicator.svg" id="Ind_al_2">
+    <rt:dyn type="Is_NotAcked" mode="cyclic" value="Is_NotAcked(2)"/> 
+    <rt:dyn type="Is_Active" mode="cyclic" value="Is_Active(2)"/> 
+    <rt:dyn type="BoundType" mode="cyclic" value="BoundType(2)"/> 
+    <rt:dyn type="Alarm_level" mode="constant" value="2"/> 
+  </image>
+  <image x="152.5" y="17.5" width="20" height="5" xlink:href="aux721_al_level_indicator.svg" id="Ind_al_1">
+    <rt:dyn type="Is_NotAcked" mode="cyclic" value="Is_NotAcked(1)"/> 
+    <rt:dyn type="Is_Active" mode="cyclic" value="Is_Active(1)"/> 
+    <rt:dyn type="BoundType" mode="cyclic" value="BoundType(1)"/> 
+    <rt:dyn type="Alarm_level" mode="constant" value="1"/> 
+  </image>
+  <image x="177.5" y="17.5" width="20" height="5" xlink:href="aux721_al_level_indicator.svg" id="Ind_al_0">
+    <rt:dyn type="Is_NotAcked" mode="cyclic" value="Is_NotAcked(0)"/> 
+    <rt:dyn type="Is_Active" mode="cyclic" value="Is_Active(0)"/> 
+    <rt:dyn type="BoundType" mode="cyclic" value="BoundType(0)"/> 
+    <rt:dyn type="Alarm_level" mode="constant" value="0"/> 
+  </image>
+  <circle cx="192.5" cy="8.5" r="5" id="Ind_NA" fill="Col_Grey3" stroke="Col_Grey5">
+    <rt:dyn type="fill" mode="cyclic" value="ShowInAlarmColor(1 * CByte(Alarm_NotAcked(8)), ColorAlarm(8), ColorAlarm(9))"/> 
+    <rt:dyn type="visibility" mode="onchange" value="Is_NotAcked(8)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </circle>
+  <text x="100" y="14" id="St_ID" text-anchor="middle">
+    <rt:dyn type="text" mode="onchange" value="PLStrCut(Model_ID, 15)"/> 
+    <rt:dyn type="title" mode="onchange" value="Model_ID"/> 
+ИМЯ_СТАНЦИИ</text>
+  <image width="200" height="25" xlink:href="obj_Button_icon.svg" id="Sel_area">
+    <rt:event type="OnClick">If VIS.ModelExists(false, Model_ID) Then
+	//определить окно и послать туда модель
+	Dim WinNr As UShort
+	WinNr = Clicked_Win_Num()
+	If WinNr == 0 Then
+		ShowWarning(&quot;Нельзя вызвать видеокадр,\nтак как на этом мониторе\nне найдено\nглавное окно визуализации.&quot;, 10)
+	Else
+		LoadNew(Model_ID)
+	End If
+Else
+	ShowWarning(&quot;Не найден файл модели:\n&quot; + Model_ID, 10)
+End If</rt:event>
+    <rt:dyn type="Disable" mode="onchange" value="Model_ID == &quot;&quot;"/> 
+  </image>
+</svg>

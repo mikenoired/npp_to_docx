@@ -1,0 +1,251 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="-7.5 -15 15 22.5" width="15" height="22.5" id="DS_lockout">
+  <desc>Индикатор блокировки (механизмов)</desc>
+  <rt:model modelversion="7.2.0.23" comment="Стандартная подмодель ПОРТАЛа" revision="6.0">
+    <rt:param name="Lock_Color" datatype="string" comment="Цвет замка" value="black"/> 
+    <rt:param name="PointID1" datatype="string" value="NULL" comment="Идентификатор сигнала 1"/> 
+    <rt:param name="Mask_Blocked1" datatype="ushort" value="0xFFFF" comment="Маска блокировки 1 сигнала"/> 
+    <rt:param name="PointID2" datatype="string" value="NULL" comment="Идентификатор сигнала 2"/> 
+    <rt:param name="Mask_Blocked2" datatype="ushort" value="0xFFFF" comment="Маска блокировки 2 сигнала"/> 
+    <rt:param name="PointID3" datatype="string" value="NULL" comment="Идентификатор сигнала 3"/> 
+    <rt:param name="Mask_Blocked3" datatype="ushort" value="0xFFFF" comment="Маска блокировки 3 сигнала"/> 
+    <rt:param name="Aux_Bool_Blocked" datatype="boolean" value="false" comment="Если индикаторов сигнала более 3, то пользователю нужно самостоятельно вычислить параметр, есть ли блокировка. По умолчанию блокировки нет."/> 
+    <rt:param name="Aux_Quality" datatype="ubyte" enumname="EPlsQuality" value="3" comment="Если индикаторов сигнала более 3, то пользователю нужно самостоятельно вычислить качество суммарного сигнала."/> 
+    <rt:var name="Pv_1" datatype="PlsPVBin" comment="Указатель на сигнал 1"/> 
+    <rt:var name="Pv_2" datatype="PlsPVBin" comment="Указатель на сигнал 2"/> 
+    <rt:var name="Pv_3" datatype="PlsPVBin" comment="Указатель на сигнал 3"/> 
+    <rt:var name="If_Blocked" datatype="boolean" comment="Переменная, отвечающая за результат блокирования"/> 
+    <rt:var name="Pv_Quality" datatype="ubyte" value="3" comment="Качество сигналов" enumname="EPlsQuality"/> 
+    <rt:var name="Tmp_Vis" datatype="string" value="&quot;visible&quot;" comment="Переменная, отвечающая за видимость объекта"/> 
+    <rt:var name="Tmp_Color" datatype="uint" comment="Текущий цвет объекта" value="0"/> 
+    <rt:var name="Er_Link" datatype="boolean" value="false" comment="Ошибка привязки"/> 
+    <rt:sub>Sub Calc_Lock () 	
+	Dim C_L as boolean
+	Dim P_Q as ubyte
+	
+	Pv_Quality = PLS_QUAL_GOOD
+	Check_Pv (Pv_1, Mask_Blocked1, C_L, P_Q)	
+	
+	if (P_Q == PLS_QUAL_GOOD) &amp;&amp; (C_L) Then &apos;если 1 сигнал достоверен и закрыто
+		If_Blocked = True		
+		
+	Else   
+		Pv_Quality = Pv_Quality &amp; P_Q
+		Check_Pv (Pv_2, Mask_Blocked2, C_L, P_Q)	
+		if (P_Q == PLS_QUAL_GOOD) &amp;&amp; (C_L) Then &apos;если 2 сигнал достоверен и закрыто
+			If_Blocked = True		
+			Pv_Quality = PLS_QUAL_GOOD
+		Else	
+			Pv_Quality = Pv_Quality &amp; P_Q
+			Check_Pv (Pv_3, Mask_Blocked3, C_L, P_Q)	
+			if (P_Q == PLS_QUAL_GOOD) &amp;&amp; (C_L) Then &apos;если 3 сигнал достоверен и закрыто
+				If_Blocked = True	
+				Pv_Quality = PLS_QUAL_GOOD
+			Else
+				Pv_Quality = Pv_Quality &amp; P_Q
+				If (Pv_Quality == PLS_QUAL_GOOD) Then
+					If_Blocked = False
+				End IF
+
+			End If
+		End If
+		
+	End If
+
+	if (Aux_Quality==PLS_QUAL_GOOD) &amp;&amp; Aux_Bool_Blocked Then
+		Pv_Quality = PLS_QUAL_GOOD
+		If_Blocked = true
+	Else
+		Pv_Quality = Pv_Quality &amp; Aux_Quality
+	
+	End If
+End Sub</rt:sub>
+    <rt:sub>Sub Check_Pv (ByVal Pv as PlsPVBin, ByVal Mask as ushort, ByRef C_L as boolean, ByRef P_Q as ubyte)	
+	C_L = false
+	P_Q = PLS_QUAL_GOOD
+	If Pv != Nothing Then
+		P_Q = Pv.Quality
+		If (P_Q == PLS_QUAL_GOOD) &amp;&amp; ((Pv.Value &amp; Mask) !=0 ) Then
+				C_L = true
+		End If
+
+	End If
+End Sub</rt:sub>
+    <rt:sub>Sub Calc_Color () 
+
+If (!Er_Link) Then
+	Calc_Lock ()
+	
+	If (Pv_Quality == PLS_QUAL_GOOD) Then
+		if If_Blocked Then 
+			Tmp_Color = VIS.Color(Lock_Color)
+			Tmp_Vis = &quot;visible&quot;
+		else
+			Tmp_Vis = &quot;hidden&quot;
+
+		End If
+	else
+		Tmp_Color = Color_Inval
+		Tmp_Vis = &quot;visible&quot;
+	End If
+else
+	Tmp_Color = Color_ErLink
+	Tmp_Vis = &quot;visible&quot;
+End If
+end Sub</rt:sub>
+    <rt:sub>Function s() as String
+	s = &quot;&quot;
+	if (Pv_1 != Nothing) Then
+			s = Pv_1.PVId + &quot;|&quot; 
+	End If
+	if (Pv_2 != Nothing) Then
+		s = s + Pv_2.PVId + &quot;|&quot;
+	End If
+	if (Pv_3 != Nothing) Then
+		s = s +  Pv_3.PVId + &quot;|&quot;
+	End If
+End Function</rt:sub>
+    <rt:event type="OnInitialize">If (PointID1 != &quot;NULL&quot;) then
+	&apos;работаем с полученными сигналами
+	Pv_1 = BIN(PointID1)
+	If Pv_1 == Nothing Then &apos; ошибка привязки
+		Er_Link = true
+	End If
+else
+	Pv_1 = Nothing
+End If
+
+If (PointID2 != &quot;NULL&quot;) then
+	Pv_2 = BIN(PointID2)
+	If Pv_2 == Nothing Then
+		Er_Link = true &apos; ошибка привязки
+	End If
+else
+	Pv_2 = Nothing
+End If
+
+If (PointID3 != &quot;NULL&quot;) then
+	Pv_3 = BIN(PointID3)
+	If Pv_3 == Nothing Then
+		Er_Link = true
+	End If
+else
+	Pv_3 = Nothing
+End If
+
+Calc_Lock ()</rt:event>
+    <rt:changeTrigger name="Check_Pv_Sum">
+      <rt:chgItem>Aux_Bool_Blocked</rt:chgItem>
+      <rt:chgItem>Aux_Quality</rt:chgItem>
+      <rt:code>Calc_Color()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Check_Pv2">
+      <rt:chgItem>Pv_2</rt:chgItem>
+      <rt:code>Calc_Color()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Check_Pv1">
+      <rt:chgItem>Pv_1</rt:chgItem>
+      <rt:code>Calc_Color()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Check_Pv3">
+      <rt:chgItem>Pv_3</rt:chgItem>
+      <rt:code>Calc_Color()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <g id="Lock" fill-opacity="0.699994" stroke-width="0.5">
+    <rt:dyn type="stroke" mode="onchange" value="Middle_Color(0, Tmp_Color)"/> 
+    <rt:dyn type="fill" mode="onchange" value="Tmp_Color"/> 
+    <rt:dyn type="visibility" mode="onchange" value="Tmp_Vis"/> 
+    <rt:event type="OnMouseOver"/> 
+    <path d="M-6.80001 -2.5 L-6.73334 -8.8 Q-6.33334 -11.4 -5 -12.5 Q-2.5 -15 2.95974e-006 -15 Q2.5 -15 5 -12.5 Q6.39999 -11.3333 6.66666 -8.66667 L6.73332 -2.5 L5.04207 -2.91466 L5 -8.66667 Q4.19999 -11.6667 2.5 -12.5 Q1.46666 -13.2667 2.95974e-006 -13.3333 Q-1.00001 -13.2667 -2.5 -12.5 Q-4.33334 -11.6667 -5 -9.06667 L-5 -2.5 Z"/> 
+    <rect x="-7.5" y="-5" width="15" height="12.5" rx="0" ry="0">
+      <rt:event type="OnMouseOver"/> 
+    </rect>
+    <polygon points="0,-2.5 -2.5,5 2.5,5" fill="Col_Grey1"/> 
+    <circle cx="0" cy="-2.5" r="2" fill="Col_Grey1"/> 
+  </g>
+  <rect x="-7.5" y="-15" width="15" height="22.5" rx="0" ry="0" id="Sel_Area" fill="darkorange" fill-opacity="0">
+    <title>&quot;Управление блокировано&quot;</title>
+    <rt:event type="OnMouseOver">if Tmp_Vis != &quot;visible&quot; Then
+	Lock.visibility = &quot;visible&quot;
+	Lock.fill = &quot;none&quot;
+End If</rt:event>
+    <rt:event type="OnMouseOut">Lock.visibility = Tmp_Vis
+Lock.fill = Tmp_Color</rt:event>
+    <rt:event type="OnClick">If PointID1 != &quot;NULL&quot; &amp;&amp; (Pv_1 == Nothing)  Then
+	ShowWarning (&quot;Ошибка привязки.\nPointID_1 = \&quot;&quot; + PointID1 + &quot;\&quot;&quot;, 0)
+ElseIf (PointID2 != &quot;NULL&quot;) &amp;&amp; (Pv_2 == Nothing) Then
+	ShowWarning (&quot;Ошибка привязки.\nPointID_2 = \&quot;&quot; + PointID2 + &quot;\&quot;&quot;, 0)
+ElseIf (PointID3 != &quot;NULL&quot;) &amp;&amp; (Pv_3 == Nothing) Then
+	ShowWarning (&quot;Ошибка привязки.\nPointID_3 = \&quot;&quot; + PointID3 + &quot;\&quot;&quot;, 0)
+
+ElseIf  (Pv_1 == Nothing) &amp;&amp; (Pv_2 == Nothing) &amp;&amp; (Pv_3 == Nothing) Then   &apos;нет ошибки привязки, но Pv не определены
+	ShowMessage (&quot;Индикация по локальной переменной.&quot;, 5)	
+Else
+	
+	if (Pv_1 != Nothing) &amp;&amp; (Pv_2 != Nothing) &amp;&amp; (Pv_3 != Nothing)  Then &apos; если определены все 3 идентификатора
+		
+		Open_Win_Uni(False, &quot;multyKKS&quot;, &quot;Составной объект&quot;, &quot;wi_MultyPV&quot;, s() + &quot;возможна индик. по лок. переменной&quot;)
+	
+	Else
+		if Aux_Bool_Blocked || (Aux_Quality != PLS_QUAL_GOOD) Then  &apos; если 4- я составляющая не равна &quot;по умолчанию&quot;
+			Open_Win_Uni(False, &quot;multyKKS&quot;, &quot;Составной объект&quot;, &quot;wi_MultyPV&quot;, s() + &quot;возможна индик. по лок. переменной&quot;)
+		else
+			Open_Win_Uni(False, &quot;multyKKS&quot;, &quot;Составной объект&quot;, &quot;wi_MultyPV&quot;, s())
+		End If
+	
+	End If
+
+
+
+
+
+End If</rt:event>
+    <rt:event type="OnRightClick">If PointID1 != &quot;NULL&quot; &amp;&amp; (Pv_1 == Nothing)  Then
+	ShowWarning (&quot;Ошибка привязки.\nPointID_1 = \&quot;&quot; + PointID1 + &quot;\&quot;&quot;, 0)
+ElseIf (PointID2 != &quot;NULL&quot;) &amp;&amp; (Pv_2 == Nothing) Then
+	ShowWarning (&quot;Ошибка привязки.\nPointID_2 = \&quot;&quot; + PointID2 + &quot;\&quot;&quot;, 0)
+ElseIf (PointID3 != &quot;NULL&quot;) &amp;&amp; (Pv_3 == Nothing) Then
+	ShowWarning (&quot;Ошибка привязки.\nPointID_3 = \&quot;&quot; + PointID3 + &quot;\&quot;&quot;, 0)
+
+ElseIf  (Pv_1 == Nothing) &amp;&amp; (Pv_2 == Nothing) &amp;&amp; (Pv_3 == Nothing) Then   &apos;нет ошибки привязки, но Pv не определены
+	ShowMessage (&quot;Для локальных переменных\nменю не предусмотрено.&quot;, 5)
+
+Else
+	Dim Pv as PlsPVBin
+	Dim i as UByte
+&apos;	LoadPopUpMenu(Pv_1.PVId + &quot;|BINi|wi_BIN &quot; + Pv_1.PVId)
+	i = 0
+	if Pv_1 != Nothing Then	
+		TmpBuffer(i) = Pv_1.PVId
+		i = i + 1
+		Pv = Pv_1
+	End If
+	if Pv_2 != Nothing Then	
+		TmpBuffer(i) = Pv_2.PVId
+		If i = 0 Then
+			Pv = Pv_2
+		End If
+		i = i + 1
+	End If
+	if Pv_3 != Nothing Then	
+		TmpBuffer(i) = Pv_3.PVId
+		If i = 0 Then
+			Pv = Pv_3
+		End If
+		i = i + 1
+	End If
+	if (Aux_Bool_Blocked || (Aux_Quality != PLS_QUAL_GOOD)) || (i == 3) Then  &apos; если 4 - я составляющая не равна &quot;по умолчанию&quot; или идентификаторов больше 2
+
+		TmpBuffer(i) = &quot;возможна индик. по лок. переменной&quot;
+	End If
+	LoadPopUpMenu(Pv.PVId + &quot;|NONi|&quot;)
+
+End If</rt:event>
+    <rt:event type="OnMiddleClick">ShowMessage (&quot;Объект неуправляемый.&quot;, 5)</rt:event>
+    <rt:dyn type="title" mode="onchange" value="!Er_Link &amp;&amp; If_Blocked &amp;&amp; (Pv_Quality == PLS_QUAL_GOOD)" trans="bt">
+      <rt:xy value="false" value2=""/> 
+      <rt:xy value2="Управление блокировано"/> 
+    </rt:dyn>
+  </rect>
+</svg>

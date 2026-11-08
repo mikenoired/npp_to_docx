@@ -1,0 +1,78 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="codedlayout meet" viewBox="0 0 75 25" width="75" height="25" id="bool_indicator_txt_a">
+  <desc>Индикатор boolean текстовый</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.1">
+    <rt:param name="Stat" datatype="boolean" value="False" comment="значение сигнала"/> 
+    <rt:param name="Qual" datatype="ubyte" value="3" comment="качество сигнала"/> 
+    <rt:param name="Col_ON" datatype="string" value="Col_Yellow" comment="цвет для индикации состояния True"/> 
+    <rt:param name="Col_OFF" datatype="string" value="Col_Green" comment="цвет для индикации состояния False"/> 
+    <rt:param name="T_String" datatype="string" value="" comment="Текст на индикаторе"/> 
+    <rt:param name="T_Color" datatype="string" value="black" comment="Цвет текста"/> 
+    <rt:param name="T_Font" datatype="string" value="inherit" comment="Шрифт"/> 
+    <rt:param name="T_Size" datatype="float" value="15" comment="Размер шрифта"/> 
+    <rt:param name="T_Style" datatype="string" value="normal" comment="Стиль"/> 
+    <rt:param name="T_Weight" datatype="string" value="normal" comment="Толщина букв шрифта"/> 
+    <rt:param name="Grad_Style" datatype="boolean" value="false" comment="Индикатор имеет градиентную заливку - объёмный фон"/> 
+    <rt:param name="Auto_Scale" datatype="boolean" value="false" comment="Автомасштабировать текст под размеры индикатора"/> 
+    <rt:sub>Sub BGColor()
+If Qual == 0 Then
+	body.fill = Color_Inval
+Else
+	If Stat Then
+		body.fill = Col_ON
+	Else
+		body.fill = Col_OFF
+	End If
+End If
+End Sub</rt:sub>
+    <rt:event type="OnResize">Dim Th_Ht As Float
+Dim Th_Wdth As Float
+Th_Ht = _This.height
+Th_Wdth = _This.width
+
+Grad_BG.width = Th_Wdth
+Grad_BG.height = Th_Ht
+body.width = Th_Wdth
+body.height = Th_Ht
+RB_border.points = &quot;0,&quot; + CStr(Th_Ht) + &quot; &quot; + CStr(Th_Wdth)+ &quot;,&quot; + CStr(Th_Ht) + &quot; &quot; + CStr(Th_Wdth) + &quot;,0&quot;
+LU_border.points =  &quot;0,&quot; + CStr(Th_Ht) + &quot; 0,0 &quot; + CStr(Th_Wdth) + &quot;,0&quot;
+
+My_Text.width = 50
+My_Text.height = 25
+//My_Text.x = Th_Wdth / 2.0 - 25.0
+My_Text.x = (Th_Wdth - 50.0) / 2.0
+
+My_Text.y = Th_Ht / 2.0 - 12.5
+
+Sel_Frame.width = Th_Wdth
+Sel_Frame.height = Th_Ht</rt:event>
+    <rt:changeTrigger name="MyTrig">
+      <rt:chgItem>Stat</rt:chgItem>
+      <rt:chgItem>Qual</rt:chgItem>
+      <rt:code>BGColor()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="75" height="25" rx="0" ry="0" id="Grad_BG" fill="url(#Cylinder_horizontal2)" stroke="none"/> 
+  <rect x="0" y="0" width="75" height="25" rx="0" ry="0" id="body" fill="Col_Yellow" fill-opacity="0.5" stroke="none">
+    <rt:dyn type="fill-opacity" mode="onchange" value="Grad_Style &amp;&amp; (Qual != PLS_QUAL_BAD)" trans="bd">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0.6"/> 
+    </rt:dyn>
+  </rect>
+  <polyline points="0,25 75,25 75,0" id="RB_border" fill="none" stroke="Col_Grey1" stroke-linecap="round" stroke-linejoin="miter" stroke-width="1"/> 
+  <polyline points="0,25 0,0 75,0" id="LU_border" fill="none" stroke="Col_Grey5" stroke-linecap="round" stroke-linejoin="miter" stroke-width="1"/> 
+  <image x="12.5" width="50" height="25" xlink:href="TextAutoScale.svg" id="My_Text">
+    <rt:dyn type="T_String" mode="onchange" value="T_String"/> 
+    <rt:dyn type="T_Color" mode="onchange" value="T_Color"/> 
+    <rt:dyn type="T_Font" mode="onchange" value="T_Font"/> 
+    <rt:dyn type="T_Size" mode="onchange" value="T_Size"/> 
+    <rt:dyn type="T_Style" mode="onchange" value="T_Style"/> 
+    <rt:dyn type="T_Weight" mode="onchange" value="T_Weight"/> 
+    <rt:dyn type="Auto_Scale" mode="constant" value="Auto_Scale"/> 
+    <rt:dyn type="Parent" mode="constant" value="_This"/> 
+  </image>
+  <rect x="0" y="0" width="75" height="25" rx="0" ry="0" id="Sel_Frame" fill="black" fill-opacity="0">
+    <rt:event type="OnClick">ShowMessage (&quot;Это индикатор\nдля локальной переменной.&quot;, 5)</rt:event>
+    <rt:event type="OnRightClick">ShowMessage (&quot;Для локальных переменных\nменю не предусмотрено.&quot;, 5)</rt:event>
+  </rect>
+</svg>

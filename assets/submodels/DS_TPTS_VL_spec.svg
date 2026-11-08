@@ -1,0 +1,331 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 160 75" width="160" height="75" id="DS_TPTS_VL_spec" font-size="16" font-weight="bold">
+  <desc>ТПТС ([I]VL) предвыбор универсальный c текстом Dull Screen</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа для Dull Screen" revision="6.0">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS оборудования"/> 
+    <rt:param name="Operate" datatype="boolean" value="False" comment="сделать объект управляемым"/> 
+    <rt:param name="VL_type" datatype="string" value="1o3" comment="Тип предвыбора (сколько из скольки). Разрешено: 1о2, 1о3, 2о3 1k2 или 1k3"/> 
+    <rt:param name="OneLine" datatype="boolean" value="False" comment="Для предвыбора 1 из 2 или 1 из 3 обрезать индикатор снизу и показывать только одну строку"/> 
+    <rt:var name="Z0" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="OU" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="VB6" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="Status" datatype="int" comment="обобщенное сотояние" value="0"/> 
+    <rt:var name="Col1" datatype="ushort" value="10" comment="код цвета сост. 1"/> 
+    <rt:var name="Col2" datatype="ushort" value="10" comment="код цвета сост. 2"/> 
+    <rt:var name="Col3" datatype="ushort" value="10" comment="код цвета сост. 3"/> 
+    <rt:var name="Text1" datatype="string" value="предвыбор 1" comment="текст 1"/> 
+    <rt:var name="Text2" datatype="string" value="предвыбор 2" comment="текст 2"/> 
+    <rt:var name="Text3" datatype="string" value="предвыбор 3" comment="текст 3"/> 
+    <rt:var name="AStat" datatype="ushort" value="0" comment="код сигнализации"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="MyStrokeWdth" datatype="float" value="2" comment="Толщина рамок в зависимости от управляемости"/> 
+    <rt:var name="Shorter" datatype="boolean" value="False" comment="отображать короче, только одну цифру"/> 
+    <rt:var name="HasErr" datatype="boolean" value="False" comment="в параметрах привязки обнаружены ошибки"/> 
+    <rt:var name="HeightRatio" datatype="float" value="1" comment="Соотношение высоты объекта к исходной"/> 
+    <rt:var name="CatNr" datatype="ushort" value="37" comment="Надо узнать, это VL (37) или IVL (30)"/> 
+    <rt:sub>Sub Show_Selection()
+If Shorter Then
+	If (PRJSPEC.ObjectColorEx(4, Col1, 11) == Color_Sel) Then
+		text_1.font_size = 16 * HeightRatio
+		text_1.font_weight = &quot;bold&quot;
+		text_1.text_decoration = &quot;underline&quot;
+	Else
+		text_1.font_size = 13 * HeightRatio
+		text_1.font_weight = &quot;normal&quot;
+		text_1.text_decoration = &quot;none&quot;
+	End If
+Else
+	If (PRJSPEC.ObjectColorEx(4, Col1, 11) == Color_Sel) Then
+		text_1.font_size = 16 * HeightRatio
+		text_1.font_weight = &quot;bold&quot;
+		text_1.text_decoration = &quot;underline&quot;
+		text_1.fill = &quot;black&quot;
+	Else
+		text_1.font_size = 13 * HeightRatio
+		text_1.font_weight = &quot;normal&quot;
+		text_1.text_decoration = &quot;none&quot;
+		text_1.fill = &quot;Col_Grey5&quot;
+	End If
+	If (PRJSPEC.ObjectColorEx(4, Col2, 11) == Color_Sel) Then
+		text_2.font_size = 16 * HeightRatio
+		text_2.font_weight = &quot;bold&quot;
+		text_2.text_decoration = &quot;underline&quot;
+		text_2.fill = &quot;black&quot;
+	Else
+		text_2.font_size = 13 * HeightRatio
+		text_2.font_weight = &quot;normal&quot;
+		text_2.text_decoration = &quot;none&quot;
+		text_2.fill = &quot;Col_Grey5&quot;
+	End If
+	If (PRJSPEC.ObjectColorEx(4, Col3, 11) == Color_Sel) Then
+		text_3.font_size = 16 * HeightRatio
+		text_3.font_weight = &quot;bold&quot;
+		text_3.text_decoration = &quot;underline&quot;
+		text_3.fill = &quot;black&quot;
+	Else
+		text_3.font_size = 13 * HeightRatio
+		text_3.font_weight = &quot;normal&quot;
+		text_3.text_decoration = &quot;none&quot;
+		text_3.fill = &quot;Col_Grey5&quot;
+	End If
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Get_Selection()
+If HasErr || Z0 == Nothing  Then
+	Backgr.fill = Color_ErLink
+	Exit Sub
+End If
+
+If Shorter Then
+	Status = PRJSPEC.TPTS_VL_1(KKS, Col1, AStat)
+	If (Status == -1)Then
+		text_1.text = &quot;РЕМОНТ&quot;
+	ElseIf ((Status &amp; 4096) != 0) Then
+		text_1.text = &quot;НДСТ&quot;
+	ElseIf (Status &lt;= 0) Then
+		text_1.text = &quot;НЕИЗВ.&quot;
+	ElseIf ((Status &amp; 0x3) &gt; 0) &amp;&amp; ((Status &amp; 0x3C) == 0) Then
+		text_1.text = Text1
+	ElseIf ((Status &amp; 0xC) &gt; 0) &amp;&amp; ((Status &amp; 0x33) == 0) Then
+		text_1.text = Text2
+	ElseIf ((Status &amp; 0x30) &gt; 0) &amp;&amp; ((Status &amp; 0xF) == 0) Then
+		text_1.text = Text3
+	&apos;приоритет мигания
+	ElseIf ((Status &amp; 0x2A) &gt; 0) Then
+		If ((Status &amp; 0x2A) == 2) Then
+			text_1.text = &quot;1&quot;
+		ElseIf ((Status &amp; 0x2A) == 8) Then
+			text_1.text = &quot;2&quot;
+		ElseIf ((Status &amp; 0x2A) == 32) Then
+			text_1.text = &quot;3&quot;
+		Else
+			text_1.text = &quot;НЕИЗВ.&quot;
+		End If
+	Else
+		text_1.text = &quot;НЕИЗВ.&quot;
+	End If
+Else
+	Status = PRJSPEC.TPTS_VL(KKS, Col1, Col2, Col3, AStat)
+End If
+If (Status == -1)Then
+	Backgr.fill = Color_Remont
+ElseIf ((Status &amp; 4096) != 0) || (Status &lt; 0) Then
+	Backgr.fill = Color_Inval
+ElseIf ((Status &amp; 0x3F) != 0) Then
+	Backgr.fill = &quot;Col_BGmain&quot;
+Else
+	Backgr.fill = &quot;Col_Grey5&quot;
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">SingleDig.visibility = &quot;hidden&quot;
+TwoDig.visibility = &quot;hidden&quot;
+
+If (KKS != &quot;NULL&quot;) Then
+	Z0 = BIN(KKS + &quot;_Z0&quot;)
+	OU = BIN(KKS + &quot;_OU&quot;)
+	VB6 = BIN(KKS + &quot;_VB6&quot;)
+	Text1 = PRJSPEC.GET_KKS(KKS, 1)
+	Text2 = PRJSPEC.GET_KKS(KKS, 2)
+	Text3 = PRJSPEC.GET_KKS(KKS, 3)
+	If Text1 == &quot;Н.Д.&quot; Then
+		Text1 = Text1 + &quot; 1&quot;
+	ElseIf Len(Text1) == 0 Then
+		Text1 = &quot;&lt; 1 &gt;&quot;
+	End If
+	If Text2 == &quot;Н.Д.&quot; Then
+		Text2 = Text2 + &quot; 2&quot;
+	ElseIf Len(Text2) == 0 Then
+		Text2 = &quot;&lt; 2 &gt;&quot;
+	End If
+	If Text3 == &quot;Н.Д.&quot; Then
+		Text3 = Text3 + &quot; 3&quot;
+	ElseIf Len(Text3) == 0 Then
+		Text3 = &quot;&lt; 3 &gt;&quot;
+	End If
+Else
+	HasErr = True
+End If
+If (Z0 != Nothing) Then
+	CatNr = Z0.CategoryNr
+Else
+	HasErr = True
+End If
+If CatNr == 37 Then	//это VL
+	HasErr = HasErr || !((VL_type == &quot;1o2&quot;) || (VL_type == &quot;1o3&quot;) || (VL_type == &quot;2o3&quot;) || (VL_type == &quot;1k2&quot;) || (VL_type == &quot;1k3&quot;))
+Else	//иначе полагаем, что это IVL
+	HasErr = HasErr || !((VL_type == &quot;1o2&quot;) || (VL_type == &quot;1o3&quot;) || (VL_type == &quot;2o3&quot;) || (VL_type == &quot;1k2&quot;) || (VL_type == &quot;1k3&quot;) || (VL_type == &quot;2o2&quot;) || (VL_type == &quot;3o3&quot;))
+End If
+If HasErr Then
+	Backgr.fill = Color_ErLink
+	Backgr.fill_opacity = 1
+	Text1 = &quot;Ошибка&quot;
+	Text2 = &quot;Ошибка&quot;
+	Text3 = &quot;Ошибка&quot;
+End If
+If Left(VL_type, 1) == &quot;1&quot; &amp;&amp; OneLine Then
+	text_2.visibility = &quot;hidden&quot;
+	text_3.visibility = &quot;hidden&quot;
+	Shorter = True
+ElseIf Right(VL_type, 1) == &quot;2&quot; Then
+	text_3.visibility = &quot;hidden&quot;
+End If
+Dim NewHeight As Float
+Dim NewWidth As Float
+NewWidth = CInt(_This.width)
+If Left(VL_type, 1) == &quot;1&quot; &amp;&amp; OneLine Then
+	NewHeight = CInt(_This.height * 35.0 / 75.0)
+	text_1.y = 22.5 * _This.height / 75.0
+ElseIf Right(VL_type, 1) == &quot;2&quot; Then
+	NewHeight = CInt(_This.height * 55.0 / 75.0)
+	text_1.y = 22.5 * _This.height / 75.0
+Else
+	NewHeight = CInt(_This.height)
+End If
+
+InGr.height = NewHeight 
+body.x = 5
+body.y = 5
+body.width = NewWidth - 10
+body.height = NewHeight - 10
+Backgr.x = 5
+Backgr.y = 5
+Backgr.width = NewWidth - 10
+Backgr.height = NewHeight - 10
+SelFrame.x = 5
+SelFrame.y = 5
+SelFrame.width = NewWidth - 10
+RB_edge.points = &quot;5,&quot;+CStr(NewHeight - 5)+&quot; &quot;+CStr(NewWidth - 5)+&quot;,&quot;+CStr(NewHeight - 5)+&quot; &quot;+CStr(NewWidth - 5)+&quot;,5&quot;
+LU_edge.points = &quot;5,&quot;+CStr(NewHeight - 5)+&quot; 5,5 &quot;+CStr(NewWidth - 5)+&quot;,5&quot;</rt:event>
+    <rt:event type="OnResize">HeightRatio = _This.height / 75.0
+text_1.font_size = 16 * HeightRatio
+text_2.font_size = 16 * HeightRatio
+text_3.font_size = 16 * HeightRatio
+
+/*
+Dim NewHeight As Float
+Dim NewWidth As Float
+NewWidth = CInt(_This.width)
+NewHeight = CInt(_This.height)
+
+InGr.height = NewHeight 
+body.x = 5
+body.y = 5
+body.width = NewWidth - 10
+body.height = NewHeight - 10
+Backgr.x = 5
+Backgr.y = 5
+Backgr.width = NewWidth - 10
+Backgr.height = NewHeight - 10
+SelFrame.x = 5
+SelFrame.y = 5
+SelFrame.width = NewWidth - 10
+RB_edge.points = &quot;5,&quot;+CStr(NewHeight - 5)+&quot; &quot;+CStr(NewWidth - 5)+&quot;,&quot;+CStr(NewHeight - 5)+&quot; &quot;+CStr(NewWidth - 5)+&quot;,5&quot;
+LU_edge.points = &quot;5,&quot;+CStr(NewHeight - 5)+&quot; 5,5 &quot;+CStr(NewWidth - 5)+&quot;,5&quot;
+*/</rt:event>
+    <rt:cycleTrigger name="update_indication" cycle="250" unit="millisecond">
+      <rt:condition>(KKS != &quot;NULL&quot;) &amp;&amp; !HasErr</rt:condition>
+      <rt:code>Show_Selection()</rt:code>
+    </rt:cycleTrigger>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChRights">
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>MyStrokeWdth = FrameStrokeWidth (Operate, OU)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetStatus">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>Z0</rt:chgItem>
+      <rt:chgItem>OU</rt:chgItem>
+      <rt:chgItem>VB6</rt:chgItem>
+      <rt:code>Get_Selection()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="5" y="5" width="150" height="65" rx="0" ry="0" id="body" fill="url(#Cylinder_horizontal2)" stroke="none"/> 
+  <rect x="5" y="5" width="150" height="65" rx="0" ry="0" id="Backgr" visibility="visible" rt:detect="enabled" fill="Col_BGmain" fill-opacity="0.5" stroke="none">
+    <rt:dyn type="fill-opacity" mode="onchange" value="HasErr || (Status &lt; 0) || ((Status &amp; 4096) != 0) || (Z0 == Nothing)" trans="bd">
+      <rt:xy value="false" value2="0.5"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </rect>
+  <polyline points="5,70 155,70 155,5" id="RB_edge" fill="none" stroke="Col_Grey5" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey1"/> 
+      <rt:xy value2="Col_Grey5"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <polyline points="5,70 5,5 155,5" id="LU_edge" fill="none" stroke="Col_Grey1" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey5"/> 
+      <rt:xy value2="Col_Grey1"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <text x="75" y="20" id="text_1" fill="black" font-family="AAP_Font3" text-anchor="middle">
+    <rt:dyn type="text" mode="constant" value="Text1"/> 
+Предвыбор 1</text>
+  <text x="75" y="40" id="text_2" fill="black" font-family="AAP_Font3" text-anchor="middle">
+    <rt:dyn type="text" mode="constant" value="Text2"/> 
+Предвыбор 2</text>
+  <text x="75" y="60" id="text_3" fill="black" font-family="AAP_Font3" text-anchor="middle">
+    <rt:dyn type="text" mode="constant" value="Text3"/> 
+Предвыбор 3</text>
+  <rect x="0" y="0" width="160" height="75" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="6.25" y="6.25" width="148.75" height="58.75" rx="0" ry="0" id="SelFrame" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Нет привязки.&quot;, 5)
+ElseIf (CatNr == 37) &amp;&amp; !((VL_type == &quot;1o2&quot;) || (VL_type == &quot;1o3&quot;) || (VL_type == &quot;2o3&quot;) || (VL_type == &quot;1k2&quot;) || (VL_type == &quot;1k3&quot;)) Then
+	ShowWarning (&quot;Ошибка привязки.\nVL_type = \&quot;&quot; + VL_type + &quot;\&quot;\nДолжно быть для VL\n1о2,1о3,2о3,1k2 или 1k3.&quot;, 0)
+ElseIf (CatNr == 30) &amp;&amp; !((VL_type == &quot;1o2&quot;) || (VL_type == &quot;1o3&quot;) || (VL_type == &quot;2o3&quot;) || (VL_type == &quot;1k2&quot;) || (VL_type == &quot;1k3&quot;) || (VL_type == &quot;2o2&quot;) || (VL_type == &quot;3o3&quot;)) Then
+	ShowWarning (&quot;Ошибка привязки.\nVL_type = \&quot;&quot; + VL_type + &quot;\&quot;\nДолжно быть для IVL\n1о2,1о3,2о3,1k2,1k3,2o2,3o3.&quot;, 0)
+ElseIf Z0 != nothing Then
+	If CatNr== 30 Then
+		Open_ws_wf_wi(&quot;TPTS_IVL_spec&quot;, KKS + &quot;|&quot; + VL_type, Operate)
+	Else
+		Open_ws_wf_wi(&quot;TPTS_VL_spec&quot;, KKS + &quot;|&quot; + VL_type, Operate)
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnRightClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Нет привязки.&quot;, 5)
+ElseIf (CatNr == 37) &amp;&amp; !((VL_type == &quot;1o2&quot;) || (VL_type == &quot;1o3&quot;) || (VL_type == &quot;2o3&quot;) || (VL_type == &quot;1k2&quot;) || (VL_type == &quot;1k3&quot;)) Then
+	ShowWarning (&quot;Ошибка привязки.\nVL_type = \&quot;&quot; + VL_type + &quot;\&quot;\nДолжно быть для VL\n1о2,1о3,2о3,1k2 или 1k3.&quot;, 0)
+ElseIf (CatNr == 30) &amp;&amp; !((VL_type == &quot;1o2&quot;) || (VL_type == &quot;1o3&quot;) || (VL_type == &quot;2o3&quot;) || (VL_type == &quot;1k2&quot;) || (VL_type == &quot;1k3&quot;) || (VL_type == &quot;2o2&quot;) || (VL_type == &quot;3o3&quot;)) Then
+	ShowWarning (&quot;Ошибка привязки.\nVL_type = \&quot;&quot; + VL_type + &quot;\&quot;\nДолжно быть для IVL\n1о2,1о3,2о3,1k2,1k3,2o2,3o3.&quot;, 0)
+ElseIf Z0 != nothing Then
+	If CatNr == 30 Then
+		If Operate &amp;&amp; Check_Oper_Rights(OU) Then
+			LoadPopUpMenu(KKS + &quot;|IVLo|TPTS_IVL_spec &quot; + KKS + &quot;|&quot; + VL_type)
+		Else
+			LoadPopUpMenu(KKS + &quot;|IVLi|TPTS_IVL_spec &quot; + KKS + &quot;|&quot; + VL_type)
+		End If
+	Else
+		If Operate &amp;&amp; Check_Oper_Rights(OU) Then
+			LoadPopUpMenu(KKS + &quot;|VL o|TPTS_VL_spec &quot; + KKS + &quot;|&quot; + VL_type)
+		Else
+			LoadPopUpMenu(KKS + &quot;|VL i|&quot;)
+		End If
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnMiddleClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Нет привязки.&quot;, 5)
+ElseIf Z0 != nothing Then
+	Open_Win_Uni(False, &quot;rights&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS+&quot;|&quot;+CStr(Operate))
+Else
+	NoLink(KKS)
+End If</rt:event>
+  </rect>
+  <line x1="160" y1="35" x2="0" y2="35" id="SingleDig" stroke="Col_InGR1" stroke-dasharray="5,5" stroke-width="1"/> 
+  <line x1="160" y1="55" x2="0" y2="55" id="TwoDig" stroke="Col_InGR1" stroke-dasharray="5,5" stroke-width="1"/> 
+</svg>

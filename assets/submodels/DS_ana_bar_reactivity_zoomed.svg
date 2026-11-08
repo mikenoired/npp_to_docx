@@ -1,0 +1,163 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="smart meet" viewBox="0 0 25 100" width="25" height="100" id="DS_ana_bar_reactivity_zoomed" stroke="Col_Grey5">
+  <desc>Барограф для отображения реактивности c зуммированием (диапазон -25; +1)</desc>
+  <rt:model comment="Пользовательская подмодель ПОРТАЛа" revision="6.0">
+    <rt:param name="PointID" datatype="string" comment="Идентификатор сигнала заливки" value="NULL"/> 
+    <rt:param name="FillFromZero" datatype="boolean" value="False" comment="Заливать вверх положительную область и вниз от нуля - отрицательную"/> 
+    <rt:param name="ShowWarning" datatype="boolean" value="False" comment="Обозначить положительную реактивность цветом нарушения верхней предупредительной границы"/> 
+    <rt:param name="ShowScales" datatype="boolean" value="False" comment="Выводить обозначения линейной и логарифмической областей барографа"/> 
+    <rt:var name="pv" datatype="PlsPVAna" comment="DB PV"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="object in group"/> 
+    <rt:var name="FBar" datatype="float" value="1" comment="fill level"/> 
+    <rt:var name="FColor" datatype="uint" comment="цвет индикации"/> 
+    <rt:var name="ht" datatype="float" comment="высота барографа"/> 
+    <rt:var name="c1" datatype="double" comment="log10(25)"/> 
+    <rt:var name="wt" datatype="float" comment="ширина барографа"/> 
+    <rt:sub>Sub ValCalc()
+If pv != nothing Then
+	Dim val As double
+	val = pv.Value
+	If FillFromZero Then
+		L_range_exceed.visibility = &quot;hidden&quot;
+		H_range_exceed.visibility = &quot;hidden&quot;
+		If (val &lt; -25) Then
+			body.y = ht * 0.35
+			body.height = ht * 0.65
+			L_range_exceed.visibility = &quot;visible&quot;
+		ElseIf (val &gt;= -25) &amp;&amp; (val &lt; -1) Then
+			body.y = ht * 0.35
+			body.height =  ht * (0.65 - 0.3 * (1 - Log10(- val) / c1))
+		ElseIf (val &gt;= -1) &amp;&amp; (val &lt; 0) Then
+			body.y = ht * 0.35
+			body.height = ht * (-0.35 * val)
+		ElseIf (val &gt;= 0) &amp;&amp; (val &lt; 1) Then
+			body.y = ht * 0.35 * (1.0 - val)
+			body.height = ht * (0.35 * val)
+		Else
+			body.y = 0
+			body.height = ht * 0.35
+			H_range_exceed.visibility = &quot;visible&quot;
+		End If
+	Else
+		L_range_exceed.visibility = &quot;hidden&quot;
+		H_range_exceed.visibility = &quot;hidden&quot;
+		If (val &lt; -25) Then
+			FBar = 0
+			L_range_exceed.visibility = &quot;visible&quot;
+		ElseIf (val &gt;= -25) &amp;&amp; (val &lt; -1) Then
+			FBar = ht * 0.3 * (1 - Log10(- val) / c1)
+		ElseIf (val &gt;= -1) &amp;&amp; (val &lt; 1) Then
+			FBar = ht * (0.3 + 0.35 * (1.0 + val))
+		Else
+			FBar = ht
+			H_range_exceed.visibility = &quot;visible&quot;
+		End If
+		body.y = ht - FBar
+		body.height = FBar
+	End If
+	If ShowWarning &amp;&amp; (val &gt; 0) Then
+		FColor = Color_ANA_HI_P
+	Else
+		FColor = Color_ANA_GOOD
+	End If
+	If ((pv.SuspendedFlags &amp; PLS_SUSP_CMD) != 0 ) Then
+		FColor = Color_Remont
+	ElseIf (pv.Quality == PLS_QUAL_BAD) Then
+		FColor = Color_Inval
+	ElseIf (pv.QualitySubstatus == PLS_QUALSUB_LOCALOVERRIDE) Then
+		FColor = Color_Imitation
+	ElseIf (pv.QualitySubstatus == PLS_QUALSUB_RANGEEXCEEDED) Then
+		FColor = Color_Inval
+	End If
+Else
+	FBar = -1
+	FColor = Color_ANA_ER_LINK
+End If
+If (FColor == Color_ANA_GOOD) Then
+	FColor = Middle_Color_Wieghted(FColor, 0xcdcdcd, 0.5)
+End If
+End Sub</rt:sub>
+    <rt:event type="OnResize">InGr.y = -2.5
+InGr.height = _This.height + 5
+gr_scale.font_size = 7
+</rt:event>
+    <rt:event type="OnInitialize">Set pv = ANA(PointID)
+If pv == Nothing Then
+	FColor = Color_ANA_ER_LINK
+End If
+ht = _This.height
+wt = _This.width
+c1 = Log10(25)
+H_range_exceed.visibility = &quot;hidden&quot;</rt:event>
+    <rt:changeTrigger name="GRP">
+      <rt:condition>pv != Nothing</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(pv.PVId) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc">
+      <rt:condition>PointID != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="2.5" y="0" width="20" height="35" rx="0" ry="0" id="rect_hi" fill="Col_Yellow" stroke-width="1">
+    <rt:dyn type="fill" mode="constant" value="Middle_Color_Wieghted(Color_ANA_HI_P, 0xffffff, 0.35)"/> 
+    <rt:dyn type="visibility" mode="constant" value="ShowWarning" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <line x1="1" y1="35" x2="24" y2="35" id="line_null" stroke="black" stroke-width="2"/> 
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="Backgr_rect" fill="Col_BGmain" fill-opacity="0.849997" stroke="none"/> 
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="body" fill="Col_Green" stroke="none">
+    <rt:dyn type="fill" mode="onchange" value="FColor"/> 
+  </rect>
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="Backgr_frame" fill="none" stroke-width="1"/> 
+  <polygon points="7.5,2.5 12.5,-2.5 17.5,2.5" id="H_range_exceed" fill="Col_Grey1" stroke-width="1">
+    <rt:dyn type="fill" mode="onchange" value="Logical_Color(_Blink1, Color_Inval, Col_Ar(11))"/> 
+  </polygon>
+  <polygon points="7.5,97.2928 12.5,102.293 17.5,97.2928" id="L_range_exceed" visibility="hidden" rt:detect="disabled" fill="Col_Grey1" stroke-width="1">
+    <rt:dyn type="fill" mode="onchange" value="Logical_Color(_Blink1, Color_Inval, Col_Ar(11))"/> 
+  </polygon>
+  <rect x="0" y="-2.5" width="25" height="105" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If pv == nothing Then
+	NoLink(PointID)
+Else
+	Call_Win (&quot;ws_ANA_NB&quot;, pv.PVId + &quot;|-1&quot;)
+End If</rt:event>
+    <rt:event type="OnRightClick">If pv == nothing Then
+	NoLink(PointID)
+Else
+	LoadPopUpMenu(pv.PVId + &quot;|ANAi|ws_ANA_NB &quot; + pv.PVId + &quot;|-1&quot;)
+End If</rt:event>
+  </rect>
+  <g id="gr_scale" fill="Col_Grey5" font-family="AAP_Font2" font-size="7" font-weight="normal" text-anchor="middle" rt:text-vertanchor="middle">
+    <rt:dyn type="visibility" mode="constant" value="ShowScales" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <line x1="2.5" y1="70" x2="22.5" y2="70" id="line_null0" stroke="Col_Grey5" stroke-dasharray="1,2" stroke-width="1"/> 
+    <text x="12.5" y="85">
+      <rt:dyn type="y" mode="constant" value="ht * 0.85"/> 
+      <rt:dyn type="text" mode="constant" value="&quot;L\no\ng&quot;"/> 
+      <rt:dyn type="font-size" mode="constant" value="7"/> 
+      <rt:dyn type="x" mode="unknown" value="wt / 2.0"/> 
+L<tspan dy="7">o</tspan>
+<tspan dy="7">g</tspan>
+    </text>
+    <text x="12.5" y="52">
+      <rt:dyn type="y" mode="constant" value="ht * 0.52"/> 
+      <rt:dyn type="font-size" mode="constant" value="7"/> 
+      <rt:dyn type="text" mode="constant" value="&quot;L\ni\nn&quot;"/> 
+      <rt:dyn type="x" mode="unknown" value="wt / 2.0"/> 
+L<tspan dy="7">i</tspan>
+<tspan dy="7">n</tspan>
+    </text>
+  </g>
+  <rect x="0" y="-2.5" width="25" height="105" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="1.5">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+</svg>

@@ -1,0 +1,48 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg baseProfile="" xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 50 50" width="50" height="50" id="obj_Button_icon" fill="Col_Grey2">
+  <desc>Простая кнопка для иконок</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="4.0-6.0">
+    <rt:param name="Disable" datatype="boolean" value="False" comment="Сделать кнопку недоступной"/> 
+    <rt:var name="D_Color" datatype="uint" value="0" comment="my new var"/> 
+    <rt:var name="L_Color" datatype="uint" value="0xFFFFFF" comment="my new var"/> 
+    <rt:var name="ButDown" datatype="boolean" value="False" comment="my new var"/> 
+    <rt:var name="Initial_rt_detect" datatype="byte" comment="Начальное значение rt:detect"/> 
+    <rt:var name="First_call" datatype="boolean" value="True" comment="Первая загрузка"/> 
+    <rt:sub>Sub StatusColor()
+If Disable Then
+	_This.rt_detect = &quot;disabled&quot;
+	Shadow.visibility = &quot;visible&quot;
+
+	LU_edge.stroke = L_Color
+	RB_edge.stroke = D_Color
+	ButDown = False
+Else
+	If First_call Then
+		_This.rt_detect = Initial_rt_detect
+		First_call = false
+	Else
+		_This.rt_detect = &quot;enabled&quot;
+	End If
+	Shadow.visibility = &quot;hidden&quot;
+End If
+End Sub</rt:sub>
+    <rt:event type="OnMouseDown">LU_edge.stroke = D_Color
+RB_edge.stroke = L_Color
+ButDown = True</rt:event>
+    <rt:event type="OnMouseUp">LU_edge.stroke = L_Color
+RB_edge.stroke = D_Color
+ButDown = False</rt:event>
+    <rt:event type="OnMouseOut">LU_edge.stroke = L_Color
+RB_edge.stroke = D_Color
+ButDown = False</rt:event>
+    <rt:event type="OnInitialize">Initial_rt_detect = _This.rt_detect</rt:event>
+    <rt:changeTrigger name="ChInputs">
+      <rt:chgItem>Disable</rt:chgItem>
+      <rt:code>StatusColor()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="50" height="50" rx="0" ry="0" id="Backgr" fill-opacity="0" stroke="none"/> 
+  <polyline points="0,50 50,50 50,0" id="RB_edge" fill="none" stroke="black" stroke-opacity="0.399805" stroke-width="2"/> 
+  <polyline points="0,50 0,0 50,0" id="LU_edge" fill="none" stroke="white" stroke-opacity="0.399805" stroke-width="2"/> 
+  <rect x="0" y="0" width="50" height="50" rx="0" ry="0" id="Shadow" visibility="hidden" rt:detect="disabled" fill-opacity="0.699994" stroke="none"/> 
+</svg>

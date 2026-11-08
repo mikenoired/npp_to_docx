@@ -1,0 +1,71 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 280 15" width="280" height="15" id="aux_ana_bar_h" font-family="AAR_Font1" font-size="13">
+  <desc>горизонтальный барограф для окон регулаторов</desc>
+  <rt:model revision="6.0" modelversion="7.2.0.24" comment="Вспомогательная подмодель ПОРТАЛа">
+    <rt:param name="PvNR" datatype="int" value="-1" comment="Номер аналоговой переменной для отображения"/> 
+    <rt:param name="fill_from_zero" datatype="boolean" value="false" comment="заливать от нулевой отметки (для отклонения)"/> 
+    <rt:var name="pv_1" datatype="PlsPVAna" comment="указатель на переменную"/> 
+    <rt:sub>Sub Show_Data()
+If pv_1 != Nothing Then
+	Dim RL As Double
+	Dim RH As Double
+	Dim CV As Double
+	RL = pv_1.RangeLow
+	RH = pv_1.RangeHigh
+	CV = pv_1.Value
+	If CV &lt; RL Then
+		CV = RL
+	ElseIf CV &gt; RH Then
+		CV = RH
+	End If
+	txt_marks_V_min.text = RoundAscii(RL, pv_1.RoundDigits, True)
+	txt_marks_V_max.text = RoundAscii(RH, pv_1.RoundDigits, True)
+	Dim Fill_value As Float
+	If fill_from_zero &amp;&amp; (RL &lt; 0) &amp;&amp; (RH &gt; 0) Then
+		zero_line.visibility = &quot;visible&quot;
+		Dim Z_pos As Float
+		Z_pos = -280 * RL / (RH - RL)
+		zero_line.x1 = Z_pos
+		zero_line.x2 = Z_pos
+		If CV &gt;= 0 Then
+			V_bar.x = Z_pos
+			V_bar.width = (280 - Z_pos)
+			Fill_value = CV / RH
+		Else
+			V_bar.x = 0
+			V_bar.width = Z_pos
+			Fill_value = -CV / RL
+		End If
+	Else
+		zero_line.visibility = &quot;hidden&quot;
+		Fill_value = (CV - RL) / (RH - RL)
+	End If
+	If Fill_value &gt; 1 Then
+		Fill_value = 1
+	ElseIf Fill_value &lt; -1 Then
+		Fill_value = -1
+	End IF
+	V_bar.rt_fillx = Fill_value
+	V_bar.fill = Color_NB(pv_1)
+Else
+	V_bar.fill = Color_ANA_ER_LINK
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If PvNR &gt; 0 Then
+	pv_1 = ANA(PvNR)
+End If</rt:event>
+    <rt:changeTrigger name="Ch_v">
+      <rt:chgItem>pv_1</rt:chgItem>
+      <rt:code>Show_Data()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="280" height="5" rx="0" ry="0" id="bg" fill="Col_Grey5"/> 
+  <rect x="0" y="0" width="280" height="5" rx="0" ry="0" rt:fillx="1" rt:filly="1" id="V_bar" fill="Col_Green" stroke="none"/> 
+  <polyline points="0,5 0,0 280,0" id="edge_LU" fill="none" stroke="Col_Grey5"/> 
+  <polyline points="0,5 280,5 280,0" id="edge_RD" fill="none" stroke="Col_Grey1"/> 
+  <g id="txt_marks" font-weight="normal">
+    <text x="0" y="15" id="V_min">МИН</text>
+    <text x="280" y="15" id="V_max" text-anchor="end">МАКС</text>
+  </g>
+  <line x1="140" y1="-0.5" x2="140" y2="5" id="zero_line" visibility="hidden" rt:detect="disabled" stroke="Col_Grey1"/> 
+</svg>

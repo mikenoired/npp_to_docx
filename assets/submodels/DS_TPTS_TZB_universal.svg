@@ -1,0 +1,219 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 110 30" width="110" height="30" id="DS_TPTS_TZB_universal">
+  <desc>ТПТС ТЗБ (логика [I]VL и [I]TE) для Dull Screen</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа Dull Screen" revision="6.2">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS оборудования"/> 
+    <rt:param name="Operate" datatype="boolean" value="False" comment="сделать объект управляемым"/> 
+    <rt:param name="HS" datatype="boolean" value="False" comment="работа в режиме повышенной безопасности"/> 
+    <rt:param name="AorVW1isOUT" datatype="boolean" value="False" comment="Инверсаная логика, при которой состояние АВТОМАТ или Выбор1 означают ВЫВЕДЕНА"/> 
+    <rt:param name="OneBut" datatype="boolean" value="False" comment="переключение VL одной кнопкой (только для [I]VL)"/> 
+    <rt:param name="IsShield" datatype="boolean" value="False" comment="Это не накладка ТЗБ, а ручной ввод-вывод самой защиты (имитация срабатывания)"/> 
+    <rt:var name="Z0" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="OU" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="VB" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="Status" datatype="int" comment="обобщенное сотояние" value="0"/> 
+    <rt:var name="Col" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="AStat" datatype="ushort" value="0" comment="код сигнализации"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="SText" datatype="string" value="ТЗБ" comment="текст для отображения"/> 
+    <rt:var name="IsVL" datatype="boolean" value="true" comment="объект управляется [I]VL"/> 
+    <rt:var name="ShowIN" datatype="boolean" value="false" comment="показать состояние накладки ВВЕДЕНА"/> 
+    <rt:var name="ShowOUT" datatype="boolean" value="false" comment="показать состояние накладки ВЫВЕДЕНА"/> 
+    <rt:var name="ObjCode" datatype="ushort" value="5" comment="Код объекта 5 - накладка, 7 - защита"/> 
+    <rt:var name="MyStrokeWdth" datatype="float" value="2" comment="Толщина рамок в зависимости от управляемости"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub AckMe()
+If !IsVL Then		//VL не квитируется
+	If Check_Oper_Rights(OU) &amp;&amp; ((OU.PVSuspendedFlags &amp; PLS_SUSP_CMD) == 0) &amp;&amp; ((AStat &amp; 1) != 0) Then
+		OU.Command(_Now, TE_BHA)
+	End If
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub StatusColor()
+	Status = PRJSPEC.TPTS_TZBorNAKLADKA(KKS, IsVL, AorVW1isOUT, ShowIN, ShowOUT,  Col, AStat )
+	If (Status == -1)Then
+		SText = &quot;РЕМОНТ&quot;
+	ElseIf ((Status &amp; 4096) &gt; 0) Then
+		SText = &quot;НДСТ&quot;
+	ElseIf (IsVL &amp;&amp; ((Status &amp; 0xF) == 0xA)) Then	//это только для VL
+		SText = &quot;не выбрано&quot;
+	ElseIf ShowIN Then
+		SText = &quot;ВВЕДЕНА&quot;
+	ElseIf ShowOUT Then
+		SText = &quot;ВЫВЕДЕНА&quot;
+	Else
+		SText = &quot;НЕИЗВ.&quot;
+	End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (KKS != &quot;NULL&quot;) Then
+	Z0 = BIN(KKS + &quot;_Z0&quot;)
+	OU = BIN(KKS + &quot;_OU&quot;)
+	Dim CN As Short
+	CN = Z0.CategoryNr % 100
+	If (CN == 30) || (CN == 37) Then
+		IsVL = True
+	ElseIf (CN == 29) || (CN == 36) Then
+		IsVL = False
+	Else
+		//последние символы KKS д.б. VLn или TEn
+		IsVL =  (Left(Right(KKS, 3), 2) == &quot;VL&quot;)
+	End If
+	If IsVL Then
+		VB = BIN(KKS + &quot;_VB6&quot;)
+	Else
+		VB = BIN(KKS + &quot;_VB7&quot;)
+	End If
+	If IsShield Then
+		ObjCode = 7
+	End If
+End If</rt:event>
+    <rt:event type="OnResize">Al_frame.x = 2.5
+Al_frame.y = 2.5
+Al_frame.width = _This.width - 5
+Al_frame.height = _This.height - 5
+InGr.x = 0
+InGr.y = 0
+InGr.width = _This.width 
+InGr.height = _This.height
+Backgr.x = 5
+Backgr.y = 5
+Backgr.width =  _This.width - 10
+Backgr.height = _This.height - 10
+body.x = 5
+body.y = 5
+body.width =  _This.width - 10
+body.height = _This.height - 10
+LU_edge.points = &quot;5,&quot; + CStr(_This.height - 5) + &quot; 5,5 &quot; + CStr(_This.width - 5) + &quot;,5&quot;
+RB_edge.points = &quot;5,&quot; + CStr(_This.height - 5) + &quot; &quot; + CStr(_This.width - 5) + &quot;,&quot; + CStr(_This.height - 5) + &quot; &quot; + CStr(_This.width - 5) + &quot;,5&quot;
+main_text.font_size = _This.height / 2.0</rt:event>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetStatus">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>Z0</rt:chgItem>
+      <rt:chgItem>OU</rt:chgItem>
+      <rt:chgItem>VB</rt:chgItem>
+      <rt:code>StatusColor()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChRights">
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>MyStrokeWdth = FrameStrokeWidth (Operate, OU)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="5" y="5" width="100" height="20" rx="0" ry="0" id="Backgr" fill="url(#Cylinder_horizontal2)" stroke="none"/> 
+  <rect x="5" y="5" width="100" height="20" rx="0" ry="0" id="body" fill="Col_Grey3" fill-opacity="0.349997" stroke="none">
+    <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(ObjCode , Col, 10)"/> 
+    <rt:dyn type="fill-opacity" mode="onchange" value="(Status &lt; 0) || ((Status &amp; 4096)!= 0) || (Z0 == Nothing) || ShowIN" trans="bd">
+      <rt:xy value="false" value2="0.35"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </rect>
+  <text x="55" y="20" id="main_text" fill="black" font-family="AAP_Font3" font-size="15" font-weight="bold" text-anchor="middle">
+    <rt:dyn type="text" mode="onchange" value="SText"/> 
+ВЫВЕДЕНА</text>
+  <polyline points="5,25 105,25 105,5" id="RB_edge" fill="none" stroke="Col_Grey5" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey1"/> 
+      <rt:xy value2="Col_Grey5"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <polyline points="5,25 5,5 105,5" id="LU_edge" fill="none" stroke="Col_Grey1" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey5"/> 
+      <rt:xy value2="Col_Grey1"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <rect x="2.5" y="2.5" width="105" height="25" rx="0" ry="0" id="Al_frame" fill="none" stroke="Col_Red" stroke-width="2">
+    <rt:dyn type="visibility" mode="cyclic" value="PRJSPEC.AlarmVis(AStat)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke" mode="constant" value="Color_Alarm"/> 
+  </rect>
+  <rect x="0" y="0" width="110" height="30" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="2.5" y="2.5" width="105" height="25" rx="0" ry="0" id="SelFrame" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Нет привязки.&quot;, 5)
+ElseIf Z0 != nothing Then
+	Dim Parameters As UByte
+	Parameters = 0
+	If IsVL Then
+		Parameters = 1
+	End If
+	If AorVW1isOUT Then
+		Parameters = Parameters | 2
+	End If
+	If IsShield Then
+		Parameters = Parameters | 4
+	End If
+	If OneBut Then
+		Parameters = Parameters | 8
+	End If
+	If HS &amp;&amp; Operate &amp;&amp; (USERGROUP.UserGroupId == VAR(&quot;VIS.GROUP_SUPERVISOR_TZB&quot;).ValueString()) Then
+		Call_Win(&quot;wa_TPTS_TZB_universal_6&quot;, KKS + &quot;|&quot; + CStr(Parameters ) + &quot;|&quot; + CStr(HS))
+	Else
+		If IsVL &amp;&amp; (!Operate || !flag_operate) Then
+			Call_Win (&quot;wi_NoDiag&quot;, KKS + &quot;|&quot; + CStr(Parameters ) + &quot;|&quot; + CStr(HS))
+		Else
+			Open_ws_wf_wi(&quot;TPTS_TZB_universal_6&quot;, KKS + &quot;|&quot; + CStr(Parameters ) + &quot;|&quot; + CStr(HS), Operate)
+		End If
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnRightClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Нет привязки.&quot;, 5)
+ElseIf Z0 != nothing Then
+	Dim Parameters As UByte
+	Parameters = 0
+	If IsVL Then
+		Parameters = 1
+	End If
+	If AorVW1isOUT Then
+		Parameters = Parameters | 2
+	End If
+	If IsShield Then
+		Parameters = Parameters | 4
+	End If
+	If OneBut Then
+		Parameters = Parameters | 8
+	End If
+	If IsVL Then
+		If HS &amp;&amp; Operate &amp;&amp; (USERGROUP.UserGroupId == VAR(&quot;VIS.GROUP_SUPERVISOR_TZB&quot;).ValueString()) Then
+			LoadPopUpMenu(KKS + &quot;|VL a|TPTS_TZB_universal_6 &quot; + KKS + &quot;|&quot; + CStr(Parameters ) + &quot;|&quot; + CStr(HS))
+		ElseIf Operate &amp;&amp; Check_Oper_Rights(OU) Then
+			LoadPopUpMenu(KKS + &quot;|VL o|TPTS_TZB_universal_6 &quot; + KKS + &quot;|&quot; + CStr(Parameters ) + &quot;|&quot; + CStr(HS))
+		Else
+			LoadPopUpMenu(KKS + &quot;|VL i|&quot;)
+		End If
+	Else
+		If HS &amp;&amp; Operate &amp;&amp; (USERGROUP.UserGroupId == VAR(&quot;VIS.GROUP_SUPERVISOR_TZB&quot;).ValueString()) Then
+			LoadPopUpMenu(KKS + &quot;|TE a|TPTS_TZB_universal_6 &quot; + KKS + &quot;|&quot; + CStr(Parameters ) + &quot;|&quot; + CStr(HS))
+		ElseIf Operate &amp;&amp; Check_Oper_Rights(OU) Then
+			LoadPopUpMenu(KKS + &quot;|TE o|TPTS_TZB_universal_6 &quot; + KKS + &quot;|&quot; + CStr(Parameters ) + &quot;|&quot; + CStr(HS))
+		Else
+			LoadPopUpMenu(KKS + &quot;|TE i|TPTS_TZB_universal_6 &quot; + KKS + &quot;|&quot; + CStr(Parameters ) + &quot;|&quot; + CStr(HS))
+		End If
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnMiddleClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Нет привязки.&quot;, 5)
+ElseIf Z0 != nothing Then
+	Open_Win_Uni(False, &quot;rights&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS+&quot;|&quot;+CStr(Operate))
+Else
+	NoLink(KKS)
+End If</rt:event>
+  </rect>
+</svg>

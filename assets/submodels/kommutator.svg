@@ -1,0 +1,65 @@
+<?xml  version="1.0" encoding="windows-1251"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="-30 -30 60 60" width="60" height="60" id="kommutator">
+  <rt:model modelversion="7.2.0.16" comment="Created by MAINEVENT\MainEvent 8/11/2008 12:53:12 PM">
+    <rt:param name="ND" datatype="RtaNode" comment=""/> 
+    <rt:sub>Sub ref()
+Dim stat as integer
+
+stat = ND.NodeStatus
+
+If (stat == 14) then
+indikator.fill = &quot;Col_Green&quot;
+
+ElseIf (stat == 13) then
+indikator.fill = &quot;Col_LtBlue&quot;
+
+ElseIf (stat=5) then
+indikator.fill = &quot;Col_Yellow&quot;
+
+ElseIf (stat=6) then
+indikator.fill = &quot;Col_Yellow&quot;
+
+ElseIf (stat=7) then
+indikator.fill = &quot;Col_Yellow&quot;
+
+ElseIf (stat=9) then
+indikator.fill = &quot;Col_Yellow&quot;
+
+ElseIf (stat=10) then
+indikator.fill = &quot;Col_Yellow&quot;
+
+ElseIf (stat=11) then
+indikator.fill = &quot;Col_Yellow&quot;
+
+ElseIf (stat=12) then
+indikator.fill = &quot;Col_Yellow&quot;
+
+ElseIf (stat == 0) then
+indikator.fill = &quot;Col_Red&quot;
+
+ElseIf (stat == 1) then
+indikator.fill = &quot;Col_Red&quot;
+
+ElseIf (stat == 2) then
+indikator.fill = &quot;Col_Red&quot;
+
+ElseIf (stat == 3) then
+indikator.fill = &quot;Col_Red&quot;
+
+ElseIf (stat == 4) then
+indikator.fill = &quot;Col_Red&quot;
+
+End If
+
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">ref()</rt:event>
+    <rt:cycleTrigger name="b" cycle="5" unit="second">
+      <rt:code>ref()</rt:code>
+    </rt:cycleTrigger>
+  </rt:model>
+  <rect x="-25" y="-9.99998" width="40" height="10" rx="0" ry="0" id="indikator" fill="Col_Green" stroke="black"/> 
+  <g id="korpus">
+    <polyline points="-25,-9.99998 -25,10 15,10 15,-9.99998 25,-20 -15,-20 -25,-9.99998" fill="none" stroke="black"/> 
+    <polyline points="15,10 25,1.85966e-005 25,-20 15,-9.99998 -25,-9.99998" fill="none" stroke="black"/> 
+  </g>
+</svg>

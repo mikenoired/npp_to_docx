@@ -1,0 +1,423 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="codedlayout meet" viewBox="0 0 150 30" width="150" height="30" id="DS_setter">
+  <desc>универсальный задатчик для Dull Screen</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа (Dull Screen)" revision="6.2" controlref="PortalControl_Setter">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS оборудования"/> 
+    <rt:param name="DATA_NARY" datatype="string" value="AUTO" comment="тип привязки: AUTO/TPTS/BIN/ANA/TYPEn (n = 1...3) или суффикс многобитового сигнала состояний"/> 
+    <rt:param name="SIG_Auto" datatype="string" value="NULL" comment="при KKS - нестандартный суффикс, а без KKS - идентификатор сигнала «АВТОМАТ»"/> 
+    <rt:param name="SIG_Dist" datatype="string" value="NULL" comment="при KKS - нестандартный суффикс, а без KKS - идентификатор сигнала «ДИСТАНЦИЯ»"/> 
+    <rt:param name="SIG_Fail" datatype="string" value="NULL" comment="при KKS - нестандартный суффикс, а без KKS - идентификатор сигнала «Неисправность»"/> 
+    <rt:param name="SIG_Value" datatype="string" value="NULL" comment="при KKS - нестандартный суффикс, а без KKS - идентификатор ANA сигнала  «Задание (текущее)»"/> 
+    <rt:param name="Mask_Auto" datatype="ushort" value="2" comment="только для NARY - маска состояния &quot;АВТОМАТ&quot;"/> 
+    <rt:param name="Mask_Dist" datatype="ushort" value="1" comment="только для NARY - маска состояния &quot;ДИСТАНЦИЯ&quot;"/> 
+    <rt:param name="Mask_Fail" datatype="ushort" value="16" comment="только для NARY - маска состояния &quot;Неисправность&quot;"/> 
+    <rt:param name="Mask_Invalid" datatype="ushort" value="0" comment="только для NARY - маска состояния &quot;Недостоверность&quot;"/> 
+    <rt:param name="Operate" datatype="boolean" value="False" comment="Сделать объект управляемым"/> 
+    <rt:param name="HideBut" datatype="boolean" value="False" comment="убрать кнопку Авт./Дист. с окон управления"/> 
+    <rt:param name="ShowGoodColor" datatype="boolean" value="false" comment="окрашивать подложку при хорошем качестве"/> 
+    <rt:param name="BG_StaticColor" datatype="string" value="none" comment="Имя цвета подложки, если объект не должен быть прозрачным"/> 
+    <rt:var name="Actual_Signal_Auto" datatype="string" comment="фактическое название сигнала «АВТОМАТ»"/> 
+    <rt:var name="Actual_Signal_Dist" datatype="string" comment="фактическое название сигнала «ДИСТАНЦИЯ»"/> 
+    <rt:var name="Actual_Signal_Fail" datatype="string" comment="фактическое название сигнала  «Неисправность»"/> 
+    <rt:var name="Actual_Signal_Value" datatype="string" comment="фактическое название сигнала «Задание»"/> 
+    <rt:var name="pv_1" datatype="PlsPVBin" comment="указатель на переменную АВТОМАТ или NARY или Z0 для ТПТС"/> 
+    <rt:var name="pv_2" datatype="PlsPVBin" comment="указатель на переменную ДИСТАНЦИЯ или VB13 для ТПТС"/> 
+    <rt:var name="pv_Fail" datatype="PlsPVBin" comment="указатель на переменную Неисправность"/> 
+    <rt:var name="pv_Value" datatype="PlsPVAna" comment="указатель на переменную Задание"/> 
+    <rt:var name="pv_OU" datatype="PlsPVBin" comment="указатель на переменную управления, которая может встретиться для любого объекта"/> 
+    <rt:var name="pv_SP" datatype="PlsPVAna" comment="указатель на переменную ввода задания - она здесь самая главная"/> 
+    <rt:var name="SIGNAL_NARY" datatype="string" value="Z0" comment="Фактическое имя сигнала для типа NARY"/> 
+    <rt:var name="Link_Type" datatype="ubyte" value="0" comment="Тип объекта: 0-неизвестный, 1-бинарный, 2-NARY, 3-ТПТС, ..."/> 
+    <rt:var name="ctrl" datatype="PortalControl_Setter" comment="Optional pointer to the PortalControlProto C++ class"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub AckMe()
+	ctrl.AckMe()
+End Sub</rt:sub>
+    <rt:event type="OnResize">Dim My_w As Float
+Dim My_h As Float
+My_w = _This.width
+My_h = _This.height
+Static_BG.x = 5
+Static_BG.y = 5
+Static_BG.width = My_w - 10
+Static_BG.height = My_h - 10
+body.x = 5
+body.y = 5
+body.width = My_w - 10
+body.height = My_h - 10
+LU_edge.points = &quot;5,&quot; + CStr(My_h - 5) + &quot; 5,5 &quot; + CStr(My_w - 5) + &quot;,5&quot;
+RB_edge.points = &quot;5,&quot; + CStr(My_h - 5) + &quot; &quot; + CStr(My_w - 5) + &quot;,&quot; + CStr(My_h - 5) + &quot; &quot; + CStr(My_w - 5) + &quot;,5&quot;
+Al_frame.x = 2.5
+Al_frame.y = 2.5
+Al_frame.width = My_w - 5
+Al_frame.height = My_h - 5
+bg_H.cx = 10 + My_h / 6
+bg_H.cy = My_h / 2
+bg_H.r = My_h / 6
+bg_H.stroke_width = My_h / 30
+indic_H.cx = 10 + My_h / 6
+indic_H.cy = My_h / 2
+indic_H.r = My_h / 6
+bg_A.cx = My_w - 10 - My_h / 6
+bg_A.cy = My_h / 2
+bg_A.r = My_h / 6
+bg_A.stroke_width = My_h / 30
+indic_A.cx = My_w - 10 - My_h / 6
+indic_A.cy = My_h / 2
+indic_A.r = My_h / 6
+l.points = CStr(12.5 + My_h / 3) + &quot;,&quot; + CStr(My_h / 3) + &quot; &quot; + CStr(20 + My_h / 3) + &quot;,&quot; + CStr(My_h / 2) + &quot; &quot; + CStr(12.5 + My_h / 3) + &quot;,&quot; + CStr(My_h / 1.5)
+l.stroke_width = My_h / 30
+r.points = CStr(My_w - 12.5 - My_h / 3) + &quot;,&quot; + CStr(My_h / 3) + &quot; &quot; + CStr(My_w - 20 - My_h / 3) + &quot;,&quot; + CStr(My_h / 2) + &quot; &quot; + CStr(My_w - 12.5 - My_h / 3) + &quot;,&quot; + CStr(My_h / 1.5)
+r.stroke_width = My_h / 30
+Value_text.font_size = My_h / 1.5
+Value_text.x = My_w / 2
+Value_text.y = 22.5 * My_h / 30
+InGr.width = My_w
+InGr.height = My_h
+SelFrame.width = My_w - 5
+SelFrame.height = My_h - 5
+If !IsViewMode Then
+	If (KKS == &quot;NULL&quot;) &amp;&amp; (SIG_Auto == &quot;NULL&quot;) &amp;&amp; (SIG_Dist == &quot;NULL&quot;) &amp;&amp; (SIG_Value == &quot;NULL&quot;) Then
+		indic_A.fill = Color_Static
+		indic_H.fill = Color_Static
+		Al_frame.visibility = &quot;hidden&quot;
+		InGr.visibility = &quot;hidden&quot;
+	End If
+End If</rt:event>
+  </rt:model>
+  <rect x="5" y="5" width="140" height="20" rx="0" ry="0" id="Static_BG" fill="none" stroke="none"/> 
+  <rect x="5" y="5" width="140" height="20" rx="0" ry="0" id="body" fill="none" stroke="none"/> 
+  <text x="75" y="22.5" id="Value_text" fill="black" font-family="AAR_Font2" font-size="20" font-weight="bold" text-anchor="middle">888.8</text>
+  <polyline points="5,25 145,25 145,5.875" id="RB_edge" fill="none" stroke="Col_Grey5" stroke-width="2"/> 
+  <polyline points="5,25 5,5 145,5" id="LU_edge" fill="none" stroke="Col_Grey1" stroke-width="2"/> 
+  <polyline points="22.5,10 30,15 22.5,20" id="l" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <polyline points="127.5,10 120,15 127.5,20" id="r" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <circle cx="15" cy="15" r="5" id="bg_H" fill="url(#DS_circle)" stroke="Col_Grey5" stroke-width="1"/> 
+  <circle cx="135" cy="15" r="5" id="bg_A" fill="url(#DS_circle)" stroke="Col_Grey5" stroke-width="1"/> 
+  <circle cx="15" cy="15" r="5" id="indic_H" fill="Col_Green" fill-opacity="0.349997" stroke="none"/> 
+  <circle cx="135" cy="15" r="5" id="indic_A" fill="Col_Yellow" fill-opacity="0.349997" stroke="none"/> 
+  <rect x="2.5" y="2.5" width="145" height="25" rx="0" ry="0" id="Al_frame" fill="none" stroke="Col_Red" stroke-width="2"/> 
+  <rect x="0" y="0" width="150" height="30" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2"/> 
+  <rect x="5" y="5" width="140" height="20" rx="0" ry="0" id="SelFrame" fill="black" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">Dim s As String
+If (Link_Type == 0) Then
+	If (KKS == &quot;NULL&quot;) Then
+		If (SIG_Auto == &quot;NULL&quot;) &amp;&amp; (SIG_Dist == &quot;NULL&quot;) &amp;&amp; (SIG_Value == &quot;NULL&quot;)Then
+			ShowMessage (&quot;Объект не привязан.&quot;, 5)
+		ElseIf (SIG_Auto != &quot;NULL&quot;) &amp;&amp; (pv_1 == Nothing) Then
+			ShowWarning (&quot;Ошибка привязки.\nSIG_Auto = \&quot;&quot; + SIG_Auto + &quot;\&quot;&quot;, 0)
+		ElseIf (SIG_Dist != &quot;NULL&quot;) &amp;&amp; (pv_2 == Nothing) Then
+			ShowWarning (&quot;Ошибка привязки.\nSIG_Dist = \&quot;&quot; + SIG_Dist + &quot;\&quot;&quot;, 0)
+		ElseIf (SIG_Value != &quot;NULL&quot;) &amp;&amp; (pv_Value == Nothing) Then
+			ShowWarning (&quot;Ошибка привязки.\nSIG_Value = \&quot;&quot; + SIG_Value + &quot;\&quot;&quot;, 0)
+		Else
+			ShowWarning (&quot;Ошибка обработки\nвходных сигналов.&quot;, 0)
+		End If
+	ElseIf (DATA_NARY == &quot;AUTO&quot;) Then
+		ShowWarning (&quot;Ошибка привязки AUTO.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Auto = \&quot;&quot; + SIG_Auto + &quot;\&quot;\nSIG_Dist = \&quot;&quot; + SIG_Dist + &quot;\&quot;&quot;, 0)
+	ElseIf (DATA_NARY == &quot;TPTS&quot;) Then
+		ShowWarning (&quot;Ошибка привязки TPTS.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;&quot;, 0)
+	ElseIf (DATA_NARY == &quot;BIN&quot;) Then
+		ShowWarning (&quot;Ошибка привязки BIN.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Auto = \&quot;&quot; + SIG_Auto + &quot;\&quot;\nSIG_Dist = \&quot;&quot; + SIG_Dist + &quot;\&quot;&quot;, 0)
+	ElseIf (DATA_NARY == &quot;ANA&quot;) Then
+		ShowWarning (&quot;Ошибка привязки ANA.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Value = \&quot;&quot; + SIG_Value + &quot;\&quot;&quot;, 0)
+	Else
+		ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nDATA_NARY = \&quot;&quot; + DATA_NARY + &quot;\&quot;&quot;, 0)
+	End If
+ElseIf (SIG_Value != &quot;NULL&quot;) &amp;&amp; (pv_Value == Nothing) Then
+	ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Value = \&quot;&quot; + SIG_Value + &quot;\&quot;&quot;, 0)
+ElseIf ((Link_Type == 1) || (Link_Type == 6)) &amp;&amp; (SIG_Fail != &quot;NULL&quot;) &amp;&amp; (pv_Fail == Nothing) Then
+	ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Fail = \&quot;&quot; + SIG_Fail + &quot;\&quot;&quot;, 0)
+ElseIf (Left(DATA_NARY, 4) == &quot;TYPE&quot;) Then
+	&apos;Структура параметра
+	&apos;[KKS]|&lt;тип и номер схемы&gt;|&lt;убрать кнопку переключения режима&gt;
+	s = KKS + &quot;|SET&quot; + Right(DATA_NARY, 1) + &quot;|&quot; + CStr(HideBut)
+	Open_TYPE_ws_wf_wi(&quot;PRJSPEC_Setter&quot;, s, Operate, &quot;SET&quot; + Right(DATA_NARY, 1))
+ElseIf (Link_Type == 1) || (Link_Type == 6) Then	//BIN - Link_Type == 1, ANA - Link_Type == 6
+	&apos;Для ANA и BIN будем использовать одно окно
+	&apos;Структура параметра
+	&apos;{&quot;&quot; / KKS}|{&quot;&quot; / SIGNAL_Auto / PID_Auto}|{&quot;&quot; / SIGNAL_Dist / PID_Dist}|{&quot;&quot; / SIGNAL_fail / PID_fail}|{&quot;&quot; / SIGNAL_Value / PID_Value}|{&quot;&quot; / &quot;OU&quot; / PID_OU}|{&quot;&quot; / &quot;SP&quot; / PID_SP}|&lt;убрать кнопку переключения режима&gt;
+	If (KKS != &quot;NULL&quot;) Then
+		s = KKS + &quot;|&quot;
+		If (pv_1 != Nothing) Then
+			s = s + Actual_Signal_Auto + &quot;|&quot;
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If (pv_2 != Nothing) Then
+			s = s + Actual_Signal_Dist + &quot;|&quot;
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If pv_Fail != Nothing Then
+			s = s + Actual_Signal_Fail + &quot;|&quot;
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If pv_Value != Nothing Then
+			s = s + Actual_Signal_Value + &quot;|&quot;
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If pv_OU != Nothing Then
+			s = s + &quot;OU|&quot;
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If pv_SP != Nothing Then
+			s = s + &quot;SP|&quot; + CStr(HideBut)
+		Else
+			s = s + &quot;|&quot; + CStr(HideBut)
+		End If
+		Open_ws_wf_wi(&quot;BIN_Setter&quot;, s, Operate)
+	Else
+		If (pv_1 != Nothing) Then
+			s = &quot;|&quot; + pv_1.PVId + &quot;|&quot;
+		Else
+			s = &quot;||&quot;
+		End If
+		If (pv_2 != Nothing) Then
+			s = s + pv_2.PVId + &quot;|&quot;
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If (pv_Fail != Nothing) Then
+			s = s + pv_Fail.PVId + &quot;|&quot;
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If (pv_Value != Nothing) Then
+			s = s + pv_Value.PVId + &quot;|&quot;
+		Else
+			s = s + &quot;|&quot;
+		End If
+		/*	для отдельных идентификаторов нельзя определить переменные управления
+		If (pv_OU != Nothing) Then
+			s = s + pv_OU.PVId + &quot;|&quot;
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If (pv_SP != Nothing) Then
+			s = s + pv_SP.PVId + &quot;|&quot; + CStr(HideBut)
+		Else
+			s = s + &quot;|&quot; + CStr(HideBut)
+		End If
+		*/
+		s = s + &quot;||&quot; + CStr(HideBut)	//управление и ввод задания отсутствуют
+
+		Open_ws_wf_wi(&quot;BIN_Setter&quot;, s, False)
+	End If
+	If (DATA_NARY == &quot;AUTO&quot;) &amp;&amp; (Link_Type == 1) Then
+		ShowWarning (&quot;Привязка DATA_NARY = AUTO\nнежелательна.\nОна должна быть BIN.&quot;, 0)
+	End If
+ElseIf (Link_Type == 2) Then	//NARY
+&apos;Структура параметра
+&apos;KKS|SIGNAL|MASK_auto|MASK_dist|MASK_fail|MASK_Invalid|{&quot;&quot; / PID_Value}|&lt;убрать кнопку переключения режима&gt;
+	s = KKS + &quot;|&quot; + SIGNAL_NARY + &quot;|&quot; + CStr(Mask_Auto) + &quot;|&quot; + CStr(Mask_Dist) + &quot;|&quot; + CStr(Mask_Fail) + &quot;|&quot; + CStr(Mask_Invalid) + &quot;|&quot;
+	If (pv_Value != Nothing) Then
+		s = s + pv_Value.PVId + &quot;|&quot; + CStr(HideBut)
+	Else
+		s = s + &quot;|&quot; + CStr(HideBut)
+	End If
+	Open_ws_wf_wi(&quot;NARY_Setter&quot;, s, Operate)
+	If (DATA_NARY == &quot;AUTO&quot;) Then
+		ShowWarning (&quot;Привязка DATA_NARY = AUTO\nнежелательна.\nОна должна быть Z0.&quot;, 0)
+	End If
+ElseIf (Link_Type == 3) Then
+	&apos;Структура параметра
+	&apos;KKS|&lt;убрать кнопку переключения режима&gt;
+	Open_ws_wf_wi(&quot;TPTS_IBR_set&quot;, KKS + &quot;|&quot; + CStr(HideBut), Operate)
+	If (DATA_NARY == &quot;AUTO&quot;) Then
+		ShowWarning (&quot;Привязка DATA_NARY = AUTO\nнежелательна.\nОна должна быть TPTS.&quot;, 0)
+	End If
+End If</rt:event>
+    <rt:event type="OnRightClick">Dim s As String
+Dim i As Short
+If (Link_Type == 0) Then
+	If (KKS == &quot;NULL&quot;) Then
+		If (SIG_Auto == &quot;NULL&quot;) &amp;&amp; (SIG_Dist == &quot;NULL&quot;) &amp;&amp; (SIG_Value == &quot;NULL&quot;)Then
+			ShowMessage (&quot;Объект не привязан.&quot;, 5)
+		ElseIf (SIG_Auto != &quot;NULL&quot;) &amp;&amp; (pv_1 == Nothing) Then
+			ShowWarning (&quot;Ошибка привязки.\nSIG_Auto = \&quot;&quot; + SIG_Auto + &quot;\&quot;&quot;, 0)
+		ElseIf (SIG_Dist != &quot;NULL&quot;) &amp;&amp; (pv_2 == Nothing) Then
+			ShowWarning (&quot;Ошибка привязки.\nSIG_Dist = \&quot;&quot; + SIG_Dist + &quot;\&quot;&quot;, 0)
+		ElseIf (SIG_Value != &quot;NULL&quot;) &amp;&amp; (pv_Value == Nothing) Then
+			ShowWarning (&quot;Ошибка привязки.\nSIG_Value = \&quot;&quot; + SIG_Value + &quot;\&quot;&quot;, 0)
+		Else
+			ShowWarning (&quot;Ошибка обработки\nвходных сигналов.&quot;, 0)
+		End If
+	ElseIf (DATA_NARY == &quot;AUTO&quot;) Then
+		ShowWarning (&quot;Ошибка привязки AUTO.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Auto = \&quot;&quot; + SIG_Auto + &quot;\&quot;\nSIG_Dist = \&quot;&quot; + SIG_Dist + &quot;\&quot;&quot;, 0)
+	ElseIf (DATA_NARY == &quot;TPTS&quot;) Then
+		ShowWarning (&quot;Ошибка привязки TPTS.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;&quot;, 0)
+	ElseIf (DATA_NARY == &quot;BIN&quot;) Then
+		ShowWarning (&quot;Ошибка привязки BIN.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Auto = \&quot;&quot; + SIG_Auto + &quot;\&quot;\nSIG_Dist = \&quot;&quot; + SIG_Dist + &quot;\&quot;&quot;, 0)
+	ElseIf (DATA_NARY == &quot;ANA&quot;) Then
+		ShowWarning (&quot;Ошибка привязки ANA.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Value = \&quot;&quot; + SIG_Value + &quot;\&quot;&quot;, 0)
+	Else
+		ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nDATA_NARY = \&quot;&quot; + DATA_NARY + &quot;\&quot;&quot;, 0)
+	End If
+ElseIf (SIG_Value != &quot;NULL&quot;) &amp;&amp; (pv_Value == Nothing) Then
+	ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Value = \&quot;&quot; + SIG_Value + &quot;\&quot;&quot;, 0)
+ElseIf ((Link_Type == 1) || (Link_Type == 6)) &amp;&amp; (SIG_Fail != &quot;NULL&quot;) &amp;&amp; (pv_Fail == Nothing) Then
+	ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Fail = \&quot;&quot; + SIG_Fail + &quot;\&quot;&quot;, 0)
+ElseIf (Left(DATA_NARY, 4) == &quot;TYPE&quot;) Then
+	&apos;Структура параметра
+	&apos;[KKS]|&lt;тип и номер схемы&gt;|&lt;убрать кнопку переключения режима&gt;
+	s = KKS + &quot;|SET&quot; + Right(DATA_NARY, 1) + &quot;|&quot; + CStr(HideBut)
+	If Operate &amp;&amp; Check_Oper_Rights(pv_OU) Then
+		LoadPopUpMenu(KKS + &quot;|SETo|PRJSPEC_Setter &quot; + s)
+	Else
+		LoadPopUpMenu(KKS + &quot;|SETi|PRJSPEC_Setter &quot; + s)
+	End If
+ElseIf (Link_Type == 1) || (Link_Type == 6) Then	//BIN - Link_Type == 1, ANA - Link_Type == 6
+	&apos;Для ANA и BIN будем использовать одно окно
+	&apos;Структура параметра
+	&apos;{&quot;&quot; / KKS}|{&quot;&quot; / SIGNAL_Auto / PID_Auto}|{&quot;&quot; / SIGNAL_Dist / PID_Dist}|{&quot;&quot; / SIGNAL_fail / PID_fail}|{&quot;&quot; / SIGNAL_Value / PID_Value}|{&quot;&quot; / &quot;OU&quot; / PID_OU}|{&quot;&quot; / &quot;SP&quot; / PID_SP}|&lt;убрать кнопку переключения режима&gt;
+	i = 0
+	If (KKS != &quot;NULL&quot;) Then
+		s = KKS + &quot;|&quot;
+		If (pv_1 != Nothing) Then
+			s = s + Actual_Signal_Auto + &quot;|&quot;
+			TmpBuffer(i) = pv_1.PVId
+			i = i + 1
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If (pv_2 != Nothing) Then
+			s = s + Actual_Signal_Dist + &quot;|&quot;
+			TmpBuffer(i) = pv_2.PVId
+			i = i + 1
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If pv_Fail != Nothing Then
+			s = s + Actual_Signal_Fail + &quot;|&quot;
+			TmpBuffer(i) = pv_Fail.PVId
+			i = i + 1
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If pv_Value != Nothing Then
+			s = s + Actual_Signal_Value + &quot;|&quot;
+			TmpBuffer(i) = pv_Value.PVId
+			i = i + 1
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If pv_OU != Nothing Then
+			s = s + &quot;OU|&quot;
+			TmpBuffer(i) = pv_OU.PVId
+			i = i + 1
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If pv_SP != Nothing Then
+			s = s + &quot;SP|&quot; + CStr(HideBut)
+			TmpBuffer(i) = pv_SP.PVId
+		Else
+			s = s + &quot;|&quot; + CStr(HideBut)
+		End If
+		TmpMnuPar = KKS + &quot;|SETo|BIN_Setter &quot; + s
+		If Operate &amp;&amp; Check_Oper_Rights(pv_OU) Then
+			LoadPopUpMenu(KKS + &quot;|SETo|BIN_Setter &quot; + s)
+		Else
+			LoadPopUpMenu(KKS + &quot;|SETi|BIN_Setter &quot; + s)
+		End If
+	Else
+		If (pv_1 != Nothing) Then
+			s = &quot;|&quot; + pv_1.PVId + &quot;|&quot;
+			TmpBuffer(i) = pv_1.PVId
+			i = i + 1
+		Else
+			s = &quot;||&quot;
+		End If
+		If (pv_2 != Nothing) Then
+			s = s + pv_2.PVId + &quot;|&quot;
+			TmpBuffer(i) = pv_2.PVId
+			i = i + 1
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If (pv_Fail != Nothing) Then
+			s = s + pv_Fail.PVId + &quot;|&quot;
+			TmpBuffer(i) = pv_Fail.PVId
+			i = i + 1
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If (pv_Value != Nothing) Then
+			s = s + pv_Value.PVId + &quot;|&quot;
+			TmpBuffer(i) = pv_Value.PVId
+			i = i + 1
+		Else
+			s = s + &quot;|&quot;
+		End If
+		/*	для отдельных идентификаторов нельзя определить переменные управления
+		If (pv_OU != Nothing) Then
+			s = s + pv_OU.PVId + &quot;|&quot;
+			TmpBuffer(i) = pv_OU.PVId
+			i = i + 1
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If (pv_SP != Nothing) Then
+			s = s + pv_SP.PVId + &quot;|&quot; + CStr(HideBut)
+			TmpBuffer(i) = pv_SP.PVId
+		Else
+			s = s + &quot;|&quot; + CStr(HideBut)
+		End If
+		*/
+		s = s + &quot;||&quot; + CStr(HideBut)			//управление и ввод задания отсутствуют
+		TmpMnuPar = TmpMnuPar + &quot;i|BIN_Setter &quot; + s	//управление и ввод задания отсутствуют - поэтому оставляем только i версию
+		LoadPopUpMenu(TmpMnuPar)
+	End If
+	If (DATA_NARY == &quot;AUTO&quot;) &amp;&amp; (Link_Type == 1) Then
+		ShowWarning (&quot;Привязка DATA_NARY = AUTO\nнежелательна.\nОна должна быть BIN.&quot;, 0)
+	End If
+ElseIf (Link_Type == 2) Then	//NARY
+&apos;Структура параметра
+&apos;KKS|SIGNAL|MASK_auto|MASK_dist|MASK_fail|MASK_Invalid|{&quot;&quot; / PID_Value}|&lt;убрать кнопку переключения режима&gt;
+	s = KKS + &quot;|&quot; + SIGNAL_NARY + &quot;|&quot; + CStr(Mask_Auto) + &quot;|&quot; + CStr(Mask_Dist) + &quot;|&quot; + CStr(Mask_Fail) + &quot;|&quot; + CStr(Mask_Invalid) + &quot;|&quot;
+	If (pv_Value != Nothing) Then
+		s = s + pv_Value.PVId + &quot;|&quot; + CStr(HideBut)
+	Else
+		s = s + &quot;|&quot; + CStr(HideBut)
+	End If
+	If Operate &amp;&amp; Check_Oper_Rights(pv_OU) Then
+		LoadPopUpMenu(KKS + &quot;|SRKo|NARY_Setter &quot; + s)
+	Else
+		LoadPopUpMenu(KKS + &quot;|SRKi|NARY_Setter &quot; + s)
+	End If
+	If (DATA_NARY == &quot;AUTO&quot;) Then
+		ShowWarning (&quot;Привязка DATA_NARY = AUTO\nнежелательна.\nОна должна быть Z0.&quot;, 0)
+	End If
+ElseIf (Link_Type == 3) Then
+	&apos;Структура параметра
+	&apos;KKS|&lt;убрать кнопку переключения режима&gt;
+	If Operate &amp;&amp; Check_Oper_Rights(pv_OU) Then
+		LoadPopUpMenu(KKS + &quot;|IBRo|TPTS_IBR_set &quot; + KKS + &quot;|&quot; + CStr(HideBut))
+	Else
+		LoadPopUpMenu(KKS + &quot;|IBRi|TPTS_IBR_set &quot; + KKS + &quot;|&quot; + CStr(HideBut))
+	End If
+	If (DATA_NARY == &quot;AUTO&quot;) Then
+		ShowWarning (&quot;Привязка DATA_NARY = AUTO\nнежелательна.\nОна должна быть TPTS.&quot;, 0)
+	End If
+End If</rt:event>
+    <rt:event type="OnMiddleClick">If (KKS == &quot;NULL&quot;) &amp;&amp; (SIG_Auto == &quot;NULL&quot;) &amp;&amp; (SIG_Dist == &quot;NULL&quot;) &amp;&amp; (SIG_Value == &quot;NULL&quot;) Then
+	ShowMessage (&quot;Объект не привязан.&quot;, 5)
+ElseIf (KKS != &quot;NULL&quot;) &amp;&amp; (pv_OU != nothing) Then
+	Open_Win_Uni(False, &quot;rights&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS + &quot;|&quot; + CStr(Operate))
+Else
+	If (pv_OU == nothing) &amp;&amp; (pv_SP == nothing) Then
+		ShowMessage (&quot;Управление не предусмотрено.&quot;, 5)
+	ElseIf (pv_OU == nothing) Then
+		ShowMessage (&quot;Нет переменной ввода команд.&quot;, 5)
+	ElseIf (pv_SP == nothing) Then
+		ShowMessage (&quot;Нет переменной ввода уставки.&quot;, 5)
+	Else
+		ShowMessage (&quot;Нет удалось определить права доступа.&quot;, 5)
+	End If
+End If</rt:event>
+  </rect>
+</svg>

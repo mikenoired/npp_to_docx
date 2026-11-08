@@ -1,0 +1,476 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg color="Col_BGwin" xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 495 180" width="495" height="180" id="aux_PRJSPEC_breaker_diag" stroke="Col_Grey5" font-family="AAP_Font4" font-size="13" font-weight="bold">
+  <desc>диагностика для специфического выключателя</desc>
+  <rt:model revision="6.0" modelversion="7.2.0.23" comment="Стандартная модель ПОРТАЛа">
+    <rt:param name="KKS" datatype="string" comment="KKS"/> 
+    <rt:param name="Obj_Type_Nr" datatype="ubyte" value="1" comment="Номер схемы сигналов из конф. файла от 1 до 3"/> 
+    <rt:param name="HasTray" datatype="boolean" value="true" comment="тележка имеется"/> 
+    <rt:var name="pv_ON" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_OFF" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_NOT_ON" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_NOT_OFF" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_START" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_STOP" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_ON_MISMATCH" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_OFF_MISMATCH" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_ON_OVERTIME" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_OFF_OVERTIME" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_FAIL" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_FAIL_BLINK" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_INVALID" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_UNDEFINED" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_TEST" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_REPAIR" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_SELECTED" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_TR_TEST" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_TR_OUT" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="pv_OU" datatype="PlsPVBin" comment="указатель на переменную"/> 
+    <rt:var name="STrig" datatype="boolean" value="false" comment="наш вывод в ремонт - запрет управления"/> 
+    <rt:var name="No_OU" datatype="boolean" value="false" comment="Нет переменной управления"/> 
+    <rt:var name="Is_NARY" datatype="boolean" value="false" comment="Используется один NARY сигнал"/> 
+    <rt:var name="More_signals" datatype="boolean" value="false" comment="Есть ещё сигналы, найденные по маске"/> 
+    <rt:var name="mask_ON" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_OFF" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_NOT_ON" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_NOT_OFF" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_START" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_STOP" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_ON_MISMATCH" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_OFF_MISMATCH" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_ON_OVERTIME" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_OFF_OVERTIME" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_FAIL" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_FAIL_BLINK" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_INVALID" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_UNDEFINED" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_TEST" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_REPAIR" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_SELECTED" datatype="ushort" comment="маска битов" value="0xFFFF"/> 
+    <rt:var name="mask_TR_TEST" datatype="ushort" value="0xFFFF" comment="маска битов"/> 
+    <rt:var name="mask_TR_OUT" datatype="ushort" value="0xFFFF" comment="маска битов"/> 
+    <rt:var name="TopicID" datatype="string" comment="имя раздела с описанием схемы" value="1"/> 
+    <rt:var name="Delimiter" datatype="string" comment="разделитель" value="_"/> 
+    <rt:var name="SchemeNr" datatype="string" comment="часть имени схемы" value="_"/> 
+    <rt:var name="Mask" datatype="string" comment="Маска поиска дополнительных сигналов, сконструированная по гибкому правилу с учётом наличия точек" value="-"/> 
+    <rt:sub>Sub HighlightMessage(ByVal TxtObj As RtSvgObj, ByVal pv As PlsPVBin, ByVal mask As UShort, ByVal HighlightColor As Int)
+If (pv == Nothing) || (mask == 0) Then
+	TxtObj.visibility = &quot;hidden&quot;
+Else
+	TxtObj.visibility = &quot;visible&quot;
+	If pv.Quality == PLS_QUAL_BAD Then
+		TxtObj.fill = 0xa0a0a0
+		TxtObj.font_size = 11
+		TxtObj.font_weight = &quot;normal&quot;
+		TxtObj.text_decoration = &quot;password&quot;
+	ElseIf (pv.Value &amp; mask) != 0 Then
+		TxtObj.text_decoration = &quot;none&quot;
+		TxtObj.fill = HighlightColor
+		TxtObj.font_size = 13
+		TxtObj.font_weight = &quot;bold&quot;
+	Else
+		TxtObj.text_decoration = &quot;none&quot;
+		TxtObj.fill = 0xa0a0a0
+		TxtObj.font_size = 11
+		TxtObj.font_weight = &quot;normal&quot;
+	End If
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub HighlightMessageSimple(ByVal TxtObj As RtSvgObj, ByVal Highlight As Boolean, ByVal HighlightColor As Int)
+If Highlight Then
+	TxtObj.fill = HighlightColor
+	TxtObj.font_size = 13
+	TxtObj.font_weight = &quot;bold&quot;
+Else
+	TxtObj.fill = 0xa0a0a0
+	TxtObj.font_size = 11
+	TxtObj.font_weight = &quot;normal&quot;
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Open_diag()
+HighlightMessage(ON, pv_ON, mask_ON, 0)
+If Is_NARY Then	
+	HighlightMessage(OFF, pv_ON, mask_OFF, 0)
+	HighlightMessage(NOT_ON, pv_ON, mask_NOT_ON, 0)
+	HighlightMessage(NOT_OFF, pv_ON, mask_NOT_OFF, 0)
+	HighlightMessage(START, pv_ON, mask_START, 0)
+	HighlightMessage(STOP, pv_ON, mask_STOP, 0)
+	HighlightMessage(ON_MISMATCH, pv_ON, mask_ON_MISMATCH, 0xf5)
+	HighlightMessage(OFF_MISMATCH, pv_ON, mask_OFF_MISMATCH, 0xf5)
+	HighlightMessage(ON_OVERTIME, pv_ON, mask_ON_OVERTIME, 0xf5)
+	HighlightMessage(OFF_OVERTIME, pv_ON, mask_OFF_OVERTIME, 0xf5)
+	HighlightMessage(FAIL, pv_ON, mask_FAIL, 0xf5)
+	HighlightMessage(FAIL_BLINK, pv_ON, mask_FAIL_BLINK, 0xf5)
+	HighlightMessage(INVALID, pv_ON, mask_INVALID, 0xf5)
+	HighlightMessage(UNDEFINED, pv_ON, mask_UNDEFINED, 0xf5)
+	HighlightMessage(TEST, pv_ON, mask_TEST, Middle_Color_Wieghted(Color_Imitation, 0,0.75))
+	HighlightMessage(REPAIR, pv_ON, mask_REPAIR, 0xf5)
+	HighlightMessage(SELECTED, pv_ON, mask_SELECTED, 0)
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">Dim TmpName As String
+Dim TmpMask As String
+If Obj_Type_Nr &lt; 1 Then
+	Obj_Type_Nr = 1
+ElseIf Obj_Type_Nr &gt; 3 Then
+	Obj_Type_Nr = 3
+End If
+SchemeNr = &quot;BRK&quot; + CStr(Obj_Type_Nr)
+TopicID = &quot;ObjectRules_&quot; + SchemeNr
+Delimiter = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_DELIMITER&quot;))
+Is_NARY = CBool(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_USE_SINGLE_NARY&quot;))	&apos;чтобы не задействовать лишние переменные
+If Is_NARY Then
+	//это один NARY
+	pv_ON = BIN(KKS + Delimiter + CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_ON&quot;)))
+	mask_ON = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_ON&quot;))
+	mask_OFF = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_OFF&quot;))
+	mask_NOT_ON = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_NOT_ON&quot;))
+	mask_NOT_OFF = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_NOT_OFF&quot;))
+	mask_START = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_START&quot;))
+	mask_STOP = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_STOP&quot;))
+	mask_ON_MISMATCH = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_ON_MISMATCH&quot;))
+	mask_OFF_MISMATCH = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_OFF_MISMATCH&quot;))
+	mask_ON_OVERTIME = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_ON_OVERTIME&quot;))
+	mask_OFF_OVERTIME = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_OFF_OVERTIME&quot;))
+	mask_FAIL = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_FAIL&quot;))
+	mask_FAIL_BLINK = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_FAIL_BLINK&quot;))
+	mask_INVALID = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_INVALID&quot;))
+	mask_UNDEFINED = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_UNDEFINED&quot;))
+	mask_TEST = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_TEST&quot;))
+	mask_REPAIR = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_REPAIR&quot;))
+	mask_SELECTED = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_SELECTED&quot;))
+Else
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_ON&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_ON = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_OFF&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_OFF = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_NOT_ON&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_NOT_ON = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_NOT_OFF&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_NOT_OFF = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_START&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_START = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_STOP&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_STOP = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_ON_MISMATCH&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_ON_MISMATCH = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_OFF_MISMATCH&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_OFF_MISMATCH = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_ON_OVERTIME&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_ON_OVERTIME = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_OFF_OVERTIME&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_OFF_OVERTIME = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_FAIL&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_FAIL = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_FAIL_BLINK&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_FAIL_BLINK = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_INVALID&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_INVALID = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_UNDEFINED&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_UNDEFINED = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_TEST&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_TEST = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_REPAIR&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_REPAIR = BIN(KKS + Delimiter + TmpName)
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_SELECTED&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		pv_SELECTED = BIN(KKS + Delimiter + TmpName)
+	End If
+	If CBool(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_APPLY_MASK&quot;)) Then
+		If pv_ON != Nothing Then
+			mask_ON = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_ON&quot;))
+		End If
+		If pv_OFF  != Nothing Then
+			mask_OFF = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_OFF&quot;))
+		End If
+		If pv_NOT_ON != Nothing Then
+			mask_NOT_ON = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_NOT_ON&quot;))
+		End If
+		If pv_NOT_OFF != Nothing Then
+			mask_NOT_OFF = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_NOT_OFF&quot;))
+		End If
+		If pv_START != Nothing Then
+			mask_START = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_START&quot;))
+		End If
+		If pv_STOP != Nothing Then
+			mask_STOP = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_STOP&quot;))
+		End If
+		If pv_ON_MISMATCH != Nothing Then
+			mask_ON_MISMATCH = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_ON_MISMATCH&quot;))
+		End If
+		If pv_OFF_MISMATCH != Nothing Then
+			mask_OFF_MISMATCH = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_OFF_MISMATCH&quot;))
+		End If
+		If pv_ON_OVERTIME != Nothing Then
+			mask_ON_OVERTIME = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_ON_OVERTIME&quot;))
+		End If
+		If pv_OFF_OVERTIME != Nothing Then
+			mask_OFF_OVERTIME = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_OFF_OVERTIME&quot;))
+		End If
+		If pv_FAIL != Nothing Then
+			mask_FAIL = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_FAIL&quot;))
+		End If
+		If pv_FAIL_BLINK != Nothing Then
+			mask_FAIL_BLINK = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_FAIL_BLINK&quot;))
+		End If
+		If pv_INVALID != Nothing Then
+			mask_INVALID = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_INVALID&quot;))
+		End If
+		If pv_UNDEFINED != Nothing Then
+			mask_UNDEFINED = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_UNDEFINED&quot;))
+		End If
+		If pv_TEST != Nothing Then
+			mask_TEST = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_TEST&quot;))
+		End If
+		If pv_REPAIR != Nothing Then
+			mask_REPAIR = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_REPAIR&quot;))
+		End If
+		If pv_SELECTED != Nothing Then
+			mask_SELECTED = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_SELECTED&quot;))
+		End If
+	End If
+End If
+//сигналы тележки кодируются отдельно от основного сигнала
+If HasTray Then
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_PVMASK_TR_POS_TEST&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		If Left(TmpName, 1) == &quot;.&quot; Then	&apos;если первый символ = точка, значит задана маска с точками
+			TmpMask = PRJSPEC.BuildFinalMask(KKS, TmpName)
+		Else	&apos;иначе - маской является расширение после разделителя
+			TmpMask = KKS + Delimiter + TmpName
+		End If
+		pv_TR_TEST = BIN(TmpMask)
+		If pv_TR_TEST != Nothing Then
+			mask_TR_TEST = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_TR_POS_TEST&quot;))
+		End If
+	End If
+	TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_PVMASK_TR_POS_REPAIR&quot;))
+	If TmpName != &quot;NONE&quot; Then
+		If Left(TmpName, 1) == &quot;.&quot; Then	&apos;если первый символ = точка, значит задана маска с точками
+			TmpMask = PRJSPEC.BuildFinalMask(KKS, TmpName)
+		Else	&apos;иначе - маской является расширение после разделителя
+			TmpMask = KKS + Delimiter + TmpName
+		End If
+		pv_TR_OUT = BIN(TmpMask)
+		If pv_TR_OUT != Nothing Then
+			mask_TR_OUT = CUInt(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_MASK_TR_POS_REPAIR&quot;))
+		End If
+	End If
+End If
+
+	//изначально всё пусть будет скрыто
+	ON.visibility = &quot;hidden&quot;
+	OFF.visibility = &quot;hidden&quot;
+	NOT_ON.visibility = &quot;hidden&quot;
+	NOT_OFF.visibility = &quot;hidden&quot;
+	START.visibility = &quot;hidden&quot;
+	STOP.visibility = &quot;hidden&quot;
+	ON_MISMATCH.visibility = &quot;hidden&quot;
+	OFF_MISMATCH.visibility = &quot;hidden&quot;
+	ON_OVERTIME.visibility = &quot;hidden&quot;
+	OFF_OVERTIME.visibility = &quot;hidden&quot;
+	FAIL.visibility = &quot;hidden&quot;
+	FAIL_BLINK.visibility = &quot;hidden&quot;
+	INVALID.visibility = &quot;hidden&quot;
+	UNDEFINED.visibility = &quot;hidden&quot;
+	TEST.visibility = &quot;hidden&quot;
+	REPAIR.visibility = &quot;hidden&quot;
+	SELECTED.visibility = &quot;hidden&quot;
+	TR_TEST.visibility = &quot;hidden&quot;
+	TR_OUT.visibility = &quot;hidden&quot;
+TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_SIGNAL_COMMAND&quot;))
+If TmpName != &quot;NONE&quot; Then
+	pv_OU = BIN(KKS + Delimiter + TmpName)
+End If
+If (pv_OU == nothing) Then
+	No_OU = True
+ElseIf (pv_OU.PVCategories != 2) Then
+	No_OU = True
+Else
+	No_OU = False
+End If
+If No_OU Then
+	NO_OU.title = &quot;Переменная &quot; + KKS + Delimiter + TmpName + &quot; не найдена или ее тип не Out&quot;
+End If
+
+TmpName = CStr(RTAPLS.GetConfigurationParameter(True, TopicID, SchemeNr + &quot;_AUX_SIGNAL_MASK&quot;))
+If Left(TmpName, 1) == &quot;.&quot; Then	&apos;если первый символ = точка, значит задана маска с точками
+	Mask = PRJSPEC.BuildFinalMask(KKS, TmpName)
+Else	&apos;иначе - маской является расширение после разделителя
+	Mask = KKS + Delimiter + TmpName
+End If
+Dim selBINs(100) As Int
+Dim selANAs(100) As Int
+Dim actualANAs As Int
+Dim actualBINs As Int
+More_signals = PRJSPEC.GET_Selection(Mask, actualANAs, actualBINs, selANAs, selBINs)</rt:event>
+    <rt:changeTrigger name="OnOpen">
+      <rt:chgItem>pv_ON</rt:chgItem>
+      <rt:code>Open_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnOU">
+      <rt:chgItem>pv_OU</rt:chgItem>
+      <rt:code>STrig = ((pv_OU.SuspendedFlags &amp; PLS_SUSP_CMD) != 0)</rt:code>
+      <rt:code>HighlightMessageSimple(OU_SUSP, STrig, 0xf5)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnOFF">
+      <rt:chgItem>pv_OFF</rt:chgItem>
+      <rt:code>HighlightMessage(OFF, pv_OFF, mask_OFF, 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnNOT_ON">
+      <rt:chgItem>pv_NOT_ON</rt:chgItem>
+      <rt:code>HighlightMessage(NOT_ON, pv_NOT_ON, mask_NOT_ON, 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnNOT_OFF">
+      <rt:chgItem>pv_NOT_OFF</rt:chgItem>
+      <rt:code>HighlightMessage(NOT_OFF, pv_NOT_OFF, mask_NOT_OFF, 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnSTART">
+      <rt:chgItem>pv_START</rt:chgItem>
+      <rt:code>HighlightMessage(START, pv_START, mask_START, 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnSTOP">
+      <rt:chgItem>pv_STOP</rt:chgItem>
+      <rt:code>HighlightMessage(STOP, pv_STOP, mask_STOP, 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnON_MISMATCH">
+      <rt:chgItem>pv_ON_MISMATCH</rt:chgItem>
+      <rt:code>HighlightMessage(ON_MISMATCH, pv_ON_MISMATCH, mask_ON_MISMATCH, 0xf5)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnOFF_MISMATCH">
+      <rt:chgItem>pv_OFF_MISMATCH</rt:chgItem>
+      <rt:code>HighlightMessage(OFF_MISMATCH, pv_OFF_MISMATCH, mask_OFF_MISMATCH, 0xf5)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnON_OVERTIME">
+      <rt:chgItem>pv_ON_OVERTIME</rt:chgItem>
+      <rt:code>HighlightMessage(ON_OVERTIME, pv_ON_OVERTIME, mask_ON_OVERTIME, 0xf5)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnOFF_OVERTIME">
+      <rt:chgItem>pv_OFF_OVERTIME</rt:chgItem>
+      <rt:code>HighlightMessage(OFF_OVERTIME, pv_OFF_OVERTIME, mask_OFF_OVERTIME, 0xf5)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnFAIL">
+      <rt:chgItem>pv_FAIL</rt:chgItem>
+      <rt:code>HighlightMessage(FAIL, pv_FAIL, mask_FAIL, 0xf5)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnFAIL_BLINK">
+      <rt:chgItem>pv_FAIL_BLINK</rt:chgItem>
+      <rt:code>HighlightMessage(FAIL_BLINK, pv_FAIL_BLINK, mask_FAIL_BLINK, 0xf5)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnINVALID">
+      <rt:chgItem>pv_INVALID</rt:chgItem>
+      <rt:code>HighlightMessage(INVALID, pv_INVALID, mask_INVALID, 0xf5)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnUNDEFINED">
+      <rt:chgItem>pv_UNDEFINED</rt:chgItem>
+      <rt:code>HighlightMessage(UNDEFINED, pv_UNDEFINED, mask_UNDEFINED, 0xf5)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnTEST">
+      <rt:chgItem>pv_TEST</rt:chgItem>
+      <rt:code>HighlightMessage(TEST, pv_TEST, mask_TEST, Middle_Color_Wieghted(Color_Imitation, 0,0.75))</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnREPAIR">
+      <rt:chgItem>pv_REPAIR</rt:chgItem>
+      <rt:code>HighlightMessage(REPAIR, pv_REPAIR, mask_REPAIR, 0xf5)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnSELECTED">
+      <rt:chgItem>pv_SELECTED</rt:chgItem>
+      <rt:code>HighlightMessage(SELECTED, pv_SELECTED, mask_SELECTED, 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnTR_TEST">
+      <rt:condition>HasTray</rt:condition>
+      <rt:chgItem>pv_TR_TEST</rt:chgItem>
+      <rt:code>HighlightMessage(TR_TEST, pv_TR_TEST, mask_TR_TEST, Middle_Color_Wieghted(Color_Imitation, 0,0.75))</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnTR_OUT">
+      <rt:condition>HasTray</rt:condition>
+      <rt:chgItem>pv_TR_OUT</rt:chgItem>
+      <rt:code>HighlightMessage(TR_OUT, pv_TR_OUT, mask_TR_OUT, 0xf5)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <g id="info_area">
+    <rect x="0" y="0" width="495" height="180" rx="0" ry="0" fill="Col_BGSand" stroke="Col_Grey1" stroke-width="2"/> 
+    <polyline points="0,180 0,0 495,0" fill="none" stroke="Col_Grey5" stroke-width="2"/> 
+  </g>
+  <g stroke="Col_TxtStatic">
+    <line x1="150" y1="2.5" x2="150" y2="145"/> 
+    <line x1="345" y1="2.5" x2="345" y2="145"/> 
+    <line x1="2.5" y1="22.5" x2="492.5" y2="22.5"/> 
+    <line x1="2.5" y1="65" x2="492.5" y2="65"/> 
+    <line x1="2.5" y1="145" x2="492.5" y2="145"/> 
+  </g>
+  <text x="74.999" y="17" fill="Col_TxtStatic" font-family="AAP_Font3" font-weight="bold" text-anchor="middle">ОТКЛЮЧИТЬ</text>
+  <text x="420.006" y="17" fill="Col_TxtStatic" font-family="AAP_Font3" font-weight="bold" text-anchor="middle">ВКЛЮЧИТЬ</text>
+  <text x="5" y="35" id="OFF_MISMATCH" fill="Col_Red">НЕСООТВ. СОСТОЯНИЯ</text>
+  <text x="5" y="47.5" id="OFF_OVERTIME" fill="Col_Red">ПРЕВЫШЕНИЕ ВРЕМЕНИ</text>
+  <text x="5" y="77.5" id="OFF" fill="black">ОТКЛЮЧЕНО</text>
+  <text x="5" y="90" id="NOT_ON" fill="black">НЕ ВКЛЮЧЕНО</text>
+  <text x="5" y="102.5" id="STOP" fill="black">ОТКЛЮЧЕНИЕ</text>
+  <text x="350" y="35" id="ON_MISMATCH" fill="Col_Red">НЕСООТВ. СОСТОЯНИЯ</text>
+  <text x="350" y="47.5" id="ON_OVERTIME" fill="Col_Red">ПРЕВЫШЕНИЕ ВРЕМЕНИ</text>
+  <text x="350" y="77.5" id="ON" fill="black">ВКЛЮЧЕНО</text>
+  <text x="350" y="90" id="NOT_OFF" fill="black">НЕ ОТКЛЮЧЕНО</text>
+  <text x="350" y="102.5" id="START" fill="black">ВКЛЮЧЕНИЕ</text>
+  <text x="155" y="35" id="FAIL" fill="Col_Red">ОБОБЩЕННАЯ НЕИСПРАВНОСТЬ</text>
+  <text x="155" y="47.5" id="FAIL_BLINK" fill="Col_Red">НЕСКВИТИРОВАННАЯ НЕИСПР.</text>
+  <text x="155" y="60" id="INVALID" fill="Col_Red">НЕДОСТОВЕРНОСТЬ</text>
+  <text x="155" y="77.5" id="UNDEFINED" fill="Col_Red">НЕОПРЕДЕЛЁННОЕ ПОЛОЖЕНИЕ</text>
+  <text x="155" y="90" id="TEST" fill="Col_LtBlue">ТЕСТОВЫЙ РЕЖИМ</text>
+  <text x="155" y="102.5" id="REPAIR" fill="Col_Red">РЕЖИМ - РЕМОНТ</text>
+  <text x="155" y="115" id="OU_SUSP" fill="Col_Red">
+    <title>OU (Susp)</title>
+    <rt:dyn type="visibility" mode="constant" value="No_OU" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+РЕМОНТ - ЗАПРЕТ УПРАВЛЕНИЯ</text>
+  <text x="155" y="127.5" id="NO_OU" fill="Col_Red">
+    <rt:dyn type="visibility" mode="constant" value="No_OU" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+НЕТ ПЕРЕМЕННОЙ УПРАВЛЕНИЯ</text>
+  <text x="155" y="140" id="SELECTED" fill="black">ВЫБРАНО ДЛЯ УПРАВЛЕНИЯ</text>
+  <image x="152.5" y="2.5" width="190" height="17.5" xlink:href="obj_Button.svg" id="Sh_other_signals">
+    <rt:dyn type="Label" mode="constant" value="&quot;Прочие сигналы&quot;"/> 
+    <rt:event type="OnClick">Open_Win_Uni(False, &quot;wi_&quot; + KKS, &quot;Дополнительные сигналы&quot;, &quot;wi_aux_signals&quot;, Mask)</rt:event>
+    <rt:dyn type="T_Size" mode="constant" value="13"/> 
+    <rt:dyn type="visibility" mode="constant" value="More_signals" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </image>
+  <text x="5" y="160" id="TR_TEST" fill="Col_LtBlue">ТЕСТОВОЕ (ИСПЫТАТЕЛЬНОЕ) ПОЛОЖЕНИЕ ТЕЛЕЖКИ</text>
+  <text x="5" y="175" id="TR_OUT" fill="Col_Red">НЕРАБОЧЕЕ (РЕМОНТНОЕ) ПОЛОЖЕНИЕ ТЕЛЕЖКИ</text>
+</svg>

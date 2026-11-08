@@ -1,0 +1,126 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 50 80" width="50" height="80" id="TPTS_AETS" font-family="AAP_Font1">
+  <desc>Модуль ТПТС AETS</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="4.0-6.0">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS модуля"/> 
+    <rt:param name="MN" datatype="string" value="1731" comment="типовой номер модуля"/> 
+    <rt:var name="Err" datatype="boolean" value="true" comment="ошибки"/> 
+    <rt:var name="Fail" datatype="boolean" value="false" comment="отказы"/> 
+    <rt:var name="Sim" datatype="boolean" value="false" comment="имитация"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="F0" datatype="PlsPVBin" comment="Указатель на переменную"/> 
+    <rt:var name="F1" datatype="PlsPVBin" comment="Указатель на переменную"/> 
+    <rt:var name="F2" datatype="PlsPVBin" comment="Указатель на переменную"/> 
+    <rt:var name="F3" datatype="PlsPVBin" comment="Указатель на переменную"/> 
+    <rt:var name="F4" datatype="PlsPVBin" comment="Указатель на переменную"/> 
+    <rt:var name="F5" datatype="PlsPVBin" comment="Указатель на переменную"/> 
+    <rt:var name="F6" datatype="PlsPVBin" comment="Указатель на переменную"/> 
+    <rt:var name="F7" datatype="PlsPVBin" comment="Указатель на переменную"/> 
+    <rt:var name="AETE_pv" datatype="PlsPVBin" arraysize="52" comment="маркеры переменных AETE"/> 
+    <rt:var name="AETE_num" datatype="ushort" value="0" comment="количество найденных AETE"/> 
+    <rt:var name="AETE_Er" datatype="boolean" value="False" comment="наличие ошибок AETE"/> 
+    <rt:sub>Sub Calculate_AETE()
+Dim i As Integer
+For i = 0 to (AETE_num - 1)
+	If (AETE_pv(i).Value &gt; 0) Then
+		AETE_Er = True
+		Exit Sub
+	End If
+Next i
+AETE_Er = False
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (KKS != &quot;NULL&quot;) Then
+	F0 = BIN(KKS + &quot;_F0&quot;)
+	F1 = BIN(KKS + &quot;_F1&quot;)
+	F2 = BIN(KKS + &quot;_F2&quot;)
+	F3 = BIN(KKS + &quot;_F3&quot;)
+	F4 = BIN(KKS + &quot;_F4&quot;)
+	F5 = BIN(KKS + &quot;_F5&quot;)
+	F6 = BIN(KKS + &quot;_F6&quot;)
+	F7 = BIN(KKS + &quot;_F7&quot;)
+End If
+Dim AETE_maks As String
+Dim Act_ANAs As Int
+Dim Act_BINs As Int
+Dim Sel_ANAs(100) As Int
+Dim Sel_BINs(100) As Int
+Dim Fnd_OK As Boolean
+Dim i As UShort
+AETE_maks = KKS + &quot;E&quot;
+Fnd_OK = PRJSPEC.GET_Selection(AETE_maks , Act_ANAs, Act_BINs, Sel_ANAs, Sel_BINs)
+If Act_BINs &gt; 52 Then
+	Act_BINs = 52
+ElseIf Act_BINs == 0 Then
+	Exit sub
+End If
+AETE_num = Act_BINs
+For i = 0 to (Act_BINs - 1)
+	AETE_pv(i) = BIN(Sel_BINs(i))
+Next i</rt:event>
+    <rt:cycleTrigger name="GetAETEState" cycle="1" unit="second">
+      <rt:condition>AETE_num &gt; 0</rt:condition>
+      <rt:code>Calculate_AETE()</rt:code>
+    </rt:cycleTrigger>
+    <rt:changeTrigger name="GetState">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>F0</rt:chgItem>
+      <rt:chgItem>F1</rt:chgItem>
+      <rt:chgItem>F2</rt:chgItem>
+      <rt:chgItem>F3</rt:chgItem>
+      <rt:chgItem>F4</rt:chgItem>
+      <rt:chgItem>F5</rt:chgItem>
+      <rt:chgItem>F6</rt:chgItem>
+      <rt:chgItem>F7</rt:chgItem>
+      <rt:code>Fail = PRJSPEC.TPTS_AET(KKS, Err, Sim)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="50" height="80" rx="0" ry="0" id="backgr" fill="Col_Grey2" stroke="Col_Grey5" stroke-linejoin="miter" stroke-width="2"/> 
+  <polyline points="0,80 0,0 50,0" id="LT_border" fill="none" stroke="Col_Grey1" stroke-linecap="butt" stroke-linejoin="miter" stroke-width="2"/> 
+  <image x="10" y="32.5" width="30" height="12.5" xlink:href="bool_indicator.svg" id="Ind_Fail">
+    <rt:dyn type="Stat" mode="onchange" value="Fail"/> 
+  </image>
+  <image x="10" y="47.5" width="30" height="12.5" xlink:href="bool_indicator.svg" id="Ind_Errors">
+    <rt:dyn type="Stat" mode="onchange" value="Err || AETE_Er"/> 
+  </image>
+  <image x="10" y="62.5" width="30" height="12.5" xlink:href="bool_indicator.svg" id="Ind_imitation">
+    <rt:dyn type="Col_ON" mode="constant" value="Color_Imitation"/> 
+    <rt:dyn type="Stat" mode="onchange" value="Sim"/> 
+  </image>
+  <rect x="2.5" y="2.5" width="45" height="75" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="1.5">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <g id="SVGGroup6" fill="black">
+    <text x="25" y="17.5" id="Mod_name" font-size="15" font-weight="bold" text-anchor="middle">AETS</text>
+    <text x="25" y="27.75" id="Mod_number" font-size="10" font-weight="normal" text-anchor="middle">
+      <rt:dyn type="text" mode="constant" value="MN"/> 
+1731</text>
+  </g>
+  <rect x="0" y="0" width="50" height="80" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If F0 != nothing Then
+	If VIS.ModelExists(False, &quot;wd_TPTS_AET_6&quot;) Then
+		Open_ws_wf_wi(&quot;wd_TPTS_AET_6&quot;, KKS, False)
+	Else
+		Open_ws_wf_wi(&quot;wd_TPTS_AET&quot;, KKS, False)
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnRightClick">If F0 != nothing Then
+	If VIS.ModelExists(False, &quot;wd_TPTS_AET_6&quot;) Then
+		LoadPopUpMenu(KKS + &quot;|AETd|wd_TPTS_AET_6 &quot; + KKS)
+	Else
+		LoadPopUpMenu(KKS + &quot;|AETd|wd_TPTS_AET &quot; + KKS)
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+  </rect>
+</svg>

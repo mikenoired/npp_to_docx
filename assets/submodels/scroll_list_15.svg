@@ -1,0 +1,262 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 300 300" width="300" height="300" id="scroll_list_15">
+  <desc>Список из 15 элементов</desc>
+  <rt:model comment="Служебная подмодель ПОРТАЛа" revision="6.0">
+    <rt:param name="StrLen" datatype="int" value="25" comment="Длина строк"/> 
+    <rt:param name="CheckDuplicated" datatype="boolean" value="False" comment="Запретить добавлять существующие записи"/> 
+    <rt:param name="Background_Color" datatype="string" value="white" comment="Цвет подложки строк без выделения"/> 
+    <rt:var name="Item_s" datatype="string" arraysize="500" comment="Массив строк"/> 
+    <rt:var name="VisItem_s" datatype="string" arraysize="15" comment="Массив видимых строк"/> 
+    <rt:var name="Sel_s" datatype="string" comment="Выбранная строка"/> 
+    <rt:var name="Total_i" datatype="int" value="0" comment="Всего элементов в списке"/> 
+    <rt:var name="Shift_i" datatype="int" value="0" comment="Смещение видимых строк относительно начала списка"/> 
+    <rt:var name="L_move" datatype="float" comment="? непонятно что"/> 
+    <rt:var name="H_move" datatype="float" comment="? непонятно что"/> 
+    <rt:var name="Cur_i" datatype="int" value="-1" comment="Текущий выбранный элемент (1-й = 0)"/> 
+    <rt:var name="ActiveItem_i" datatype="boolean" arraysize="15" comment="Массив активности строк"/> 
+    <rt:var name="Sorted_s" datatype="string" arraysize="500" comment="Массив пересортированных строк"/> 
+    <rt:sub>Sub Get_Vis()
+Dim i As int
+For i = 0 to 14
+	VisItem_s(i) = Item_s(i + Shift_i)
+Next i
+End Sub</rt:sub>
+    <rt:sub>Sub Reselect()
+Dim i As int
+For i = 0 to 14
+	If (i == (Cur_i - Shift_i)) Then
+		ActiveItem_i(i) = True
+	Else
+		ActiveItem_i(i) = False
+	End If
+Next i
+Slider.N_first = Shift_i + 1
+Slider.N = Cur_i + 1
+_This.FireUserEvent(&quot;ChangeSelection&quot; , 1)
+End Sub</rt:sub>
+    <rt:sub>Sub Clear_Items()
+Dim i As int
+For i = 0 To Total_i
+	Item_s(i) = &quot;&quot;
+Next i
+For i = 0 To 9
+	VisItem_s(i) = &quot;&quot;
+	ActiveItem_i(i) = false
+Next i
+Total_i = 0
+Cur_i = -1
+Shift_i = 0
+Sel_s = &quot;&quot;
+Get_Vis()
+Reselect()
+Slider.Slider_pos()
+End Sub</rt:sub>
+    <rt:sub>Sub Add_Item(ByVal In_Str As String)
+If CheckDuplicated Then
+	Dim i As int
+	For i = 0 To (Total_i - 1)
+		If (In_Str == Item_s(i)) Then
+			Exit Sub
+		End If
+	Next i
+End If
+If (Total_i &lt; 500) Then
+	Item_s(Total_i) = In_Str
+	Total_i = Total_i + 1
+	Get_Vis()
+	Slider.Slider_pos()
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub SelectVis_n (ByVal i As int)
+&apos;выбор из числа видимых
+If ((i &lt; 0) || (i &gt; 14)) Then
+	Cur_i = -1
+	Sel_s = &quot;&quot;
+	Get_Vis()
+ElseIf (VisItem_s(i) == &quot;&quot;) || (i &gt; (Total_i - 1)) Then
+	Cur_i = -1
+	Sel_s = &quot;&quot;
+	Get_Vis()
+Else
+	Get_Vis()
+	Sel_s = VisItem_s(i)
+	Cur_i = i + Shift_i
+End If
+Reselect()
+End Sub</rt:sub>
+    <rt:sub>Sub Sort_Items()
+If (Total_i &lt; 2) Then
+	Exit Sub
+End If
+Dim i As int
+Dim j As int
+Dim k As int
+Dim n As int
+n = (Total_i - 1)
+For i = 0 To n
+	k = n
+	For j = 0 To n
+		If (Item_s(i) &lt; Item_s(j)) Then
+			k = k - 1
+		End If
+	Next j
+	Sorted_s(k) = Item_s(i)
+Next i
+For i = 0 To n
+	Item_s(i) = Sorted_s(i)
+Next i
+Cur_i = -1
+Get_Vis()
+End Sub</rt:sub>
+    <rt:sub>Sub Del_Sel_item()
+If (Cur_i == -1) Then
+	Exit Sub
+End If
+Dim i As int
+Total_i = Total_i - 1
+For i = Cur_i To (Total_i)
+	Item_s(i) = Item_s(i + 1)
+Next i
+Cur_i = -1
+Sel_s = &quot;&quot;
+Get_Vis()
+End Sub</rt:sub>
+    <rt:timeTrigger name="Redraw" delay="100">
+      <rt:code>Get_Vis()</rt:code>
+    </rt:timeTrigger>
+    <rt:event type="OnInitialize">Dim i As int
+For i = 0 to 14
+	VisItem_s(i) = &quot;&quot;
+Next i
+Slider.Slider_pos()</rt:event>
+    <rt:event type="OnResize">Slider.x = _This.width - _This.height / 13
+Slider.width = _This.height / 13 - 2</rt:event>
+    <rt:changeTrigger name="ChScrollBar">
+      <rt:chgItem>Slider.N_first</rt:chgItem>
+      <rt:code>Shift_i = Slider.N_first - 1</rt:code>
+      <rt:code>Cur_i = Slider.N - 1</rt:code>
+      <rt:code>SelectVis_n(Cur_i - Shift_i)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="300" height="200" rx="0" ry="0" id="Backgr" fill="white" stroke="none">
+    <rt:dyn type="fill" mode="constant" value="Background_Color"/> 
+  </rect>
+  <image width="300" height="19" xlink:href="scroll_line.svg" id="Item0">
+    <rt:dyn type="NumChars" mode="constant" value="StrLen"/> 
+    <rt:dyn type="IsActive" mode="onchange" value="ActiveItem_i(0)"/> 
+    <rt:dyn type="Txt_line" mode="onchange" value="VisItem_s(0)"/> 
+    <rt:event type="OnClick">SelectVis_n(0)</rt:event>
+    <rt:dyn type="Background_Color" mode="constant" value="Background_Color"/> 
+  </image>
+  <image y="20" width="300" height="19" xlink:href="scroll_line.svg" id="Item1">
+    <rt:dyn type="NumChars" mode="constant" value="StrLen"/> 
+    <rt:dyn type="IsActive" mode="onchange" value="ActiveItem_i(1)"/> 
+    <rt:dyn type="Txt_line" mode="onchange" value="VisItem_s(1)"/> 
+    <rt:event type="OnClick">SelectVis_n(1)</rt:event>
+    <rt:dyn type="Background_Color" mode="constant" value="Background_Color"/> 
+  </image>
+  <image y="40" width="300" height="19" xlink:href="scroll_line.svg" id="Item2">
+    <rt:dyn type="NumChars" mode="constant" value="StrLen"/> 
+    <rt:dyn type="IsActive" mode="onchange" value="ActiveItem_i(2)"/> 
+    <rt:dyn type="Txt_line" mode="onchange" value="VisItem_s(2)"/> 
+    <rt:event type="OnClick">SelectVis_n(2)</rt:event>
+    <rt:dyn type="Background_Color" mode="constant" value="Background_Color"/> 
+  </image>
+  <image y="60" width="300" height="19" xlink:href="scroll_line.svg" id="Item3">
+    <rt:dyn type="NumChars" mode="constant" value="StrLen"/> 
+    <rt:dyn type="IsActive" mode="onchange" value="ActiveItem_i(3)"/> 
+    <rt:dyn type="Txt_line" mode="onchange" value="VisItem_s(3)"/> 
+    <rt:event type="OnClick">SelectVis_n(3)</rt:event>
+    <rt:dyn type="Background_Color" mode="constant" value="Background_Color"/> 
+  </image>
+  <image y="80" width="300" height="19" xlink:href="scroll_line.svg" id="Item4">
+    <rt:dyn type="NumChars" mode="constant" value="StrLen"/> 
+    <rt:dyn type="IsActive" mode="onchange" value="ActiveItem_i(4)"/> 
+    <rt:dyn type="Txt_line" mode="onchange" value="VisItem_s(4)"/> 
+    <rt:event type="OnClick">SelectVis_n(4)</rt:event>
+    <rt:dyn type="Background_Color" mode="constant" value="Background_Color"/> 
+  </image>
+  <image y="100" width="300" height="19" xlink:href="scroll_line.svg" id="Item5">
+    <rt:dyn type="NumChars" mode="constant" value="StrLen"/> 
+    <rt:dyn type="IsActive" mode="onchange" value="ActiveItem_i(5)"/> 
+    <rt:dyn type="Txt_line" mode="onchange" value="VisItem_s(5)"/> 
+    <rt:event type="OnClick">SelectVis_n(5)</rt:event>
+    <rt:dyn type="Background_Color" mode="constant" value="Background_Color"/> 
+  </image>
+  <image y="120" width="300" height="19" xlink:href="scroll_line.svg" id="Item6">
+    <rt:dyn type="NumChars" mode="constant" value="StrLen"/> 
+    <rt:dyn type="IsActive" mode="onchange" value="ActiveItem_i(6)"/> 
+    <rt:dyn type="Txt_line" mode="onchange" value="VisItem_s(6)"/> 
+    <rt:event type="OnClick">SelectVis_n(6)</rt:event>
+    <rt:dyn type="Background_Color" mode="constant" value="Background_Color"/> 
+  </image>
+  <image y="140" width="300" height="19" xlink:href="scroll_line.svg" id="Item7">
+    <rt:dyn type="NumChars" mode="constant" value="StrLen"/> 
+    <rt:dyn type="IsActive" mode="onchange" value="ActiveItem_i(7)"/> 
+    <rt:dyn type="Txt_line" mode="onchange" value="VisItem_s(7)"/> 
+    <rt:event type="OnClick">SelectVis_n(7)</rt:event>
+    <rt:dyn type="Background_Color" mode="constant" value="Background_Color"/> 
+  </image>
+  <image y="160" width="300" height="19" xlink:href="scroll_line.svg" id="Item8">
+    <rt:dyn type="NumChars" mode="constant" value="StrLen"/> 
+    <rt:dyn type="IsActive" mode="onchange" value="ActiveItem_i(8)"/> 
+    <rt:dyn type="Txt_line" mode="onchange" value="VisItem_s(8)"/> 
+    <rt:event type="OnClick">SelectVis_n(8)</rt:event>
+    <rt:dyn type="Background_Color" mode="constant" value="Background_Color"/> 
+  </image>
+  <image y="180" width="300" height="19" xlink:href="scroll_line.svg" id="Item9">
+    <rt:dyn type="NumChars" mode="constant" value="StrLen"/> 
+    <rt:dyn type="IsActive" mode="onchange" value="ActiveItem_i(9)"/> 
+    <rt:dyn type="Txt_line" mode="onchange" value="VisItem_s(9)"/> 
+    <rt:event type="OnClick">SelectVis_n(9)</rt:event>
+    <rt:dyn type="Background_Color" mode="constant" value="Background_Color"/> 
+  </image>
+  <image y="200" width="300" height="19" xlink:href="scroll_line.svg" id="Item10">
+    <rt:dyn type="NumChars" mode="constant" value="StrLen"/> 
+    <rt:dyn type="IsActive" mode="onchange" value="ActiveItem_i(10)"/> 
+    <rt:dyn type="Txt_line" mode="onchange" value="VisItem_s(10)"/> 
+    <rt:event type="OnClick">SelectVis_n(10)</rt:event>
+    <rt:dyn type="Background_Color" mode="constant" value="Background_Color"/> 
+  </image>
+  <image y="220" width="300" height="19" xlink:href="scroll_line.svg" id="Item11">
+    <rt:dyn type="NumChars" mode="constant" value="StrLen"/> 
+    <rt:dyn type="IsActive" mode="onchange" value="ActiveItem_i(11)"/> 
+    <rt:dyn type="Txt_line" mode="onchange" value="VisItem_s(11)"/> 
+    <rt:event type="OnClick">SelectVis_n(11)</rt:event>
+    <rt:dyn type="Background_Color" mode="constant" value="Background_Color"/> 
+  </image>
+  <image y="240" width="300" height="19" xlink:href="scroll_line.svg" id="Item12">
+    <rt:dyn type="NumChars" mode="constant" value="StrLen"/> 
+    <rt:dyn type="IsActive" mode="onchange" value="ActiveItem_i(12)"/> 
+    <rt:dyn type="Txt_line" mode="onchange" value="VisItem_s(12)"/> 
+    <rt:event type="OnClick">SelectVis_n(12)</rt:event>
+    <rt:dyn type="Background_Color" mode="constant" value="Background_Color"/> 
+  </image>
+  <image y="260" width="300" height="19" xlink:href="scroll_line.svg" id="Item13">
+    <rt:dyn type="NumChars" mode="constant" value="StrLen"/> 
+    <rt:dyn type="IsActive" mode="onchange" value="ActiveItem_i(13)"/> 
+    <rt:dyn type="Txt_line" mode="onchange" value="VisItem_s(13)"/> 
+    <rt:event type="OnClick">SelectVis_n(13)</rt:event>
+    <rt:dyn type="Background_Color" mode="constant" value="Background_Color"/> 
+  </image>
+  <image y="280" width="300" height="19" xlink:href="scroll_line.svg" id="Item14">
+    <rt:dyn type="NumChars" mode="constant" value="StrLen"/> 
+    <rt:dyn type="IsActive" mode="onchange" value="ActiveItem_i(14)"/> 
+    <rt:dyn type="Txt_line" mode="onchange" value="VisItem_s(14)"/> 
+    <rt:event type="OnClick">SelectVis_n(14)</rt:event>
+    <rt:dyn type="Background_Color" mode="constant" value="Background_Color"/> 
+  </image>
+  <image x="275" y="2" width="23" height="296" xlink:href="scroll_bar_v.svg" id="Slider">
+    <rt:dyn type="NN" mode="onchange" value="Total_i"/> 
+    <rt:dyn type="MM" mode="constant" value="15"/> 
+    <rt:dyn type="N_first" mode="constant" value="(Shift_i + 1)"/> 
+    <rt:dyn type="N" mode="constant" value="(Cur_i + 1)"/> 
+    <rt:dyn type="visibility" mode="onchange" value="(Total_i &lt; 16)" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+    <rt:dyn type="Tint" mode="constant" value="Background_Color"/> 
+  </image>
+  <polyline points="0,300 0,0 300,0" fill="none" stroke="Col_Grey5" stroke-width="2"/> 
+  <polyline points="0,300 300,300 300,0" fill="none" stroke="Col_Grey1" stroke-width="2"/> 
+</svg>

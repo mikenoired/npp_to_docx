@@ -1,0 +1,117 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 1200 25" width="1200" height="25" id="obj_NodeSRV" stroke="Col_Grey2" font-family="AAP_Font3" font-size="15" font-weight="bold">
+  <desc>строка состояния серверов</desc>
+  <rt:model comment="Служебная подмодель ПОРТАЛа" revision="4.3-6.1">
+    <rt:param name="NdID" datatype="RtaNode" comment="интерфейс узла"/> 
+    <rt:param name="Active" datatype="boolean" value="false" comment="выделение подсветкой"/> 
+    <rt:param name="LocalNetMask" datatype="ushort" value="3" comment="реальная маска локальной сети"/> 
+    <rt:sub>Sub GetNodeStatus()
+Dim SRV_ID As String
+Dim NStatus As UShort
+Dim NDStatus As UShort
+Dim NodeNet As UShort
+Dim IP1 As String
+Dim IP2 As String
+Dim CPU_load As UShort
+
+If NdID == Nothing Then
+	t_ID.text = &quot;&quot;
+	rect_ID.fill = Col_Ar(7)
+	t_Status.text = &quot;&quot;
+	rect_Status.fill = Col_Ar(7)
+	t_Net_1.text = &quot;&quot;
+	t_Net_2.text = &quot;&quot;
+	rect_Net_1.fill = Col_Ar(7)
+	rect_Net_2.fill = Col_Ar(7)
+	t_DataOK.text = &quot;&quot;
+	rect_DataOK.fill = Col_Ar(7)
+	t_ImpTasks.text = &quot;&quot;
+	rect_ImpTasks.fill = Col_Ar(7)
+
+Else
+	NdID.Refresh()
+	SRV_ID = PLStrCut(NdID.NodeName, 20)
+	NStatus = NdID.NodeStatus
+	IP1 = NdID.IPAddress
+	IP2 = NdID.IPAddress_2
+	NodeNet = NdID.NetMask &amp; 0xC
+	&apos;далее, если своя сеть есть (старшие биты), то младшие биты по И переносим в старшие
+	&apos;это позволит быстрее определять отказы т.к. старшие биты обсчитываются через несколько минут
+	If ((LocalNetMask &amp; 4) &gt; 0) Then
+		NodeNet = NodeNet &amp; (((NdID.NetMask &amp; 1) * 4) | 8)
+	End If
+	If ((LocalNetMask &amp; 8) &gt; 0) Then
+		NodeNet = NodeNet &amp; (((NdID.NetMask &amp; 2) * 4) | 4)
+	End If
+	Dim Alt_ND_ID As String
+	Alt_ND_ID = CStr(RTAPLS.GetConfigurationParameter(False, &quot;SYS_NODES&quot;, SRV_ID))
+	If (Len(Alt_ND_ID) &gt; 1) &amp;&amp; (GetState(Alt_ND_ID) != _BadState) Then
+		t_ID.text = PLStrCut(Alt_ND_ID, 25)
+	Else
+		t_ID.text = PLStrCut(SRV_ID, 20)
+	End If
+	If Active Then
+		rect_ID.fill = Col_Ar(14)
+	Else
+		rect_ID.fill = Col_Ar(8)
+	End If
+	t_Status.text = ENodeState(NStatus, True)
+	rect_Status.fill = NodStatColor(NStatus)
+	t_Net_1.text = IP1
+	t_Net_2.text = IP2
+	If NStatus &lt; 4 Then
+		rect_Net_1.fill = Col_Ar(8)
+		rect_Net_2.fill = Col_Ar(8)
+		t_DataOK.text = &quot;--&quot;
+		rect_DataOK.fill = Col_Ar(8)
+		t_ImpTasks.text = &quot;--&quot;
+		rect_ImpTasks.fill = Col_Ar(8)
+	Else
+		If (IP1 == &quot;&quot;) || ((LocalNetMask &amp; 0xC) == 0) Then
+			rect_Net_1.fill = Col_Ar(8)
+		Else
+			rect_Net_1.fill = Col_Ar((NodeNet &amp; 4) / 4 + 1)
+		End If	
+		If (IP2 == &quot;&quot;) || ((LocalNetMask &amp; 0xC) == 0) Then
+			rect_Net_2.fill = Col_Ar(8)
+		Else
+			rect_Net_2.fill = Col_Ar((NodeNet &amp; 8) / 8 + 1)
+		End If	
+		NDStatus = NdID.DataStatus
+		If (NDStatus &amp; RTDATA_STAT_OK) &gt; 0 Then
+			t_DataOK.text = &quot;Да&quot;
+			rect_DataOK.fill = Col_Ar(2)
+		Else
+			t_DataOK.text = &quot;Нет&quot;
+			rect_DataOK.fill = Col_Ar(1)
+		End If
+&apos;задачи пока сделаны через флаги
+		If (NDStatus &amp; RTDATA_STAT_TASKS_OK) Then
+			t_ImpTasks.text = &quot;Важные задачи - работают все&quot;
+			rect_ImpTasks.fill = Col_Ar(2)
+		Else
+			t_ImpTasks.text = &quot;Важные задачи - работают не все&quot;
+			rect_ImpTasks.fill = Col_Ar(1)
+		End If
+	End If
+End If
+
+End Sub</rt:sub>
+    <rt:cycleTrigger name="ShowData" cycle="1" unit="second">
+      <rt:code>GetNodeStatus()</rt:code>
+    </rt:cycleTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="1200" height="25" rx="0" ry="0" id="backgr"/> 
+  <rect x="0" y="0" width="225" height="25" rx="0" ry="0" id="rect_ID" fill="Col_Grey1"/> 
+  <rect x="225" y="0" width="250" height="25" rx="0" ry="0" id="rect_Status" fill="Col_Grey1"/> 
+  <rect x="475" y="0" width="150" height="25" rx="0" ry="0" id="rect_Net_1" fill="Col_Grey1"/> 
+  <rect x="625" y="0" width="150" height="25" rx="0" ry="0" id="rect_Net_2" fill="Col_Grey1"/> 
+  <rect x="775" y="0" width="100" height="25" rx="0" ry="0" id="rect_DataOK" fill="Col_Grey1"/> 
+  <rect x="875" y="0" width="325" height="25" rx="0" ry="0" id="rect_ImpTasks" fill="Col_Grey1"/> 
+  <text x="10" y="17.5" id="t_ID">Сервер</text>
+  <text x="235" y="17.5" id="t_Status">Статус</text>
+  <text x="485" y="17.5" id="t_Net_1">IP адрес 1</text>
+  <text x="635" y="17.5" id="t_Net_2">IP адрес 2</text>
+  <text x="825" y="17.5" id="t_DataOK" text-anchor="middle">НЕТ</text>
+  <text x="880" y="17.5" id="t_ImpTasks">Важные задачи - работают не все</text>
+</svg>

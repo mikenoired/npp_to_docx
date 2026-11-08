@@ -1,0 +1,209 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 610 320" width="610" height="320" id="aux_TPTS_ESS_wi" font-family="AAP_Font4" font-size="13" font-weight="bold">
+  <desc>подмодель для TPTS кан. опер. ESS</desc>
+  <rt:model comment="Служебная подмодель ПОРТАЛа" revision="6.0">
+    <rt:param name="InPar" datatype="string" comment="входной параметр"/> 
+    <rt:var name="KKS" datatype="string" comment="KKS"/> 
+    <rt:var name="F0" datatype="PlsPVBin" comment="указатель на BST F0"/> 
+    <rt:var name="F1" datatype="PlsPVBin" comment="указатель на BST F1"/> 
+    <rt:var name="F2" datatype="PlsPVBin" comment="указатель на BST F2"/> 
+    <rt:var name="Z0" datatype="PlsPVBin" comment="указатель на BST Z0"/> 
+    <rt:var name="B0" datatype="PlsPVBin" comment="указатель на BST B0"/> 
+    <rt:var name="OU" datatype="PlsPVBin" comment="команда управления"/> 
+    <rt:var name="VB6" datatype="PlsPVBin" comment="указатель на PL VB6"/> 
+    <rt:var name="VB9" datatype="PlsPVBin" comment="указатель на PL VB9"/> 
+    <rt:var name="VB10" datatype="PlsPVBin" comment="указатель на PL VB10"/> 
+    <rt:var name="VB11" datatype="PlsPVBin" comment="указатель на PL VB11"/> 
+    <rt:var name="VB12" datatype="PlsPVBin" comment="указатель на PL VB12"/> 
+    <rt:var name="Status" datatype="int" comment="обобщенное сотояние"/> 
+    <rt:var name="LCol" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="RCol" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="AStat" datatype="ushort" value="0" comment="код сигнализации"/> 
+    <rt:var name="Fl_Close" datatype="ushort" value="11" comment="код цвета индикатора ЗАКР."/> 
+    <rt:var name="Fl_Open" datatype="ushort" value="11" comment="код цвета индикатора ОТКР."/> 
+    <rt:var name="Fl_Alarm" datatype="ushort" value="11" comment="код цвета индикатора НЕИСПР."/> 
+    <rt:var name="RTM_val" datatype="string" comment="значение РТМ"/> 
+    <rt:var name="NT_N" datatype="boolean" comment="РТМ не определился и блокнот вызывать нельзя"/> 
+    <rt:var name="IE_N" datatype="boolean" comment="нельзя вызывать ИЭ"/> 
+    <rt:var name="STrig" datatype="boolean" value="false" comment="в ремонте"/> 
+    <rt:var name="Alt_OpenColor" datatype="boolean" value="false" comment="альт. цвет состояния ОТКР."/> 
+    <rt:var name="Open_Color" datatype="ushort" value="3" comment="индекс цвета состояния ОТКР."/> 
+    <rt:var name="O_Color" datatype="uint" comment="цвет состояния ОТКР."/> 
+    <rt:var name="Is_EM" datatype="boolean" value="False" comment="А не EM ли это управляет оборудованием?"/> 
+    <rt:var name="HasStopBut" datatype="boolean" value="True" comment="Есть кнопка &quot;Стоп&quot;"/> 
+    <rt:sub>Sub StatusFlash ()
+Status = PRJSPEC.TPTS_pulse(KKS, Alt_OpenColor, LCol, RCol, AStat)
+If Status == -1 Then
+	Fl_Close = 6
+	Fl_Open = 6
+	Fl_Alarm = 6
+	Exit Sub
+ElseIf Status &lt; 0 Then
+	Fl_Close = 15
+	Fl_Open = 15
+	Fl_Alarm = 15
+	Exit Sub
+End If
+If ((Status &amp; 128) &gt; 0) Then
+	Fl_Open = Open_Color | 16
+ElseIf ((Status  &amp; 64) &gt; 0) Then
+	Fl_Open = Open_Color
+ElseIf ((Status  &amp; 32) &gt; 0) Then
+	Fl_Open = Open_Color | 64
+Else
+	Fl_Open = 11
+End If
+If ((Status  &amp; 16) &gt; 0) Then
+	Fl_Close = 2 |16
+ElseIf ((Status  &amp; 8) &gt; 0) Then
+	Fl_Close = 2
+ElseIf ((Status  &amp; 4) &gt; 0) Then
+	Fl_Close = 2 | 64
+Else
+	Fl_Close = 11
+End If
+If (Z0.Value &amp; 192) != 0 Then
+	Fl_Open = Fl_Open | 15
+	Fl_Close = Fl_Close | 15
+End If
+If  ((Status &amp; 2) &gt; 0) Then
+	Fl_Alarm = 1
+ElseIf ((Status &amp; 1) &gt; 0) Then
+	Fl_Alarm = 1 | 64
+Else
+	Fl_Alarm = 11
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">/*
+Структура параметра
+KKS|&lt;альтернативный цвет для ОТКР&gt;|&lt;есть кнопка СТОП&gt;[|&lt;тип задвижки&gt;]
+p0	KKS
+p1 	альтернативный цвет для ОТКР
+p2 	есть кнопка СТОП
+p3	тип: pivot/louver/rect/[CO]
+*/
+Dim Pars(20) As String
+Dim NumPars As UInt
+Dim par_rest As String
+par_rest = PRJSPEC.GetAllPars(InPar, NumPars, Pars)
+KKS = Pars(0)
+If Pars(1) == &quot;&quot; Then
+	Alt_OpenColor = False
+Else
+	Alt_OpenColor = CBool(Pars(1))
+End If
+If Alt_OpenColor Then
+	O_Color = Color_OPEN2
+	Open_Color = 4
+Else
+	O_Color = Color_OPEN
+End If
+If Pars(2) == &quot;&quot; Then
+	HasStopBut = False
+Else
+	HasStopBut = CBool(Pars(2))
+End If
+F0 = BIN(KKS + &quot;_F0&quot;)
+F1 = BIN(KKS + &quot;_F1&quot;)
+F2= BIN(KKS + &quot;_F2&quot;)
+Z0 = BIN(KKS + &quot;_Z0&quot;)
+B0 = BIN(KKS + &quot;_B0&quot;)
+OU = BIN(KKS + &quot;_OU&quot;)
+VB6 = BIN(KKS + &quot;_VB6&quot;)
+VB9 = BIN(KKS + &quot;_VB9&quot;)
+VB10 = BIN(KKS + &quot;_VB10&quot;)
+VB11 = BIN(KKS + &quot;_VB11&quot;)
+VB12 = BIN(KKS + &quot;_VB12&quot;)
+RTM_val = PRJSPEC.RTM (KKS, True)
+If (Left(RTM_val, 1) != &quot;Н&quot;) Then
+	NT_N = False	//0 - enabled, 1 - disabled
+	IE_N = !PRJSPEC.IE_Exists(RTM_val, False)
+Else
+	NT_N = True
+	IE_N = True
+End If
+Is_EM = ((Z0.CategoryNr % 100) == 21)
+PRJSPEC.On_Oper(KKS, 5)</rt:event>
+    <rt:event type="OnTerminate">PRJSPEC.On_Oper(KKS, 0)</rt:event>
+    <rt:cycleTrigger name="OnOper" cycle="1" unit="second">
+      <rt:code>PRJSPEC.On_Oper(KKS, 5)</rt:code>
+    </rt:cycleTrigger>
+    <rt:changeTrigger name="GetStatus">
+      <rt:chgItem>Z0</rt:chgItem>
+      <rt:chgItem>VB11</rt:chgItem>
+      <rt:code>StatusFlash()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Remont">
+      <rt:chgItem>OU</rt:chgItem>
+      <rt:code>STrig = PRJSPEC.GET_Susp(KKS, True)</rt:code>
+      <rt:code>StatusFlash()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="5" y="5" width="100" height="240" rx="0" ry="0" fill="none" stroke="Col_Frames"/> 
+  <rect x="5" y="250" width="100" height="65" rx="0" ry="0" fill="none" stroke="Col_Frames"/> 
+  <g>
+    <rect x="9.75" y="10" width="90" height="25" rx="0" ry="0" fill="url(#Cylinder_horizontal2)" stroke="none"/> 
+    <rect x="9.75" y="10" width="90" height="25" rx="0" ry="0" fill="Col_Grey5" fill-opacity="0.599997" stroke="Col_Grey1" stroke-width="1">
+      <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(2, Fl_Close, 11)"/> 
+    </rect>
+    <polyline points="9.75,35 9.75,10 99.75,10" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  </g>
+  <g>
+    <rect x="9.75" y="70" width="90" height="25" rx="0" ry="0" fill="url(#Cylinder_horizontal2)" stroke="none"/> 
+    <rect x="9.75" y="70" width="90" height="25" rx="0" ry="0" fill="Col_Grey5" fill-opacity="0.5" stroke="Col_Grey1" stroke-width="1">
+      <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(2, Fl_Alarm, 11)"/> 
+    </rect>
+    <polyline points="9.75,95 9.75,70 99.75,70" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  </g>
+  <g>
+    <rect x="10" y="40" width="90" height="25" rx="0" ry="0" fill="url(#Cylinder_horizontal2)" stroke="none"/> 
+    <rect x="10" y="40" width="90" height="25" rx="0" ry="0" fill="Col_Grey5" fill-opacity="0.599997" stroke="Col_Grey1" stroke-width="1">
+      <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(2, Fl_Open, 11)"/> 
+    </rect>
+    <polyline points="10,65 10,40 100,40" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  </g>
+  <g id="flash_text" fill="black" font-family="AAP_Font3" font-size="15" font-weight="bold" text-anchor="middle">
+    <text x="52.5" y="27.5" id="Flash_closed">Закрыто</text>
+    <text x="52.4" y="87.5" id="Flash_alarm">Неиспр.</text>
+    <text x="52.5" y="57.5" id="Flash_open">Открыто</text>
+  </g>
+  <image x="10" y="215" width="90" height="25" xlink:href="obj_ButtonH.svg" id="Susp">
+    <rt:dyn type="Label" mode="constant" value="&quot;Ремонт&quot;"/> 
+    <rt:dyn type="Trigger" mode="onchange" value="STrig"/> 
+    <rt:dyn type="But_Color" mode="onchange" value="Remont_ButColor(STrig)"/> 
+    <rt:event type="OnClick">PRJSPEC.SET_Susp(KKS, True)</rt:event>
+    <rt:dyn type="Disable" mode="onchange" value="!flag_remont"/> 
+  </image>
+  <image x="10" y="285" width="90" height="25" xlink:href="obj_Button.svg" id="Notes">
+    <rt:dyn type="Label" mode="constant" value="&quot;Блокнот&quot;"/> 
+    <rt:dyn type="rt:detect" mode="constant" value="NT_N" trans="ii">
+      <rt:xy value="1" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+    <rt:event type="OnClick">Notes(RTM_val)</rt:event>
+    <rt:dyn type="Disable" mode="constant" value="NT_N"/> 
+  </image>
+  <image x="45" y="255" width="55" height="25" xlink:href="obj_Button.svg" id="Reglam">
+    <rt:dyn type="Label" mode="constant" value="&quot;ИЭ&quot;"/> 
+    <rt:event type="OnClick">IE(RTM_val)</rt:event>
+    <rt:dyn type="Disable" mode="constant" value="IE_N"/> 
+  </image>
+  <image x="12.5" y="257.5" width="22.5" height="22.5" xlink:href="obj_address.svg" id="Source_info">
+    <rt:dyn type="Is_ANA" mode="constant" value="false"/> 
+    <rt:dyn type="PointID" mode="constant" value="Z0.PVId"/> 
+  </image>
+  <image x="110" y="5" width="495" height="310" xlink:href="aux_TPTS_ESS_diag.svg">
+    <rt:dyn type="KKS" mode="constant" value="KKS"/> 
+    <rt:dyn type="F0" mode="constant" value="F0"/> 
+    <rt:dyn type="F1" mode="constant" value="F1"/> 
+    <rt:dyn type="F2" mode="constant" value="F2"/> 
+    <rt:dyn type="Z0" mode="constant" value="Z0"/> 
+    <rt:dyn type="B0" mode="constant" value="B0"/> 
+    <rt:dyn type="OU" mode="constant" value="OU"/> 
+    <rt:dyn type="VB6" mode="constant" value="VB6"/> 
+    <rt:dyn type="VB9" mode="constant" value="VB9"/> 
+    <rt:dyn type="VB10" mode="constant" value="VB10"/> 
+    <rt:dyn type="VB11" mode="constant" value="VB11"/> 
+    <rt:dyn type="VB12" mode="constant" value="VB12"/> 
+  </image>
+</svg>

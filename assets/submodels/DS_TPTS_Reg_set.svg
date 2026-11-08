@@ -1,0 +1,185 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 100 30" width="100" height="30" id="DS_TPTS_Reg_set">
+  <desc>ТПТС (SR или KR) задатчик регулятора для Dull Screen</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа Dull Screen" revision="6.0">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS оборудования"/> 
+    <rt:param name="Operate" datatype="boolean" value="False" comment="Сделать объект управляемым"/> 
+    <rt:param name="NoReadings" datatype="boolean" value="false" comment="Вместо показаний уставки выводить статический 0"/> 
+    <rt:param name="ShowGoodColor" datatype="boolean" value="false" comment="окрашивать подложку при хорошем качестве"/> 
+    <rt:param name="BG_StaticColor" datatype="string" value="none" comment="Имя цвета подложки, если объект не должен быть прозрачным"/> 
+    <rt:var name="OU" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="VB11" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="AA03" datatype="PlsPVAna" comment="указатель"/> 
+    <rt:var name="Status" datatype="int" comment="обобщенное сотояние"/> 
+    <rt:var name="ACol" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="HCol" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="AStat" datatype="ushort" value="0" comment="код сигнализации"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="MyStrokeWdth" datatype="float" value="2" comment="Толщина рамок в зависимости от управляемости"/> 
+    <rt:sub>Sub ShowVal()
+If !NoReadings Then
+	If AA03 != Nothing Then
+		Value_text.text = AA03.ValueAscii()
+		Dim ValColor As UInt
+		ValColor = PRJSPEC.ANA_Color_pv (AA03)
+		backgr.fill = ValColor
+		If ShowGoodColor Then
+			If ValColor == Color_ANA_GOOD Then
+				backgr.fill_opacity = 0.5
+			Else
+				backgr.fill_opacity = 1
+			End If
+		Else
+			If ValColor == Color_ANA_GOOD Then
+				backgr.visibility = &quot;hidden&quot;
+			Else
+				backgr.visibility = &quot;visible&quot;
+			End If
+		End If
+	Else
+		l.visibility = &quot;hidden&quot;
+		r.visibility = &quot;hidden&quot;
+		backgr.fill = Color_ANA_ER_LINK
+		Value_text.text = &quot;Ошибка&quot;
+	End If
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">AltWidth.visibility = &quot;hidden&quot;
+If (KKS != &quot;NULL&quot;) Then
+//Z0 и OU не нужны для рамки неисправности, но OU надо для определения прав доступа
+	OU = BIN(KKS + &quot;_OU&quot;)
+	VB11 = BIN(KKS + &quot;_VB11&quot;)
+	If (!requests_allown) Then
+		AA03 = ANA(KKS + &quot;_XQ07&quot;)
+	Else
+		Set AA03 = ANA(KKS + &quot;_AA3&quot;)
+		If AA03 == nothing Then
+			Set AA03 = ANA(KKS + &quot;_XQ07&quot;)
+		End If
+	End If
+End If
+Dim My_w As Float
+Dim My_h As Float
+My_w = _This.width
+My_h = _This.height
+Static_BG.x = 5
+Static_BG.y = 5
+Static_BG.height = My_h - 10
+backgr.x = 5
+backgr.y = 5
+backgr.height = My_h - 10
+Al_frame.x = 2.5
+Al_frame.y = 2.5
+Al_frame.height = My_h - 5
+SelFrame.x = 2.5
+SelFrame.y = 2.5
+SelFrame.height = My_h - 5
+If NoReadings Then
+	If AA03 == Nothing Then
+		backgr.fill = Color_ANA_ER_LINK
+		Value_text.text = &quot;Ош.&quot;
+		l.visibility = &quot;hidden&quot;
+		r.visibility = &quot;hidden&quot;
+	Else
+		backgr.visibility = &quot;hidden&quot;
+		Value_text.text = &quot;0&quot;
+		Value_text.fill = &quot;Col_Grey5&quot;
+		l.points = &quot;7.5,&quot;+CStr(My_h / 3)+&quot; 15,&quot;+CStr(My_h / 2)+&quot; 7.5,&quot;+CStr(My_h / 1.5 )
+		r.points = CStr(My_w / 2 - 7.5)+&quot;,&quot;+CStr(My_h / 3)+&quot; &quot;+CStr(My_w / 2 - 15)+&quot;,&quot;+CStr(My_h / 2)+&quot; &quot;+CStr(My_w / 2 - 7.5)+&quot;,&quot;+CStr(My_h / 1.5)
+	End If
+	Static_BG.width = My_w / 2 - 10
+	backgr.width = My_w / 2 - 10
+	Value_text.x = My_w / 4
+	RB_edge.points = &quot;5,&quot;+CStr(My_h - 5)+&quot; &quot;+CStr(My_w / 2 - 5)+&quot;,&quot;+CStr(My_h - 5)+&quot; &quot;+CStr(My_w / 2 - 5)+&quot;,5&quot;
+	LU_edge.points = &quot;5,&quot;+CStr(My_h - 5)+&quot; 5,5 &quot;+CStr(My_w / 2 - 5)+&quot;,5&quot;
+	Al_frame.width = My_w / 2 - 5
+	InGr.width = My_w / 2
+	SelFrame.width = My_w / 2 - 5
+Else
+	Static_BG.width = My_w - 10
+	backgr.width = My_w - 10
+	l.points = &quot;7.5,&quot; + CStr(My_h / 3) + &quot; 15,&quot; + CStr(My_h / 2) + &quot; 7.5,&quot; + CStr(My_h / 1.5)
+	r.points = CStr(My_w - 7.5) + &quot;,&quot; + CStr(My_h / 3) + &quot; &quot; + CStr(My_w - 15) + &quot;,&quot; + CStr(My_h / 2) + &quot; &quot; + CStr(My_w - 7.5) + &quot;,&quot; + CStr(My_h / 1.5)
+	RB_edge.points = &quot;5,&quot;+CStr(My_h - 5)+&quot; &quot;+CStr(My_w - 5)+&quot;,&quot;+CStr(My_h - 5)+&quot; &quot;+CStr(My_w - 5)+&quot;,5&quot;
+	LU_edge.points = &quot;5,&quot;+CStr(My_h - 5)+&quot; 5,5 &quot;+CStr(My_w - 5)+&quot;,5&quot;
+	Al_frame.width = My_w - 5
+	SelFrame.width = My_w - 5
+End If</rt:event>
+    <rt:event type="OnResize">Value_text.font_size = _This.height / 3 * 2</rt:event>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetSP">
+      <rt:chgItem>AA03</rt:chgItem>
+      <rt:code>ShowVal()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetStatus">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VB11</rt:chgItem>
+      <rt:chgItem>OU</rt:chgItem>
+      <rt:code>Status = PRJSPEC.TPTS_SR(KKS, ACol, HCol, AStat)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChRights">
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>MyStrokeWdth = FrameStrokeWidth (Operate, OU)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="5" y="5" width="90" height="20" rx="0" ry="0" id="Static_BG" fill="none" stroke="none">
+    <rt:dyn type="fill" mode="constant" value="BG_StaticColor"/> 
+  </rect>
+  <rect x="5" y="5" width="90" height="20" rx="0" ry="0" id="backgr" fill="none" stroke="none"/> 
+  <text x="50" y="22.5" id="Value_text" fill="black" font-family="AAR_Font2" font-size="20" font-weight="bold" text-anchor="middle">888.8</text>
+  <polyline points="7.5,10 15,15 7.5,20" id="l" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <polyline points="92.5,10 85,15 92.5,20" id="r" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <polyline points="5,25 95,25 95,5" id="RB_edge" fill="none" stroke="Col_Grey4" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey1"/> 
+      <rt:xy value2="Col_Grey5"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <polyline points="5,25 5,5 95,5" id="LU_edge" fill="none" stroke="Col_Grey1" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey5"/> 
+      <rt:xy value2="Col_Grey1"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <rect x="2.5" y="2.5" width="95" height="25" rx="0" ry="0" id="Al_frame" fill="none" stroke="Col_Red" stroke-width="2">
+    <rt:dyn type="visibility" mode="cyclic" value="PRJSPEC.AlarmVis(AStat)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke" mode="constant" value="Color_Alarm"/> 
+  </rect>
+  <rect x="0" y="0" width="100" height="30" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="2.5" y="2.5" width="95" height="25" rx="0" ry="0" id="SelFrame" fill="black" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If AA03 != nothing Then
+	Open_ws_wf_wi(&quot;TPTS_Reg_set&quot;, KKS, Operate)
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnRightClick">If AA03 != nothing Then
+	If Operate &amp;&amp; Check_Oper_Rights(OU) Then
+		LoadPopUpMenu(KKS + &quot;|SR o|TPTS_Reg_set &quot; + KKS)
+	Else
+		LoadPopUpMenu(KKS + &quot;|SR i|TPTS_Reg_set &quot; + KKS)
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnMiddleClick">If AA03 != nothing Then
+	Open_Win_Uni(False, &quot;rights&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS+&quot;|&quot;+CStr(Operate))
+Else
+	NoLink(KKS)
+End If</rt:event>
+  </rect>
+  <line x1="50" y1="-0.5" x2="50" y2="30" id="AltWidth" stroke="Col_InGR1" stroke-dasharray="2,2" stroke-width="2"/> 
+</svg>

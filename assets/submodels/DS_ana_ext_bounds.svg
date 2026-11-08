@@ -1,0 +1,734 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="codedlayout meet" viewBox="0 0 175 25" width="175" height="25" id="DS_ana_ext_bounds">
+  <desc>Аналоговый индикатор специальный для ANA границ</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа (Dull Screen) в которой возможно задать границы внешними аналоговыми сигналами. Применяется для отображения реактивности, обратного периода и т.п." revision="6.2">
+    <rt:param name="PointID" datatype="string" comment="полный идентификатор отображаемого сигнала" value="NULL"/> 
+    <rt:param name="PointID_AB" datatype="string" comment="полный идентификатор сигнала аварийной границы" value="NULL"/> 
+    <rt:param name="PointID_WB" datatype="string" comment="полный идентификатор сигнала предупредительной границы (если есть)" value="NULL"/> 
+    <rt:param name="Has_WB" datatype="boolean" value="true" comment="предупредительная уставка есть (при PointID_WB = NULL будет использован параметр WB_to_AB_ratio)"/> 
+    <rt:param name="WB_to_AB_ratio" datatype="float" value="0.98" comment="соотношение уровня предупредительной уставки к уровню аварийной уставки (при Has_WB = true и PointID_WB = NULL)"/> 
+    <rt:param name="AreUpperBounds" datatype="boolean" value="true" comment="данные границы верхние, а не нижние"/> 
+    <rt:param name="IsExp" datatype="boolean" value="false" comment="экспоненциальное представление"/> 
+    <rt:param name="ExpFraction" datatype="ushort" value="3" comment="для EXP: количество знаков после десятичной точки (&gt; 0)"/> 
+    <rt:param name="ShowGoodColor" datatype="boolean" value="true" comment="окрашивать подложку при хорошем качестве"/> 
+    <rt:param name="X" datatype="string" comment="выводимая строка префикса"/> 
+    <rt:param name="X_Width" datatype="ushort" value="0" comment="резерв знаков под строку префикса. 0 = автоопределение"/> 
+    <rt:param name="V_Width" datatype="ushort" value="1" comment="резерв знаков под строку значения. 0 - нет, 1 - максимум авто, &gt;1 - точно столько"/> 
+    <rt:param name="ShowEU" datatype="boolean" value="false" comment="выводить единицы измерения"/> 
+    <rt:param name="ShowFrame" datatype="boolean" value="false" comment="выводить рамку"/> 
+    <rt:param name="FillEntireFrame" datatype="boolean" value="true" comment=""/> 
+    <rt:param name="ValueToTheRight" datatype="boolean" value="true" comment="выровнять значения по правому краю (только при V_Width &gt; 0)"/> 
+    <rt:param name="ValueToTheCenter" datatype="boolean" value="false" comment="выровнять значения по середине рамки (только при ValueToTheRight = false, ShowEU = false, X = &quot;&quot;)"/> 
+    <rt:param name="Base_Backgr_Color" datatype="string" value="none" comment="Цвет базовой подложки (по умолчанию - none, значит индикатор - прозрачный)"/> 
+    <rt:param name="Color_Readings" datatype="boolean" value="false" comment="Индикация производится окрашенными цифрами на подложке"/> 
+    <rt:var name="EU" datatype="string" value="eu" comment="ед. измерения"/> 
+    <rt:var name="pv" datatype="PlsPVAna" comment="аналоговый сигнал БД"/> 
+    <rt:var name="pv_AB" datatype="PlsPVAna" comment="аналоговый сигнал аварийной границы"/> 
+    <rt:var name="pv_WB" datatype="PlsPVAna" comment="аналоговый сигнал предупредительной границы"/> 
+    <rt:var name="In_Group" datatype="boolean" comment="в группе" value="false"/> 
+    <rt:var name="ValStr" datatype="string" value="***" comment="строка индикации"/> 
+    <rt:var name="ValColor" datatype="uint" comment="цвет индикации фона" value="0"/> 
+    <rt:var name="TextColor" datatype="uint" comment="цвет индикации значения"/> 
+    <rt:var name="ValStrDelayed" datatype="string" value="***" comment="строка индикации обновляемая раз в секунду"/> 
+    <rt:var name="XTextPosition" datatype="float" value="5" comment="позиция строки Х"/> 
+    <rt:var name="VTextWidth" datatype="float" value="100" comment="ширина строки Value"/> 
+    <rt:var name="VTextWidth_MIN" datatype="float" value="100" comment="ширина строки Value минимально допустимая - рассчитывается при автоопределении"/> 
+    <rt:var name="BG_X" datatype="float" value="5" comment="позиция Х заливки"/> 
+    <rt:var name="BG_Width" datatype="float" value="100" comment="ширина заливки"/> 
+    <rt:var name="HasError" datatype="boolean" value="false" comment="при инициализации произошла ошибка"/> 
+    <rt:var name="VChar_coeff" datatype="float" value="0.63" comment="ширина буквы от высоты 0.63"/> 
+    <rt:var name="ValueInCenter" datatype="boolean" value="false" comment="Действительно ли располагать значение в центре"/> 
+    <rt:var name="QH" datatype="float" value="3.0" comment="отступ на полширины стрелки, отображающей выход за границу"/> 
+    <rt:var name="EU_X" datatype="float" value="75" comment="Позиция EU"/> 
+    <rt:var name="HP" datatype="float" value="50" comment="Горизонтальная позиция центра стрелки нарушения границы"/> 
+    <rt:var name="ResizeIsDone" datatype="boolean" value="false" comment="OnResize уже срабатывала"/> 
+    <rt:var name="pvRoundDigits" datatype="short" comment="pv.RoundDigits"/> 
+    <rt:var name="pvRangeHigh" datatype="double" comment="pv.RangeHigh"/> 
+    <rt:var name="pvRangeLow" datatype="double" comment="pv.RangeLow"/> 
+    <rt:sub>Sub ValCalc()
+If pv == Nothing Then
+	Exit Sub
+End If
+
+If IsExp Then	&apos;получаем строку значения
+	ValStr = PRJSPEC.CExp(pv.Value, ExpFraction)
+Else
+	ValStr = pv.ValueAscii()
+End If
+
+&apos;нет задержки - переписываем сразу
+If !ANA_indication_delay Then
+	ValStrDelayed = ValStr
+End If
+&apos;считаем, сколько занимает строка значения
+
+If (V_Width == 0) || ((V_Width == 1) &amp;&amp; (pv.OriginalQualitySubstatus == PLS_QUALSUB_RANGEEXCEEDED)) Then
+	VTextWidth = _This.height * Len(ValStr) * VChar_coeff  + 1	//как в OnInit()
+	
+	If (V_Width == 1) &amp;&amp; (VTextWidth &lt; VTextWidth_MIN) Then
+		VTextWidth = VTextWidth_MIN
+	End If
+	
+	BG_Width = VTextWidth + 5.0 + QH 
+	
+	If !(ShowFrame &amp;&amp; FillEntireFrame) Then	//если заливаем не всю рамку, то надо пересчитать размер подложки
+		Show_BG()
+	End If
+
+	If (V_Width &gt; 0) &amp;&amp; ValueToTheRight Then
+		V_text.x = BG_X + BG_Width - 2.5 - QH 
+	
+	ElseIf ValueInCenter Then
+		BG_X = (_This.width - VTextWidth) / 2.0 - (2.5 + QH)
+		If ShowFrame || Color_Readings Then
+			BG_X = BG_X - (2.5 + QH) / 2.0
+		End If
+
+		BG_Width = VTextWidth + 5.0	 + 2.0 * QH							//как в OnInit()
+		
+		
+	
+	End If
+	Show_BG()
+End If
+
+&apos;определяем цвет
+Dim B_Viol As UInt
+B_Viol = PLS_BOUNDVIOL_NONE
+If (pv_AB == Nothing) &amp;&amp; (pv_WB != Nothing) Then	&apos;только предупр. гр. - PV
+	If (pv_WB.Quality == PLS_QUAL_BAD) || (pv.OriginalQualitySubstatus == PLS_QUALSUB_RANGEEXCEEDED) Then
+		SetColor(Color_Inval)
+
+	ElseIf AreUpperBounds &amp;&amp; (pv.Value &gt; pv_WB.Value) Then
+		SetColor(Color_ANA_HI_P)
+		B_Viol = PLS_BOUNDVIOL_HI		
+	ElseIf !AreUpperBounds &amp;&amp; (pv.Value &lt; pv_WB.Value) Then
+		SetColor(Color_ANA_LO_P)
+		B_Viol = PLS_BOUNDVIOL_LO
+	Else
+		SetColor(Color_NB(pv)) 
+
+	End If
+ElseIf (pv_AB != Nothing) &amp;&amp; (pv_WB != Nothing) Then	&apos;есть все гр. - PV
+	If (pv_WB.Quality == PLS_QUAL_BAD) || (pv_AB.Quality == PLS_QUAL_BAD) || (pv.OriginalQualitySubstatus == PLS_QUALSUB_RANGEEXCEEDED) Then
+		SetColor(Color_Inval)
+	ElseIf AreUpperBounds Then
+		If (pv.Value &gt; pv_AB.Value) Then
+			SetColor(Color_ANA_HI_A)
+			B_Viol = PLS_BOUNDVIOL_HI
+		ElseIf (pv.Value &gt; pv_WB.Value) Then
+			SetColor(Color_ANA_HI_P)
+			B_Viol = PLS_BOUNDVIOL_HI
+		Else
+			SetColor(Color_NB(pv))
+		End If
+	Else
+		If (pv.Value &lt; pv_AB.Value) Then
+			SetColor(Color_ANA_LO_A)
+			B_Viol = PLS_BOUNDVIOL_LO
+		ElseIf (pv.Value &lt; pv_WB.Value) Then
+			SetColor(Color_ANA_LO_P)
+			B_Viol = PLS_BOUNDVIOL_LO
+		Else
+			SetColor(Color_NB(pv))
+		End If
+	End If
+ElseIf (pv_AB != Nothing) &amp;&amp; (pv_WB == Nothing) Then	&apos;только авар. гр. - PV
+	If (pv_AB.Quality == PLS_QUAL_BAD) || (pv.OriginalQualitySubstatus == PLS_QUALSUB_RANGEEXCEEDED) Then
+		SetColor(Color_Inval)
+	ElseIf Has_WB &amp;&amp; (WB_to_AB_ratio &gt; 0) Then	&apos;предупр. гр. расчётная
+		If AreUpperBounds Then
+			If (pv.Value &gt; pv_AB.Value) Then
+				SetColor(Color_ANA_HI_A)
+				B_Viol = PLS_BOUNDVIOL_HI
+			ElseIf (pv.Value &gt; pv_AB.Value * WB_to_AB_ratio) Then
+				SetColor(Color_ANA_HI_P)
+				B_Viol = PLS_BOUNDVIOL_HI
+			Else
+				SetColor(Color_NB(pv))
+			End If
+		Else
+			If (pv.Value &lt; pv_AB.Value) Then
+				SetColor(Color_ANA_LO_A)
+				B_Viol = PLS_BOUNDVIOL_LO
+			ElseIf (pv.Value &lt; pv_AB.Value * WB_to_AB_ratio) Then
+				SetColor(Color_ANA_LO_P)
+				B_Viol = PLS_BOUNDVIOL_LO
+			Else
+				SetColor(Color_NB(pv))
+			End If
+		End If
+	Else	&apos;предупр. гр нет
+		If AreUpperBounds &amp;&amp; (pv.Value &gt; pv_AB.Value) Then
+			SetColor(Color_ANA_HI_A)
+			B_Viol = PLS_BOUNDVIOL_HI
+		ElseIf !AreUpperBounds &amp;&amp; (pv.Value &lt; pv_AB.Value) Then
+			SetColor(Color_ANA_LO_A)
+			B_Viol = PLS_BOUNDVIOL_LO
+		Else
+			SetColor(Color_NB(pv))
+		End If
+	End If
+Else
+	SetColor(Color_NB(pv))
+End If
+
+&apos;нарушения границ
+
+If !ShowGoodColor &amp;&amp; !Color_Readings Then 
+	If (ValColor == Color_ANA_GOOD)  &amp;&amp; !pv.NotAcknowledged Then
+		Backgr.visibility = &quot;hidden&quot;
+	Else
+		Backgr.visibility = &quot;visible&quot;
+	End If
+End If
+
+HP = BG_X + BG_Width
+
+Dim HP As Float	&apos;горизонтальная позиция центра стрелки
+If ValueInCenter &amp; !Color_Readings Then	&apos;для центрального положения надо пересчитать координаты
+	BG_X = (_This.width - VTextWidth) / 2.0
+	BG_Width = VTextWidth + 5.0		&apos;отступить слева и справа от чисел на 2.5
+	HP = BG_X + BG_Width
+Else
+	HP = XTextPosition + VTextWidth + 3.5 &apos;это для стандартного представления
+End If
+
+HP = BG_X + BG_Width
+If (B_Viol == PLS_BOUNDVIOL_HI) Then
+	BoundPosition.visibility = &quot;visible&quot;
+	BoundPosition.points = CStr(HP) + &quot;,0 &quot; + CStr(HP - QH) + &quot;,&quot; + CStr(2.0 * QH) + &quot; &quot; + CStr(HP + QH) + &quot;,&quot; + CStr(2.0 * QH)
+ElseIf (B_Viol == PLS_BOUNDVIOL_LO) Then
+	BoundPosition.visibility = &quot;visible&quot;
+	BoundPosition.points = CStr(HP) + &quot;,&quot; + CStr(_This.height) +&quot; &quot; + CStr(HP - QH) + &quot;,&quot; + CStr(_This.height - 2.0 * QH) + &quot; &quot; + CStr(HP + QH) + &quot;,&quot; + CStr(_This.height - 2.0 * QH)
+
+Else
+	BoundPosition.visibility = &quot;hidden&quot;
+End If
+
+End Sub</rt:sub>
+    <rt:sub>Sub SetColor (ByVal Col as uint)
+	If Color_Readings Then
+		TextColor = Col
+	Else
+		ValColor = Col	
+	End If
+End Sub</rt:sub>
+    <rt:sub>Function BGOpasity () As Boolean
+
+	If Color_Readings Then
+		BGOpasity = false
+	Else
+		BGOpasity = ValColor == Color_ANA_GOOD
+	End If
+	
+End Function</rt:sub>
+    <rt:sub>Sub Show_BG()
+Dim Max_Width As Float
+Dim hght As String
+Dim wdth As String
+
+EU_X = BG_X + BG_Width + 2.5 + QH
+
+BG_Width = BG_Width + _This.height*Len(EU)*(VChar_coeff+0.1)
+
+If (BG_X + BG_Width) &gt; _This.width Then
+	Max_Width = BG_X + BG_Width + 5.0
+Else
+	Max_Width = _This.width
+End If
+
+hght = CStr(_This.height)
+wdth = CStr(Max_Width)
+
+Frame_LU_edge.points = &quot;0,&quot; + hght + &quot; 0,0 &quot;  + wdth + &quot;,0&quot;
+Frame_RB_edge.points = &quot;0,&quot; + hght + &quot; &quot; + wdth + &quot;,&quot; + hght + &quot; &quot; + wdth + &quot;,0&quot;
+SelFrame.width = Max_Width
+Base_Backgr.width = Max_Width
+
+If ((ShowFrame &amp;&amp; FillEntireFrame) || Color_Readings) &amp;&amp; !(ValueInCenter &amp;&amp; BG_X &lt; 0 )Then 
+		Backgr.x = 0
+		InGrObj_InGrFrame.x = 0
+		Backgr.width = Max_Width
+
+		If Color_Readings Then
+			InGrObj_InGrFrame.x = -2.5
+			InGrObj_InGrFrame.y = -2.5
+			InGrObj_InGrFrame.width = Max_Width + 5
+			InGrObj_InGrFrame.height = _This.height + 5
+		Else
+			InGrObj_InGrFrame.width = Max_Width
+		End If
+Else
+	Dim bgw as float
+	bgw = BG_Width - _This.height*Len(EU)*(VChar_coeff+0.1)
+	
+	Backgr.x = BG_X
+	InGrObj_InGrFrame.x = BG_X
+
+	Backgr.width = bgw
+	Frame_LU_edge.points = CStr(BG_X) + &quot;,&quot; + hght + &quot; &quot; + CStr(BG_X) + &quot;,0 &quot;  + &quot; &quot; + CStr(bgw + BG_X) + &quot;,0&quot;
+	Frame_RB_edge.points = CStr(BG_X)  +&quot;,&quot; + hght + &quot; &quot; + CStr(bgw + BG_X) + &quot;,&quot; + hght + &quot; &quot; + CStr(bgw + BG_X) + &quot;,0&quot;
+
+	InGrObj_InGrFrame.width = bgw
+	InGrObj_InGrCorner.points = CStr(BG_X) +  &quot;,0 &quot; +  CStr(BG_X + 5) +  &quot;,0 &quot;+   CStr(BG_X) +  &quot;,5 &quot; 
+	
+	If Color_Readings Then
+			InGrObj_InGrFrame.x = Backgr.x - 2.5
+			InGrObj_InGrFrame.y = Backgr.y - 2.5
+			InGrObj_InGrFrame.width = bgw + 5
+			InGrObj_InGrFrame.height = _This.height + 5
+	End If
+End If
+	BG_Width = BG_Width - _This.height*Len(EU)*(VChar_coeff+0.1)
+	
+End Sub</rt:sub>
+    <rt:sub>Function BoundColor() as Uint
+	If Color_Readings Then
+		BoundColor = TextColor
+	Else
+		BoundColor = 0
+	End If
+End Function</rt:sub>
+    <rt:sub>Sub Picture()
+
+
+If HasError Then
+	SetColor(Color_ANA_ER_LINK)
+	X = &quot;&quot;
+	EU = &quot;&quot;
+	V_text.x = _This.width / 2.0	//отобразить по центру
+	V_text.text_anchor = &quot;middle&quot;
+	ValStrDelayed = &quot;Ошибка&quot;
+	VTextWidth = _This.height * 6 * VChar_coeff //ширина слова Ошибка
+	BG_X = ((_This.width - VTextWidth) / 2.0) - 2.5
+	BG_Width = VTextWidth + 5.0		//отступить слева и справа от чисел на 2.5
+	Show_BG()
+	Exit Sub
+End If
+
+If IsExp &amp;&amp; (ExpFraction == 0) Then	//знак должен быть одинаковым, должна быть дробная часть
+	HasError = True
+	SetColor(Color_ANA_ER_LINK)
+	X = &quot;&quot;
+	EU = &quot;&quot;
+//	XTextPosition = 5
+//	V_text.x = XTextPosition
+	V_text.x = _This.width / 2.0	//отобразить по центру
+	V_text.text_anchor = &quot;middle&quot;
+	ValStrDelayed = &quot;Ошибка EXP&quot;
+	VTextWidth = _This.height * 10 * VChar_coeff
+	BG_X = ((_This.width - VTextWidth) / 2.0) - 2.5
+	BG_Width = VTextWidth + 5.0		//отступить слева и справа от чисел на 2.5
+	Show_BG()
+	Exit Sub
+Else
+		
+	XTextPosition = _This.height * Len(X) * 0.6 + 5
+	
+	If (X_Width &gt; 0) &amp;&amp; (X_Width &gt; Len(X)) Then
+		XTextPosition = _This.height * X_Width * 0.6 + 2.5	//реальная ширина текста + 2.5 на отступ
+	End If
+	
+	If V_Width &gt; 1 Then
+		VTextWidth = _This.height * V_Width * VChar_coeff
+	
+	ElseIf V_Width == 1 Then
+		Dim VTxtLength As Int
+		If IsExp Then
+			Dim ExpPowerMin As UInt
+			VTxtLength = Len(CStr(CInt(Log10(Abs(pvRangeHigh)))))	//длина строки представления степени
+			ExpPowerMin = Len(CStr(CInt(Log10(Abs(pvRangeLow)))))
+			If ExpPowerMin &gt; VTxtLength Then
+				VTxtLength = ExpPowerMin
+			End If
+			// знак + &quot;8.&quot; + ExpFraction + &quot;е&quot; + степень
+			VTxtLength = 4 + ExpFraction + VTxtLength
+			If pvRangeHigh &lt; 0 Then
+				VTxtLength = VTxtLength + 1
+			End If
+		Else
+			Dim AbsMax As Double
+			Dim SignReserve As UByte
+			AbsMax = Abs(pvRangeHigh)
+			SignReserve = 1			//один знак под старшую цифру
+			IF Abs(pvRangeLow) &gt; AbsMax Then
+				AbsMax = Abs(pvRangeLow)		//в случае отрицательных чисел
+			End If
+			If (pvRangeLow &lt; 0) Then
+				SignReserve = SignReserve + 1		//добавляем ешё символ под знак
+			End If
+
+			If AbsMax &lt; 10 Then
+				VTxtLength = 1 + SignReserve
+			Else
+				VTxtLength = CInt(Log10(AbsMax)) + SignReserve
+			End If
+
+			If pvRoundDigits &gt; 0 Then
+				VTxtLength = VTxtLength + 1 + pvRoundDigits 
+			End If
+		End If
+		VTextWidth = _This.height * VTxtLength * VChar_coeff + 1
+		If !IsViewMode Then
+			V_text.text = Left(&quot;1234567890&quot;, VTxtLength)
+		End If
+	Else
+		VTextWidth = _This.height * Len(ValStr) * VChar_coeff  
+
+	End If
+
+
+End If
+
+QH = _This.height / 5.0	//определяем размер стрелочки
+VTextWidth_MIN = VTextWidth
+X_text.x = XTextPosition
+ValueInCenter = ValueToTheCenter &amp;&amp; !ValueToTheRight &amp;&amp; !ShowEU &amp;&amp; (Len(X) == 0)
+
+If ValueInCenter Then
+	BG_X = (_This.width - VTextWidth) / 2.0 - (2.5 + QH)
+	
+	If ShowFrame || Color_Readings Then
+		BG_X = BG_X - (2.5 + QH)/2
+	End If
+
+	BG_Width = VTextWidth + 5.0	 + 2.0 * QH	//отступить слева и справа от чисел на 2.5 и ещё на 2 ширины рамки
+Else
+	If Len(X) == 0 Then
+		BG_X = 0		//если не задан префикс, то и отступать не надо
+	Else
+		BG_X = XTextPosition + 2.5		//от реальной ширины Х отступаем на 2.5
+	End If
+	
+	If (ValueToTheRight &amp;&amp; !ShowEU &amp;&amp; (V_Width == 1)) Then 	//если к правому краю, автоопределение ширины и не показываем EU
+		BG_Width = _This.width - QH		//ширина области числа равна ширине видимой области минус ширина стрелки
+		
+		If Len(X) != 0 Then								// если есть префикс, то еще минус ширина префикса  и минус 2 отступа
+			BG_Width = BG_Width - Len(X) * _This.height * VChar_coeff - 5.0
+		End If
+		
+		If BG_Width &lt; VTextWidth Then 
+			BG_Width = VTextWidth + 5.0 + QH
+		End If
+		VTextWidth_MIN = BG_Width - 5.0 - QH
+	Else
+		BG_Width = VTextWidth + 5.0 + QH	//ширина области равна ширине числа + 2 отсупа по 2.5 и ширина стрелки
+
+		
+	End If
+	
+	
+End If
+
+Show_BG()	//настало время показать область - потом по триггеру будет показываться только, если залита не вся рамка
+
+If ValueInCenter Then
+	V_text.x = _This.width / 2.0
+	V_text.text_anchor = &quot;middle&quot;
+	
+
+ElseIf (V_Width &gt; 0) &amp;&amp; ValueToTheRight Then	//к правому краю и (автоширина или точное количество знаков) - условие выравнивания по правому краю
+	V_text.x = BG_X + BG_Width - 2.5 - QH //отступаем от правого края подложки на ширину стрелки и ещё на 2.5
+	V_text.text_anchor = &quot;end&quot;
+Else
+	V_text.x = BG_X + 2.5	//отступить слева от подложки на 2.5
+	V_text.text_anchor = &quot;start&quot;
+End If
+
+If !IsViewMode Then
+	X_text.text = X
+	EU_text.text = EU
+	EU_text.x = BG_X + BG_Width + 2.5 + QH //от правой границы подложки отступаем на 2.5 и ещё наширину стрелки
+	InGrObj.visibility = &quot;hidden&quot;
+	If ShowFrame || Color_Readings Then
+		Frame.visibility = &quot;visible&quot;
+	End If
+End If
+
+
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">X = LTrim(X)	//для совместимости со старыми версиями RTA
+
+If Color_Readings Then									//если инверсная логика, цвет фона всегда одинаков, 
+		ShowFrame = true
+		ValColor = Color_ANA_BG
+		If ValColor != VIS.Color(&quot;none&quot;) Then
+			EU_text.fill = Color_ANA_EU
+			X_text.fill = Color_ANA_EU
+		End If
+Else
+	TextColor = Color_DIGITS_G6 						//иначе цвет текста одинаков
+End If
+
+If PointID != &quot;NULL&quot; Then
+	pv = RTAPLS.AnaPV(PointID)
+Else
+	pv = Nothing
+End If
+
+If PointID_AB != &quot;NULL&quot; Then
+	pv_AB = RTAPLS.AnaPV(PointID_AB)
+	If pv_AB == Nothing Then
+		HasError = True
+	End If
+Else
+	pv_AB = Nothing
+End If
+
+If PointID_WB != &quot;NULL&quot; Then
+	pv_WB = RTAPLS.AnaPV(PointID_WB)
+	If pv_WB == Nothing Then
+		HasError = True
+	End If
+Else
+	pv_WB = Nothing
+End If
+If pv == Nothing || HasError Then
+	HasError = True
+	Picture()
+	Exit Sub
+Else
+	If ShowEU Then 
+		EU = pv.DimString
+	Else
+		EU = &quot;&quot;
+	End If
+
+	If IsExp Then
+		ValStrDelayed = PRJSPEC.CExp(pv.Value, ExpFraction)
+	Else
+		ValStrDelayed = pv.ValueAscii()
+	End If
+
+	ValStr = ValStrDelayed
+	pvRangeHigh = pv.RangeHigh
+	pvRangeLow = pv.RangeLow
+	pvRoundDigits  = pv.RoundDigits 
+End If
+Picture()
+
+/*
+If !IsViewMode Then
+	X_text.text = &quot;X=&quot;
+	EU_text.text = &quot;EU&quot;
+	EU_text.x = BG_X + _This.height * 8 * VChar_coeff + 5 +  QH //от правой границы подложки отступаем на 2.5 и ещё наширину стрелки
+	InGrObj.visibility = &quot;hidden&quot;
+	If ShowFrame || Color_Readings Then
+		Frame.visibility = &quot;visible&quot;
+	End If
+Else
+	Picture()
+End If
+*/</rt:event>
+    <rt:event type="OnResize">Dim T_h As Float
+Dim T_w As Float
+Dim B_x1 As Float
+Dim B_x2 As Float
+T_h = _This.height
+T_w = _This.width
+
+B_x1 = T_w / 5.83
+B_x2 = B_x1 + T_w / 1.75
+
+Backgr.height = T_h
+Base_Backgr.height = T_h
+Base_Backgr.width = T_w
+
+X_text.font_size = 24 * T_h / 25
+X_text.y = 21 * T_h / 25
+V_text.font_size = T_h
+V_text.y = 21.5 * T_h / 25
+EU_text.font_size = 22 * T_h / 25
+EU_text.y = 21 * T_h / 25
+SelFrame.height = T_h
+If Color_Readings Then
+	InGrObj_InGrFrame.x = -2.5
+	InGrObj_InGrFrame.y = -2.5
+	InGrObj_InGrFrame.height = T_h + 5
+	InGrObj_InGrFrame.width = T_w + 5
+Else
+	InGrObj_InGrFrame.height = T_h
+	InGrObj_InGrFrame.width = T_w
+End If
+
+Backgr.x = B_x1
+
+Backgr.width = T_w / 1.75 // Why?
+
+X_text.x = B_x1 - 2.5
+V_text.x = B_x1 + 2.5
+EU_text.x = B_x2 + 5
+
+//Picture()
+If !IsViewMode Then
+	X_text.text = &quot;X=&quot;
+	EU_text.text = &quot;EU&quot;
+	EU_X = BG_X + _This.height * 8 * VChar_coeff + 5 + QH //от правой границы подложки отступаем на 2.5 и ещё наширину стрелки
+	InGrObj.visibility = &quot;hidden&quot;
+	Frame_LU_edge.points = &quot;0, &quot; + CStr(T_h) + &quot; 0 , 0 &quot; + CStr(T_w) + &quot; , 0&quot;
+	Frame_RB_edge.points = &quot;0, &quot; + CStr(T_h) + &quot; &quot; + CStr(T_w) + &quot; , &quot; + CStr(T_h) + &quot; &quot; + CStr(T_w) + &quot; , 0&quot;
+	If ShowFrame || Color_Readings Then
+		Frame.visibility = &quot;visible&quot;
+	End If
+Else
+	Picture()
+End If</rt:event>
+    <rt:cycleTrigger name="UpdateDelay" cycle="1" unit="second">
+      <rt:condition>ANA_indication_delay &amp;&amp; !HasError</rt:condition>
+      <rt:code>ValStrDelayed = ValStr</rt:code>
+    </rt:cycleTrigger>
+    <rt:changeTrigger name="GRP">
+      <rt:condition>!HasError</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(pv.PVId) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_pv">
+      <rt:condition>!HasError</rt:condition>
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:chgItem>pv_AB</rt:chgItem>
+      <rt:chgItem>pv_WB</rt:chgItem>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="175" height="25" rx="0" ry="0" id="Base_Backgr" fill="none" stroke="none">
+    <rt:dyn type="fill" mode="constant" value="Base_Backgr_Color"/> 
+  </rect>
+  <rect x="30" y="0" width="100" height="25" rx="0" ry="0" id="Backgr" fill="Col_Yellow" stroke="black" stroke-width="0.5">
+    <rt:dyn type="fill" mode="onchange" value="ValColor"/> 
+    <rt:dyn type="stroke" mode="constant" value="(ShowFrame  &amp;&amp; FillEntireFrame) || Color_Readings" trans="bt">
+      <rt:xy value="false" value2="black"/> 
+      <rt:xy value2="none"/> 
+    </rt:dyn>
+    <rt:dyn type="fill-opacity" mode="cyclic" value="BGOpasity ()" trans="bd">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0.5"/> 
+    </rt:dyn>
+  </rect>
+  <g id="Frame" stroke-width="1">
+    <rt:dyn type="visibility" mode="constant" value="ShowFrame" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <polyline points="0,25 0,0 175,0" id="LU_edge" fill="none" stroke="Col_Grey4" stroke-opacity="0.5"/> 
+    <polyline points="0,25 175,25 175,0" id="RB_edge" fill="none" stroke="Col_Grey1" stroke-opacity="0.75"/> 
+  </g>
+  <text x="30" y="21" id="X_text" fill="Col_Grey5" font-family="AAR_Font2" font-size="24" font-weight="normal" text-anchor="end">
+    <rt:dyn type="text" mode="constant" value="X"/> 
+X=</text>
+  <text x="135" y="21" id="EU_text" fill="Col_Grey5" font-family="AAP_Font3" font-size="22" font-style="italic" font-weight="normal" text-anchor="start">
+    <rt:dyn type="text" mode="constant" value="EU"/> 
+    <rt:dyn type="visibility" mode="constant" value="ShowEU" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="x" mode="unknown" value="EU_X"/> 
+EU</text>
+  <text x="32.5" y="21" id="V_text" fill="black" font-family="AAR_Font2" font-size="25" font-weight="bold" text-anchor="start">
+    <rt:dyn type="text" mode="onchange" value="ValStrDelayed"/> 
+    <rt:dyn type="fill" mode="onchange" value="TextColor"/> 
+-888.8</text>
+  <g id="InGrObj">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rect x="0" y="0" width="175" height="25" rx="0" ry="0" id="InGrFrame" fill="none" stroke="Col_InGR1" stroke-width="2">
+      <rt:dyn type="stroke-width" mode="constant" value="Color_Readings" trans="bd">
+        <rt:xy value="false" value2="2"/> 
+        <rt:xy value2="1"/> 
+      </rt:dyn>
+    </rect>
+    <polygon points="0,0 5,0 0,5" id="InGrCorner" fill="Col_InGR1" stroke="none">
+      <rt:dyn type="visibility" mode="onchange" value="In_Group &amp;&amp; (!Color_Readings)" trans="bi">
+        <rt:xy value="false" value2="1"/> 
+        <rt:xy value2="0"/> 
+      </rt:dyn>
+    </polygon>
+  </g>
+  <polygon points="125.5,7.5 130,0 135,7.5" id="BoundPosition" visibility="hidden" rt:detect="disabled" fill="black" stroke="none">
+    <rt:dyn type="fill" mode="unknown" value="BoundColor()"/> 
+  </polygon>
+  <rect x="0" y="0" width="175" height="25" rx="0" ry="0" id="SelFrame" fill="black" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If pv == nothing Then
+	ShowWarning(&quot;Ошибка привязки параметра\nPointID = &quot; + PointID, 10)
+ElseIf (PointID_AB != &quot;NULL&quot;) &amp;&amp; (pv_AB == Nothing) Then
+	ShowWarning(&quot;Ошибка привязки параметра\nPointID_AB = &quot; + PointID_AB, 10)
+ElseIf (PointID_WB != &quot;NULL&quot;) &amp;&amp; (pv_WB == Nothing) Then
+	ShowWarning(&quot;Ошибка привязки параметра\nPointID_WB = &quot; + PointID_WB, 10)
+ElseIf IsExp &amp;&amp; (pv.RangeLow * pv.RangeHigh &lt;= 0) Then
+	ShowWarning(&quot;Границы диапазона EXP имеют разные знаки.&quot;, 10)
+ElseIf IsExp &amp;&amp; (ExpFraction == 0) Then
+	ShowWarning(&quot;Дробная часть EXP должна быть &gt; 0.&quot;, 10)
+ElseIf (pv_WB == Nothing) &amp;&amp; Has_WB &amp;&amp; (WB_to_AB_ratio &lt;= 0) Then
+	ShowWarning(&quot;Значение WB_to_AB_ratio д.б. положительным\nWB_to_AB_ratio = &quot; + CStr(WB_to_AB_ratio), 10)
+ElseIf HasError Then
+	ShowWarning(&quot;При инициализации произошла\nнеопознанная ошибка.&quot;, 10)
+ElseIf (PointID_AB == &quot;NULL&quot;) &amp;&amp; (PointID_WB == &quot;NULL&quot;) Then
+	If IsExp Then
+		Call_Win (&quot;ws_ANA_NB&quot;, pv.PVId + &quot;|&quot; + CStr(ExpFraction))
+	Else
+		Call_Win (&quot;ws_ANA_NB&quot;, pv.PVId + &quot;|-1&quot;)
+	End If
+Else
+	Dim s As String
+	s = pv.PVId
+	If (pv_AB != Nothing) Then
+		If (pv_AB.Value &gt; pv.RangeHigh) || (pv_AB.Value &lt; pv.RangeLow) Then
+			ShowWarning (&quot;Некорректное значение.\nВеличина аварийной уставки\nвышла за диапазон.&quot;, 0)
+		End If
+		s = s + &quot;|&quot; + pv_AB.PVId
+	End If
+	If (pv_WB != Nothing) Then
+		If (pv_WB.Value &gt; pv.RangeHigh) || (pv_WB.Value &lt; pv.RangeLow) Then
+			ShowWarning (&quot;Некорректное значение.\nВеличина предупредит. уставки\nвышла за диапазон.&quot;, 0)
+		End If
+		s = s + &quot;|&quot; + pv_WB.PVId
+	End If
+	Open_Win_Uni(False, &quot;wi_&quot; + PointID, &quot;Составной объект &quot; + pv.CategoryText, &quot;wi_MultyPV&quot;, s)
+End If</rt:event>
+    <rt:event type="OnRightClick">If pv == nothing Then
+	ShowWarning(&quot;Ошибка привязки параметра\nPointID = &quot; + PointID, 10)
+ElseIf (PointID_AB != &quot;NULL&quot;) &amp;&amp; (pv_AB == Nothing) Then
+	ShowWarning(&quot;Ошибка привязки параметра\nPointID_AB = &quot; + PointID_AB, 10)
+ElseIf (PointID_WB != &quot;NULL&quot;) &amp;&amp; (pv_WB == Nothing) Then
+	ShowWarning(&quot;Ошибка привязки параметра\nPointID_WB = &quot; + PointID_WB, 10)
+ElseIf IsExp &amp;&amp; (pv.RangeLow * pv.RangeHigh &lt;= 0) Then
+	ShowWarning(&quot;Границы диапазона EXP имеют разные знаки.&quot;, 10)
+ElseIf IsExp &amp;&amp; (ExpFraction == 0) Then
+	ShowWarning(&quot;Дробная часть EXP должна быть &gt; 0.&quot;, 10)
+ElseIf (pv_WB == Nothing) &amp;&amp; Has_WB &amp;&amp; (WB_to_AB_ratio &lt;= 0) Then
+	ShowWarning(&quot;Значение WB_to_AB_ratio д.б. положительным\nWB_to_AB_ratio = &quot; + CStr(WB_to_AB_ratio), 10)
+ElseIf HasError Then
+	ShowWarning(&quot;При инициализации произошла\nнеопознанная ошибка.&quot;, 10)
+ElseIf (PointID_AB == &quot;NULL&quot;) &amp;&amp; (PointID_WB == &quot;NULL&quot;) Then
+	If IsExp Then
+		LoadPopUpMenu(pv.PVId + &quot;|ANAi|ws_ANA_NB &quot; + pv.PVId + &quot;|&quot;+CStr(ExpFraction))
+	Else
+		LoadPopUpMenu(pv.PVId + &quot;|ANAi|ws_ANA_NB &quot; + pv.PVId + &quot;|-1&quot;)
+	End If
+Else
+	Dim s As String
+	Dim i As UShort
+	s = pv.PVId
+	TmpBuffer(0) = pv.PVId
+	i = 1
+	If (pv_AB != Nothing) Then
+		If (pv_AB.Value &gt; pv.RangeHigh) || (pv_AB.Value &lt; pv.RangeLow) Then
+			ShowWarning (&quot;Некорректное значение.\nВеличина аварийной уставки\nвышла за диапазон.&quot;, 0)
+		End If
+		s = s + &quot;|&quot; + pv_AB.PVId
+		TmpBuffer(i) = pv_AB.PVId
+		i = i + 1
+	End If
+	If (pv_WB != Nothing) Then
+		If (pv_WB.Value &gt; pv.RangeHigh) || (pv_WB.Value &lt; pv.RangeLow) Then
+			ShowWarning (&quot;Некорректное значение.\nВеличина предупредит. уставки\nвышла за диапазон.&quot;, 0)
+		End If
+		s = s + &quot;|&quot; + pv_WB.PVId
+		TmpBuffer(i) = pv_WB.PVId
+	End If
+	LoadPopUpMenu(PointID + &quot;|NONi|&quot;)
+End If</rt:event>
+  </rect>
+</svg>

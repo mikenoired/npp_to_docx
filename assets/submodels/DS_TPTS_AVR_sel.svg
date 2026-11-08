@@ -1,0 +1,235 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 60 45" width="60" height="45" id="DS_TPTS_AVR_sel">
+  <desc>ТПТС АВР комбинированный для Dull Screen</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа Dull Screen" revision="6.2">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS общий для ТЕ и VL"/> 
+    <rt:param name="Operate" datatype="boolean" value="False" comment="Сделать объект управляемым"/> 
+    <rt:param name="VL_type" datatype="string" value="1o3" comment="Тип предвыбора (сколько из скольки)"/> 
+    <rt:var name="TE_Z0" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="TE_OU" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="TE_VB7" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="VL_Z0" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="VL_OU" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="VL_VB6" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="StatusVL" datatype="int" comment="обобщенное сотояние"/> 
+    <rt:var name="StatusTE" datatype="int" comment="обобщенное сотояние"/> 
+    <rt:var name="Col" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="AStat" datatype="ushort" value="0" comment="код сигнализации"/> 
+    <rt:var name="AStat_fictive" datatype="ushort" value="0" comment="фиктивная переменная для VL"/> 
+    <rt:var name="Col1" datatype="ushort" value="13" comment="код цвета сост. 1"/> 
+    <rt:var name="Col2" datatype="ushort" value="13" comment="код цвета сост. 2"/> 
+    <rt:var name="Col3" datatype="ushort" value="13" comment="код цвета сост. 3"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="SText" datatype="string" value="АВР" comment="текст для отображения"/> 
+    <rt:var name="MyStrokeWdth" datatype="float" value="2" comment="Толщина рамок в зависимости от управляемости"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub AckMe()
+If Check_Oper_Rights(TE_OU) &amp;&amp; ((TE_OU.PVSuspendedFlags &amp; PLS_SUSP_CMD) == 0) &amp;&amp; ((AStat &amp; 1) != 0) Then
+	TE_OU.Command(_Now, TE_BHA)
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub ShText()
+StatusTE = PRJSPEC.TPTS_TE(KKS + &quot;TE0&quot;, 3, 2, Col, AStat)
+If (StatusTE == -1)Then
+	SText = &quot;РЕМ.&quot;
+ElseIf ((StatusTE &amp; 4096) &gt; 0) Then
+	SText = &quot;НДСТ&quot;
+ElseIf ((StatusTE &amp; 0x30) &gt; 0) Then
+	SText = &quot;АВТ&quot;
+ElseIf ((StatusTE &amp; 0xC) &gt; 0) Then
+	SText = &quot;ДИСТ&quot;
+Else
+	SText = &quot;???&quot;
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub ComplexRights()
+If Change_Frame_on_Oper Then
+	If (IsOperable(Operate, TE_OU) &amp; IsOperable(Operate, TE_OU) &amp; 2) != 0 Then
+		MyStrokeWdth = 3
+	Else
+		MyStrokeWdth = 1
+	End If
+Else
+	MyStrokeWdth = 2
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Show_Selection()
+If (PRJSPEC.ObjectColorEx(4, Col1, 11) == Color_Sel) Then
+	text_1.font_size = 17
+	text_1.font_weight = &quot;bold&quot;
+	text_1.text_decoration = &quot;underline&quot;
+	text_1.fill = &quot;black&quot;
+Else
+	text_1.font_size = 14
+	text_1.font_weight = &quot;normal&quot;
+	text_1.text_decoration = &quot;none&quot;
+	text_1.fill = &quot;Col_Grey5&quot;
+End If
+If (PRJSPEC.ObjectColorEx(4, Col2, 11) == Color_Sel) Then
+	text_2.font_size = 17
+	text_2.font_weight = &quot;bold&quot;
+	text_2.text_decoration = &quot;underline&quot;
+	text_2.fill = &quot;black&quot;
+Else
+	text_2.font_size = 14
+	text_2.font_weight = &quot;normal&quot;
+	text_2.text_decoration = &quot;none&quot;
+	text_2.fill = &quot;Col_Grey5&quot;
+End If
+If (PRJSPEC.ObjectColorEx(4, Col3, 11) == Color_Sel) Then
+	text_3.font_size = 17
+	text_3.font_weight = &quot;bold&quot;
+	text_3.text_decoration = &quot;underline&quot;
+	text_3.fill = &quot;black&quot;
+Else
+	text_3.font_size = 14
+	text_3.font_weight = &quot;normal&quot;
+	text_3.text_decoration = &quot;none&quot;
+	text_3.fill = &quot;Col_Grey5&quot;
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (KKS != &quot;NULL&quot;) Then
+	TE_Z0 = BIN(KKS + &quot;TE0_Z0&quot;)
+	TE_OU = BIN(KKS + &quot;TE0_OU&quot;)
+	TE_VB7 = BIN(KKS + &quot;TE0_VB7&quot;)
+	VL_Z0 = BIN(KKS + &quot;VL0_Z0&quot;)
+	VL_OU = BIN(KKS + &quot;VL0_OU&quot;)
+	VL_VB6 = BIN(KKS + &quot;VL0_VB6&quot;)
+End If</rt:event>
+    <rt:event type="OnResize">Al_frame.x = 2.5
+Al_frame.y = 2.5
+Al_frame.width = _This.width - 5
+Al_frame.height = _This.height - 5
+InGr.x = 0
+InGr.y = 0
+InGr.width = _This.width 
+InGr.height = _This.height</rt:event>
+    <rt:cycleTrigger name="update_VL_indication" cycle="250" unit="millisecond">
+      <rt:code>Show_Selection()</rt:code>
+    </rt:cycleTrigger>
+    <rt:changeTrigger name="GetStatus_TE">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>TE_Z0</rt:chgItem>
+      <rt:chgItem>TE_OU</rt:chgItem>
+      <rt:chgItem>TE_VB7</rt:chgItem>
+      <rt:code>ShText()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS + &quot;TE0&quot;) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChRights">
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>ComplexRights()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetStatus_VL">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VL_Z0</rt:chgItem>
+      <rt:chgItem>VL_OU</rt:chgItem>
+      <rt:chgItem>VL_VB6</rt:chgItem>
+      <rt:code>StatusVL = PRJSPEC.TPTS_VL(KKS + &quot;VL0&quot;, Col1, Col2, Col3, AStat_fictive)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="5.5" y="5" width="49.5" height="35" rx="0" ry="0" id="Backgr" fill="url(#Cylinder_horizontal2)" stroke="none"/> 
+  <rect x="5" y="5" width="50" height="35" rx="0" ry="0" id="body" fill="Col_Yellow" fill-opacity="0.349997" stroke="none">
+    <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, Col, 11)"/> 
+    <rt:dyn type="fill-opacity" mode="onchange" value="(StatusTE &lt; 0) || ((StatusTE &amp; 4096)!= 0) || (TE_Z0 == Nothing)" trans="bd">
+      <rt:xy value="false" value2="0.35"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="7.5" y="20" width="45" height="15" rx="0" ry="0" id="VL_invalid" visibility="hidden" rt:detect="disabled" fill="Col_Grey1" stroke="black" stroke-width="1">
+    <rt:dyn type="visibility" mode="onchange" value="(StatusVL &lt; 0) || ((StatusVL &amp; 4096)!= 0) || (VL_Z0 == Nothing)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="fill" mode="constant" value="Color_Inval"/> 
+  </rect>
+  <text x="15" y="32.5" id="text_1" fill="black" font-family="AAP_Font3" font-size="15" text-anchor="middle">1</text>
+  <text x="30" y="32.5" id="text_2" fill="black" font-family="AAP_Font3" font-size="15" text-anchor="middle">2</text>
+  <text x="45" y="32.5" id="text_3" fill="black" font-family="AAP_Font3" font-size="15" text-anchor="middle">
+    <rt:dyn type="fill" mode="constant" value="Right(VL_type, 1) == &quot;3&quot;" trans="bt">
+      <rt:xy value="false" value2="Col_Grey4"/> 
+      <rt:xy value2="black"/> 
+    </rt:dyn>
+3</text>
+  <text x="30" y="17.5" id="main_text" fill="black" font-family="AAP_Font3" font-size="13" font-weight="bold" text-anchor="middle">
+    <rt:dyn type="text" mode="onchange" value="SText"/> 
+ДИСТ</text>
+  <polyline points="5,40 55,40 55,5" id="RB_edge" fill="none" stroke="Col_Grey5" stroke-opacity="0.75" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS + &quot;TE0&quot;) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey1"/> 
+      <rt:xy value2="Col_Grey5"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <polyline points="5,40 5,5 55,5" id="LU_edge" fill="none" stroke="Col_Grey1" stroke-opacity="0.75" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS + &quot;TE0&quot;) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey5"/> 
+      <rt:xy value2="Col_Grey1"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <rect x="2.5" y="2.5" width="55" height="40" rx="0" ry="0" id="Al_frame" fill="none" stroke="Col_Red" stroke-width="2">
+    <rt:dyn type="visibility" mode="cyclic" value="PRJSPEC.AlarmVis(AStat)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke" mode="constant" value="Color_Alarm"/> 
+  </rect>
+  <rect x="0" y="0" width="60" height="45" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="0.25" y="0" width="60" height="45" rx="0" ry="0" id="Sel_area" fill="black" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Нет привязки.&quot;, 5)
+ElseIf TE_Z0 != nothing Then
+	If VL_Z0 != nothing Then
+		If (VL_type != &quot;1o2&quot;) &amp;&amp; (VL_type != &quot;1o3&quot;) &amp;&amp; (VL_type != &quot;2o3&quot;) &amp;&amp; (VL_type != &quot;1k2&quot;) &amp;&amp; (VL_type != &quot;1k3&quot;)Then
+			ShowWarning (&quot;Ошибка привязки.\nVL_type = \&quot;&quot; + VL_type + &quot;\&quot;\nДолжно быть\n1о2, 1о3, 2о3 1k2 или 1k3.&quot;, 0)
+		Else
+			Open_ws_wf_wi(&quot;TPTS_AVR_sel_6&quot;, KKS + &quot;TE0|&quot; + VL_type, Operate)
+		End If
+	Else
+		ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nНет VL с KKS=&quot; + KKS + &quot;VL0.&quot;, 0)
+	End If
+Else
+	ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nНет TE с KKS=&quot; + KKS + &quot;TE0.&quot;, 0)
+End If</rt:event>
+    <rt:event type="OnRightClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Нет привязки.&quot;, 5)
+ElseIf TE_Z0 != nothing Then
+	If VL_Z0 != nothing Then
+		If (VL_type != &quot;1o2&quot;) &amp;&amp; (VL_type != &quot;1o3&quot;) &amp;&amp; (VL_type != &quot;2o3&quot;) &amp;&amp; (VL_type != &quot;1k2&quot;) &amp;&amp; (VL_type != &quot;1k3&quot;)Then
+			ShowWarning (&quot;Ошибка привязки.\nVL_type = \&quot;&quot; + VL_type + &quot;\&quot;\nДолжно быть\n1о2, 1о3, 2о3 1k2 или 1k3.&quot;, 0)
+		Else
+			TmpBuffer(0) = KKS + &quot;TE0&quot;
+			TmpBuffer(1) = KKS + &quot;VL0&quot;
+			TmpMnuPar = KKS + &quot;TE0|AVRi|TPTS_AVR_sel_6 &quot; + KKS + &quot;TE0|&quot; + VL_type
+			If Operate &amp;&amp; Check_Oper_Rights(TE_OU) Then
+				LoadPopUpMenu(KKS + &quot;TE0|AVRo|TPTS_AVR_sel_6 &quot; + KKS + &quot;TE0|&quot; + VL_type)
+			Else
+				LoadPopUpMenu(KKS + &quot;TE0|AVRi|TPTS_AVR_sel_6 &quot; + KKS + &quot;TE0|&quot; + VL_type)
+			End If
+		End If
+	Else
+		ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nНет VL с KKS=&quot; + KKS + &quot;VL0.&quot;, 0)
+	End If
+Else
+	ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nНет TE с KKS=&quot; + KKS + &quot;TE0.&quot;, 0)
+End If</rt:event>
+    <rt:event type="OnMiddleClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Нет привязки.&quot;, 5)
+ElseIf (VL_type != &quot;1o2&quot;) &amp;&amp; (VL_type != &quot;1o3&quot;) &amp;&amp; (VL_type != &quot;2o3&quot;) &amp;&amp; (VL_type != &quot;1k2&quot;) &amp;&amp; (VL_type != &quot;1k3&quot;)Then
+	ShowWarning (&quot;Ошибка привязки.\nVL_type = \&quot;&quot; + VL_type + &quot;\&quot;\nДолжно быть\n1о2, 1о3, 2о3 1k2 или 1k3.&quot;, 0)
+ElseIf TE_Z0 != nothing Then
+	Open_Win_Uni(False, &quot;rights&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS+&quot;TE0|&quot;+CStr(Operate))
+Else
+	NoLink(KKS)
+End If</rt:event>
+  </rect>
+</svg>

@@ -1,0 +1,218 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg baseProfile="" xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="codedlayout meet" viewBox="0 0 80 45" width="80" height="45" id="obj_Station_stat" fill="Col_Grey2" font-family="AAP_Font3" font-size="18" font-weight="bold" text-anchor="middle" rt:text-vertanchor="middle">
+  <desc>Обобщённые сигнализации станции</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.0">
+    <rt:param name="Label" datatype="string" value="&lt; в / к&gt;" comment="Надпись - имя вызываемого видеокадра в верхней части"/> 
+    <rt:param name="Label_Color" datatype="string" value="black" comment="Цвет надписи в верхней части индикатора"/> 
+    <rt:param name="BG_Color" datatype="string" value="none" comment="Цвет фона верхней части индикатора"/> 
+    <rt:param name="Station_Name" datatype="string" comment="Имя станции, которая содержит данные о видеокадре"/> 
+    <rt:param name="I_1_Alarm_level" datatype="byte" value="7" comment="Индикатор 1: уровень сигнализации (0...7) или недостоверность (-1)"/> 
+    <rt:param name="I_1_Character" datatype="string" comment="Индикатор 1: одна буква для отображения или &lt;пустая строка&gt; = использовать первую букву названия из конфигурации"/> 
+    <rt:param name="I_2_Alarm_level" datatype="byte" value="6" comment="Индикатор 2: уровень сигнализации (0...7) или недостоверность (-1)"/> 
+    <rt:param name="I_2_Character" datatype="string" comment="Индикатор 2: одна буква для отображения или &lt;пустая строка&gt; = использовать первую букву названия из конфигурации"/> 
+    <rt:param name="I_3_Alarm_level" datatype="byte" value="5" comment="Индикатор 3: уровень сигнализации (0...7) или недостоверность (-1)"/> 
+    <rt:param name="I_3_Character" datatype="string" comment="Индикатор 3: одна буква для отображения или &lt;пустая строка&gt; = использовать первую букву названия из конфигурации"/> 
+    <rt:param name="I_4_Alarm_level" datatype="byte" value="-1" comment="Индикатор 4: уровень сигнализации (0...7) или недостоверность (-1)"/> 
+    <rt:param name="I_4_Character" datatype="string" comment="Индикатор 4: одна буква для отображения или &lt;пустая строка&gt; = использовать первую букву названия из конфигурации"/> 
+    <rt:param name="CurrentStationDataOnly" datatype="boolean" value="false" comment="Отображать данные только по текущей станции, и не отображать данные дочерних подстанций"/> 
+    <rt:param name="Disable" datatype="boolean" value="False" comment="Сделать кнопку недоступной"/> 
+    <rt:param name="Label_Fit" datatype="boolean" value="false" comment="Вписывать надпись в поле кнопки"/> 
+    <rt:var name="D_Color" datatype="uint" value="0" comment="my new var"/> 
+    <rt:var name="L_Color" datatype="uint" value="0xFFFFFF" comment="my new var"/> 
+    <rt:var name="ButDown" datatype="boolean" value="False" comment="my new var"/> 
+    <rt:var name="Initial_rt_detect" datatype="byte" comment="Начальное значение rt:detect"/> 
+    <rt:var name="First_call" datatype="boolean" value="True" comment="Первая загрузка"/> 
+    <rt:var name="Station_detected" datatype="PlsStation" comment="Станция, которую удалось найти по указанному имени"/> 
+    <rt:sub>Sub StatusColor()
+If Disable Then
+	_This.rt_detect = &quot;disabled&quot;
+	Shadow.visibility = &quot;visible&quot;
+
+	LU.stroke = L_Color
+	RB.stroke = D_Color
+	ButDown = False
+Else
+	If First_call Then
+		_This.rt_detect = Initial_rt_detect
+		First_call = false
+	Else
+		_This.rt_detect = &quot;enabled&quot;
+	End If
+	Shadow.visibility = &quot;hidden&quot;
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Text_layout()
+
+	Dim T_h as float
+	Dim T_w as float
+	Dim len as float
+	Dim s as string
+	Dim koeff as Float
+	Dim i as ubyte
+	Dim num_str as ubyte
+	Dim pos as ubyte
+	Dim s1 as String
+	Dim s2 as string
+	Dim maxs as string
+
+	koeff = 0.63
+	T_h = _This.height - 20
+	T_w = _This.width
+	If T_h &lt; 25 Then
+		T_h = 25
+	End If
+	If T_w &lt; 80 Then
+		T_w = 80
+	End If
+	TXT_label.x = T_w / 2
+	TXT_label.font_size = T_h
+	TXT_label.text = Label
+	
+	s = Label
+	pos = InStr(s,&quot;\n&quot;) &apos; если есть перенос строки
+	i = 1
+	maxs = s
+	While pos != 0
+		i = i + 1
+		s1 = Left(s, (pos - 1))
+		s = Right(s, Len(s) - pos)
+		s2 = s
+		If InStr(pos, s, &quot;\n&quot;) !=0 then
+			s2 = Left(s, (pos - 1))
+		End If
+
+		If Len(s1) &gt; Len(s2) Then
+			maxs = s1
+		else
+			maxs = s2
+		End If
+		pos = InStr(s,&quot;\n&quot;)
+	Wend 
+	num_str = i
+	len = Len(maxs)*TXT_label.font_size * koeff
+	If len &gt; (T_w - 5) Then
+		TXT_label.font_size = CInt ((T_w - 5)/(Len(maxs) * koeff))
+	End If
+
+	If (TXT_label.font_size * num_str) &gt; (T_h - 5 ) Then
+		TXT_label.font_size = CInt((T_h - 5) / num_str)
+	End if
+
+	If !Label_Fit &amp;&amp; (TXT_label.font_size &lt; 12)  Then  
+		TXT_label.font_size = 12
+	End If
+
+	TXT_label.y = T_h / 2 - 1.5 - TXT_label.font_size/15
+	
+End Sub</rt:sub>
+    <rt:event type="OnMouseDown">LU.stroke = D_Color
+RB.stroke = L_Color
+ButDown = True</rt:event>
+    <rt:event type="OnMouseUp">LU.stroke = L_Color
+RB.stroke = D_Color
+ButDown = False</rt:event>
+    <rt:event type="OnMouseOut">LU.stroke = L_Color
+RB.stroke = D_Color
+ButDown = False</rt:event>
+    <rt:event type="OnInitialize">Initial_rt_detect = _This.rt_detect
+If Len(Station_Name) == 0 Then
+	Station_detected = RTAPLS.Station(1)
+Else
+	Station_detected = RTAPLS.Station(Station_Name)
+	If Station_detected == Nothing Then
+		Backgr.fill = Color_ErLink
+	Else
+		Backgr.fill = BG_Color
+	End If
+End If
+Text_layout()</rt:event>
+    <rt:event type="OnResize">Dim T_h as float
+Dim T_w as float
+
+T_h = _This.height
+T_w = _This.width
+
+If T_h &lt; 45 Then
+	T_h = 45
+End If
+If T_w &lt; 80 Then
+	T_w = 80
+End If
+
+Backgr.width = T_w
+Backgr.height = T_h - 20
+Shadow.width = T_w
+Shadow.height = T_h - 20
+Ind_1.x = (T_w - 80) / 2
+Ind_2.x = Ind_1.x + 20
+Ind_3.x = Ind_2.x + 20 
+Ind_4.x = Ind_3.x + 20
+Ind_1.y = T_h - 20
+Ind_2.y = T_h - 20
+Ind_3.y = T_h - 20
+Ind_4.y = T_h - 20
+
+TXT_label.x = T_w / 2
+TXT_label.y = (T_h - 20) / 2
+
+RB_RB_edge1.x1 = 0
+RB_RB_edge1.y1 = T_h - 20
+RB_RB_edge1.x2 = Ind_1.x
+RB_RB_edge1.y2 = T_h - 20
+RB_RB_edge.points = CStr(Ind_1.x) + &quot;, &quot; + CStr(T_h) + &quot; &quot; + CStr(Ind_4.x + 20) + &quot;, &quot; + CStr(T_h) + &quot; &quot; + CStr(Ind_4.x + 20) + &quot;, &quot; + CStr(T_h - 20) + &quot; &quot; + CStr(T_w) + &quot;, &quot; + CStr(T_h - 20) + &quot; &quot; + CStr(T_w) + &quot;, 0&quot;
+
+LU_LU_edge.points = &quot;0, &quot; + CStr(T_h - 20) +  &quot; 0, 0 &quot; + CStr(T_w) + &quot; ,0&quot;
+LU_LU_edge1.x1 = Ind_1.x
+LU_LU_edge1.y1 = T_h 
+LU_LU_edge1.x2 = Ind_1.x
+LU_LU_edge1.y2 = T_h - 20</rt:event>
+    <rt:changeTrigger name="ChInputs">
+      <rt:chgItem>Disable</rt:chgItem>
+      <rt:code>StatusColor()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Text">
+      <rt:chgItem>Label</rt:chgItem>
+      <rt:code>Text_layout()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="80" height="25" rx="0" ry="0" id="Backgr" fill="none" stroke="none">
+    <rt:dyn type="fill" mode="constant" value="BG_Color"/> 
+  </rect>
+  <text x="40" y="12.5" id="TXT_label" fill="black" font-size="15" text-anchor="middle" rt:text-vertanchor="middle">
+    <rt:dyn type="text" mode="constant" value="Label"/> 
+    <rt:dyn type="fill" mode="constant" value="Label_Color"/> 
+ИМЯ</text>
+  <image y="25" width="20" height="20" xlink:href="aux_Stat_Alarm_data.svg" id="Ind_1">
+    <rt:dyn type="Current_Station" mode="constant" value="Station_detected"/> 
+    <rt:dyn type="Alarm_Level" mode="constant" value="I_1_Alarm_level"/> 
+    <rt:dyn type="Txt_char" mode="constant" value="I_1_Character"/> 
+    <rt:dyn type="CurrentStationDataOnly" mode="constant" value="CurrentStationDataOnly"/> 
+  </image>
+  <image x="20" y="25" width="20" height="20" xlink:href="aux_Stat_Alarm_data.svg" id="Ind_2">
+    <rt:dyn type="Current_Station" mode="constant" value="Station_detected"/> 
+    <rt:dyn type="CurrentStationDataOnly" mode="constant" value="CurrentStationDataOnly"/> 
+    <rt:dyn type="Alarm_Level" mode="constant" value="I_2_Alarm_level"/> 
+    <rt:dyn type="Txt_char" mode="constant" value="I_2_Character"/> 
+  </image>
+  <image x="40" y="25" width="20" height="20" xlink:href="aux_Stat_Alarm_data.svg" id="Ind_3">
+    <rt:dyn type="Current_Station" mode="constant" value="Station_detected"/> 
+    <rt:dyn type="CurrentStationDataOnly" mode="constant" value="CurrentStationDataOnly"/> 
+    <rt:dyn type="Alarm_Level" mode="constant" value="I_3_Alarm_level"/> 
+    <rt:dyn type="Txt_char" mode="constant" value="I_3_Character"/> 
+  </image>
+  <image x="60" y="25" width="20" height="20" xlink:href="aux_Stat_Alarm_data.svg" id="Ind_4">
+    <rt:dyn type="Current_Station" mode="constant" value="Station_detected"/> 
+    <rt:dyn type="CurrentStationDataOnly" mode="constant" value="CurrentStationDataOnly"/> 
+    <rt:dyn type="Alarm_Level" mode="constant" value="I_4_Alarm_level"/> 
+    <rt:dyn type="Txt_char" mode="constant" value="I_4_Character"/> 
+  </image>
+  <rect x="0" y="0" width="80" height="25" rx="0" ry="0" id="Shadow" visibility="hidden" rt:detect="disabled" fill-opacity="0.699994" stroke="none"/> 
+  <g id="RB" fill="none" stroke="black" stroke-opacity="0.399805" stroke-width="2">
+    <polyline points="0,45 80,45 80,0" id="RB_edge" fill="none"/> 
+    <line x1="0" y1="45" x2="0" y2="45" id="RB_edge1"/> 
+  </g>
+  <g id="LU" fill="none" stroke="white" stroke-opacity="0.399805" stroke-width="2">
+    <polyline points="0,25 0,0 80,0" id="LU_edge"/> 
+    <line x1="0" y1="45" x2="0" y2="25" id="LU_edge1"/> 
+  </g>
+</svg>

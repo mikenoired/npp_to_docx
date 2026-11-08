@@ -1,0 +1,446 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 495 240" width="495" height="240" id="aux_KTSu1_BUZ_BUD_diag" font-family="AAP_Font4" font-size="13" font-weight="bold">
+  <desc>ïîäìîäåëü äèàãíîñòèêè äëÿ ÁÓÇ è ÁÓÄ ÊÒÑ ÓÑÁÒ-1 (Ğîñòîâ-4)</desc>
+  <rt:model comment="Ñëóæåáíàÿ ïîäìîäåëü ÏÎĞÒÀËà" revision="6.6">
+    <rt:param name="KKS" datatype="string" comment="KKS"/> 
+    <rt:param name="F0" datatype="PlsPVBin" comment="óêàçàòåëü íà F0"/> 
+    <rt:param name="F1" datatype="PlsPVBin" comment="óêàçàòåëü íà F1"/> 
+    <rt:param name="F2" datatype="PlsPVBin" comment="óêàçàòåëü íà F2"/> 
+    <rt:param name="F3" datatype="PlsPVBin" comment="óêàçàòåëü íà F3"/> 
+    <rt:param name="Z0" datatype="PlsPVBin" comment="óêàçàòåëü íà Z0"/> 
+    <rt:param name="B0" datatype="PlsPVBin" comment="óêàçàòåëü íà B0"/> 
+    <rt:param name="VB9" datatype="PlsPVBin" comment="óêàçàòåëü íà VB9"/> 
+    <rt:param name="VB10" datatype="PlsPVBin" comment="óêàçàòåëü íà VB10"/> 
+    <rt:param name="VB12" datatype="PlsPVBin" comment="óêàçàòåëü íà VB12"/> 
+    <rt:param name="pv_SUS" datatype="PlsPVBin" comment="óêàçàòåëü íà ïåğåìåííóş, â êîòîğîé õğàíèòñÿ ñîñòîÿíèå Ğåìîíò"/> 
+    <rt:var name="STrig" datatype="boolean" value="false" comment="â ğåìîíòå"/> 
+    <rt:var name="Is_BUD" datatype="boolean" value="False" comment="ıòî ÁÓÄ, íåò ÌÌ"/> 
+    <rt:var name="Has_OnOff" datatype="boolean" value="False" comment="ıòî ÁÓÄ, íî íå êëàïàí (ñîñòîÿíèÿ ÂÊË-ÎÒÊË)"/> 
+    <rt:sub>Sub B0_diag()
+	HighlightMessage(B0_gr_bit0, PRJSPEC.DetectBit(B0, 16), 0)
+	HighlightMessage(B0_gr_bit1, PRJSPEC.DetectBit(B0, 15), 0)
+	HighlightMessage(B0_gr_bit2, PRJSPEC.DetectBit(B0, 14), 0)
+	HighlightMessage(B0_gr_bit3, PRJSPEC.DetectBit(B0, 13), 0)
+	HighlightMessage(B0_gr_bit4, PRJSPEC.DetectBit(B0, 12), Middle_Color_Wieghted(Color_Imitation, 0,0.75))
+End Sub</rt:sub>
+    <rt:sub>Sub Z0_diag()
+	HighlightMessage(Z0_gr_bit1, PRJSPEC.DetectBit(Z0, 15), 0)
+	HighlightMessage(Z0_gr_bit0, PRJSPEC.DetectBit(Z0, 16), 0)
+End Sub</rt:sub>
+    <rt:sub>Sub F1_diag()
+	HighlightMessage(F1_gr_bit0, PRJSPEC.DetectBit(F1, 16), 0xf5)
+	HighlightMessage(F1_gr_bit1, PRJSPEC.DetectBit(F1, 15), 0xf5)
+	HighlightMessage(F1_gr_bit2, PRJSPEC.DetectBit(F1, 14), 0xf5)
+	HighlightMessage(F1_gr_bit3, PRJSPEC.DetectBit(F1, 13), 0xf5)
+	HighlightMessage(F1_gr_bit4, PRJSPEC.DetectBit(F1, 12), 0xf5)
+	HighlightMessage(F1_gr_bit5, PRJSPEC.DetectBit(F1, 11), Middle_Color_Wieghted(Color_Imitation, 0,0.75))
+	HighlightMessage(F1_gr_bit7, PRJSPEC.DetectBit(F1, 9), 0xf5)
+End Sub</rt:sub>
+    <rt:sub>Sub F2_diag()
+	HighlightMessage(F2_gr_bit1, PRJSPEC.DetectBit(F2, 15), 0xf5)
+	HighlightMessage(F2_gr_bit2, PRJSPEC.DetectBit(F2, 14), 0xf5)
+	HighlightMessage(F2_gr_bit3, PRJSPEC.DetectBit(F2, 13), 0xf5)
+	HighlightMessage(F2_gr_bit4, PRJSPEC.DetectBit(F2, 12), 0xf5)
+End Sub</rt:sub>
+    <rt:sub>Sub F3_diag()
+	HighlightMessage(F3_gr_bit0, PRJSPEC.DetectBit(F3, 16), 0xf5)
+	HighlightMessage(F3_gr_bit9, PRJSPEC.DetectBit(F3, 7), 0xf5)
+End Sub</rt:sub>
+    <rt:sub>Sub VB9_diag()
+If Is_BUD Then
+	HighlightMessage(VB9_gr_bit0, PRJSPEC.DetectBit(VB9, 16), 0xf5)
+	HighlightMessage(VB9_gr_bit1, PRJSPEC.DetectBit(VB9, 15), 0)
+	HighlightMessage(VB9_gr_bit2, PRJSPEC.DetectBit(VB9, 14), 0)
+End If
+	HighlightMessage(VB9_gr_bit3, PRJSPEC.DetectBit(VB9, 13), 0)
+	HighlightMessage(VB9_gr_bit4, PRJSPEC.DetectBit(VB9, 12), 0)
+	HighlightMessage(VB9_gr_bit5, PRJSPEC.DetectBit(VB9, 11), 0)
+	HighlightMessage(VB9_gr_bit6, PRJSPEC.DetectBit(VB9, 10), 0)
+	HighlightMessage(VB9_gr_bit8, PRJSPEC.DetectBit(VB9, 8), 0)
+	HighlightMessage(VB9_gr_bit9, PRJSPEC.DetectBit(VB9, 7), 0)
+End Sub</rt:sub>
+    <rt:sub>Sub VB10_diag()
+	HighlightMessage(VB10_gr_bit0, PRJSPEC.DetectBit(VB10, 16), 0)
+	HighlightMessage(VB10_gr_bit1, PRJSPEC.DetectBit(VB10, 15), 0)
+	HighlightMessage(VB10_gr_bit2, PRJSPEC.DetectBit(VB10, 14), 0)
+	HighlightMessage(VB10_gr_bit3, PRJSPEC.DetectBit(VB10, 13), 0)
+If Is_BUD Then
+	HighlightMessage(VB10_gr_bit3a, PRJSPEC.DetectBit(VB10, 13), 0)
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub VB12_diag()
+	HighlightMessage(VB12_gr_bit8, PRJSPEC.DetectBit(VB12, 8), 0)
+	HighlightMessage(VB12_gr_bit9, PRJSPEC.DetectBit(VB12, 7), 0)
+End Sub</rt:sub>
+    <rt:sub>Sub HighlightMessage(ByVal TxtObj As RtSvgObj, ByVal Highlight As Boolean, ByVal HighlightColor As Int)
+If Highlight Then
+	TxtObj.fill = HighlightColor
+	TxtObj.font_size = 13
+	TxtObj.font_weight = &quot;bold&quot;
+Else
+	TxtObj.fill = 0xa0a0a0
+	TxtObj.font_size = 11
+	TxtObj.font_weight = &quot;normal&quot;
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">Is_BUD = (Z0.CategoryNr &gt;= 1012) &amp;&amp; (Z0.CategoryNr &lt;= 1014)
+Has_OnOff = Is_BUD &amp;&amp; (Z0.CategoryNr != 1013)</rt:event>
+    <rt:changeTrigger name="OnB0">
+      <rt:condition>B0 != Nothing</rt:condition>
+      <rt:chgItem>B0</rt:chgItem>
+      <rt:code>B0_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnZ0">
+      <rt:chgItem>Z0</rt:chgItem>
+      <rt:code>Z0_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnF0">
+      <rt:condition>F0 != Nothing</rt:condition>
+      <rt:chgItem>F0</rt:chgItem>
+      <rt:code>HighlightMessage(F0_bit5, PRJSPEC.DetectBit(F0, 11), 0xf5)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnF1">
+      <rt:condition>F1 != Nothing</rt:condition>
+      <rt:chgItem>F1</rt:chgItem>
+      <rt:code>F1_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnF2">
+      <rt:condition>F2 != Nothing</rt:condition>
+      <rt:chgItem>F2</rt:chgItem>
+      <rt:code>F2_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnF3">
+      <rt:condition>F3 != Nothing</rt:condition>
+      <rt:chgItem>F3</rt:chgItem>
+      <rt:code>F3_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnVB9">
+      <rt:condition>VB9 != Nothing</rt:condition>
+      <rt:chgItem>VB9</rt:chgItem>
+      <rt:code>VB9_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnVB10">
+      <rt:condition>VB10 != Nothing</rt:condition>
+      <rt:chgItem>VB10</rt:chgItem>
+      <rt:code>VB10_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnVB12">
+      <rt:condition>VB12 != Nothing</rt:condition>
+      <rt:chgItem>VB12</rt:chgItem>
+      <rt:code>VB12_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnSUSP">
+      <rt:chgItem>pv_SUS</rt:chgItem>
+      <rt:code>STrig = ((pv_SUS.SuspendedFlags &amp; PLS_SUSP_CMD) != 0)</rt:code>
+      <rt:code>HighlightMessage(OOS_SUSP, STrig, 0xf5)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <g id="info_area">
+    <rect x="0" y="0" width="495" height="240" rx="0" ry="0" fill="Col_BGSand" stroke="Col_Grey1" stroke-width="2"/> 
+    <polyline points="0,240 0,0 495,0" fill="none" stroke="Col_Grey5" stroke-width="2"/> 
+  </g>
+  <g stroke="Col_TxtStatic">
+    <line x1="150" y1="2.5" x2="150" y2="237.5"/> 
+    <line x1="345" y1="2.5" x2="345" y2="237.5"/> 
+    <line x1="2.5" y1="22.5" x2="150" y2="22.5"/> 
+    <line x1="345" y1="22.5" x2="492.5" y2="22.5"/> 
+    <line x1="2.5" y1="92.5" x2="492.5" y2="92.5"/> 
+    <line x1="2.5" y1="222.5" x2="492.5" y2="222.5"/> 
+  </g>
+  <text x="74.999" y="17" fill="Col_TxtStatic" font-family="AAP_Font3" font-weight="bold" text-anchor="middle">
+    <rt:dyn type="text" mode="constant" value="Has_OnOff" trans="bt">
+      <rt:xy value="false" value2="ÇÀÊĞÛÒÜ"/> 
+      <rt:xy value2="ÎÒÊËŞ×ÈÒÜ"/> 
+    </rt:dyn>
+ÇÀÊĞ. / ÎÒÊË.</text>
+  <text x="415.006" y="17" fill="Col_TxtStatic" font-family="AAP_Font3" font-weight="bold" text-anchor="middle">
+    <rt:dyn type="text" mode="constant" value="Has_OnOff" trans="bt">
+      <rt:xy value="false" value2="ÎÒÊĞÛÒÜ"/> 
+      <rt:xy value2="ÂÊËŞ×ÈÒÜ"/> 
+    </rt:dyn>
+ÎÒÊĞ. / ÂÊË.</text>
+  <g id="Z0_gr">
+    <rt:dyn type="visibility" mode="constant" value="Z0 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="Z0.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="5" y="217.5" id="bit0" fill="black">
+      <title>Z0 - 0</title>
+      <rt:dyn type="text" mode="constant" value="Has_OnOff" trans="bt">
+        <rt:xy value="false" value2="ÇÀÊĞÛÒÎ"/> 
+        <rt:xy value2="ÎÒÊËŞ×ÅÍÎ"/> 
+      </rt:dyn>
+ÇÀÊĞÛÒÎ</text>
+    <text x="350" y="217.5" id="bit1" fill="black">
+      <title>Z0 - 1</title>
+      <rt:dyn type="text" mode="constant" value="Has_OnOff" trans="bt">
+        <rt:xy value="false" value2="ÎÒÊĞÛÒÎ"/> 
+        <rt:xy value2="ÂÊËŞ×ÅÍÎ"/> 
+      </rt:dyn>
+ÎÒÊĞÛÒÎ</text>
+  </g>
+  <g id="B0_gr">
+    <rt:dyn type="visibility" mode="constant" value="B0 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="B0.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="5" y="155" id="bit0" fill="black">
+      <title>B0 - 0</title>
+ÄÈÑÒÀÍÖ. ÊÎÌÀÍÄÀ</text>
+    <text x="350" y="155" id="bit1" fill="black">
+      <title>B0 - 1</title>
+ÄÈÑÒÀÍÖ. ÊÎÌÀÍÄÀ</text>
+    <text x="5" y="167.5" id="bit2" fill="black">
+      <title>B0 - 2</title>
+ÄÈÑÒÀÍÖ. ÊÎÌÀÍÄÀ Ñ<tspan x="5" dy="13">ÔÀÑÀÄÀ ÁËÎÊÀ</tspan>
+    </text>
+    <text x="350" y="167.5" id="bit3" fill="black">
+      <title>B0 - 3</title>
+ÄÈÑÒÀÍÖ. ÊÎÌÀÍÄÀ Ñ<tspan x="350" dy="13">ÔÀÑÀÄÀ ÁËÎÊÀ</tspan>
+    </text>
+    <text x="155" y="117.5" id="bit4" fill="Col_LtBlue">
+      <title>B0 - 4</title>
+ÓÑÒÀÍÎÂËÅÍ ÈÌÈÒÀÒÎĞ ÁËÎÊÀ</text>
+  </g>
+  <text x="155" y="87.5" id="F0_bit5" fill="Col_Red">
+    <title>F0 - 5</title>
+    <rt:dyn type="visibility" mode="constant" value="F0 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="F0.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+ÎÁÎÁÙÅÍÍÀß ÍÅÈÑÏĞÀÂÍÎÑÒÜ</text>
+  <g id="F1_gr">
+    <rt:dyn type="visibility" mode="constant" value="F1 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="F1.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="5" y="50" id="bit0" fill="Col_Red">
+      <title>F1 - 0</title>
+ÏĞÅÂÛØÅÍÈÅ ÂĞÅÌÅÍÈ</text>
+    <text x="350" y="50" id="bit1" fill="Col_Red">
+      <title>F1 - 1</title>
+ÏĞÅÂÛØÅÍÈÅ ÂĞÅÌÅÍÈ</text>
+    <text x="350" y="62.5" id="bit2" fill="Col_Red">
+      <title>F1 - 2</title>
+ÍÅÑÎÎÒÂ. ÑÎÑÒÎßÍÈß</text>
+    <text x="5" y="62.5" id="bit3" fill="Col_Red">
+      <title>F1 - 3</title>
+ÍÅÑÎÎÒÂ. ÑÎÑÒÎßÍÈß</text>
+    <text x="155" y="25" id="bit4" fill="Col_Red">
+      <title>F1 - 4</title>
+ÍÅÈÑÏĞ. ÑÕÅÌÛ ÓÏĞÀÂËÅÍÈß</text>
+    <text x="155" y="105" id="bit5" fill="Col_LtBlue">
+      <title>F1 - 5</title>
+      <rt:dyn type="visibility" mode="constant" value="Is_BUD" trans="bi">
+        <rt:xy value="false" value2="1"/> 
+        <rt:xy value2="0"/> 
+      </rt:dyn>
+ÒÅÑÒÎÂÎÅ ÏÎËÎÆÅÍÈÅ</text>
+    <text x="155" y="12.5" id="bit7" fill="Col_Red">
+      <title>F1 - 7</title>
+ÍÅÈÑÏĞ. ÊÎÌ. ÂÛÕÎÄÀ</text>
+  </g>
+  <g id="F2_gr">
+    <rt:dyn type="visibility" mode="constant" value="F2 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="F2.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="155" y="37.5" id="bit1" fill="Col_Red">
+      <title>F2 - 1</title>
+ÍÅÈÑÏĞ. ÊÎÍÖ. ÂÛÊËŞ×.</text>
+    <text x="155" y="50" id="bit2" fill="Col_Red">
+      <title>F2 - 2</title>
+      <rt:dyn type="visibility" mode="constant" value="Is_BUD" trans="bi">
+        <rt:xy value="false" value2="0"/> 
+        <rt:xy value2="1"/> 
+      </rt:dyn>
+ÍÅÈÑÏĞ. ÌÎÌ. ÂÛÊËŞ×.</text>
+    <text x="5" y="37.5" id="bit3" fill="Col_Red">
+      <title>F2 - 3</title>
+      <rt:dyn type="visibility" mode="constant" value="Is_BUD" trans="bi">
+        <rt:xy value="false" value2="3"/> 
+        <rt:xy value2="1"/> 
+      </rt:dyn>
+ÀÂÀĞÈÉÍÛÉ ÌÎÌÅÍÒ</text>
+    <text x="350" y="37.5" id="bit4" fill="Col_Red">
+      <title>F2 - 4</title>
+      <rt:dyn type="visibility" mode="constant" value="Is_BUD" trans="bi">
+        <rt:xy value="false" value2="3"/> 
+        <rt:xy value2="1"/> 
+      </rt:dyn>
+ÀÂÀĞÈÉÍÛÉ ÌÎÌÅÍÒ</text>
+  </g>
+  <g id="F3_gr">
+    <rt:dyn type="visibility" mode="constant" value="F3 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="F3.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="155" y="62.5" id="bit0" fill="Col_Red">
+      <title>F3 - 0</title>
+ÎÁÎÁÙ. ÍÅÈÑÏĞ. ÁËÎÊÀ</text>
+    <text x="155" y="75" id="bit9" fill="Col_Red">
+      <title>F3 - 9</title>
+ÍÅÂÅĞÍÛÉ ÒÈÏ ÁËÎÊÀ</text>
+  </g>
+  <g id="VB9_gr">
+    <rt:dyn type="visibility" mode="constant" value="VB9 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="VB9.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="350" y="75" id="bit0" fill="Col_Red">
+      <title>VB9 - 0</title>
+      <rt:dyn type="visibility" mode="constant" value="Is_BUD" trans="bi">
+        <rt:xy value="false" value2="1"/> 
+        <rt:xy value2="0"/> 
+      </rt:dyn>
+ÇÀÙÈÒÀ ÑĞÀÁÎÒÀËÀ</text>
+    <text x="5" y="205" id="bit1" visibility="hidden" rt:detect="disabled" fill="black">
+      <title>VB9 - 1</title>
+      <rt:dyn type="visibility" mode="constant" value="Is_BUD" trans="bi">
+        <rt:xy value="false" value2="1"/> 
+        <rt:xy value2="0"/> 
+      </rt:dyn>
+ÎÒÊËŞ×ÈÒÜ ÀÓ</text>
+    <text x="350" y="205" id="bit2" visibility="hidden" rt:detect="disabled" fill="black">
+      <title>VB9 - 2</title>
+      <rt:dyn type="visibility" mode="constant" value="Is_BUD" trans="bi">
+        <rt:xy value="false" value2="1"/> 
+        <rt:xy value2="0"/> 
+      </rt:dyn>
+ÂÊËŞ×ÈÒÜ ÀÓ</text>
+    <text x="5" y="142.5" id="bit3" fill="black">
+      <title>VB9 - 3</title>
+      <rt:dyn type="text" mode="constant" value="Has_OnOff" trans="bt">
+        <rt:xy value="false" value2="ÇÀÊĞÛÒÜ ÀÓ"/> 
+        <rt:xy value2="ÎÒÊËŞ×ÈÒÜ ÎÒ ÀÂĞ"/> 
+      </rt:dyn>
+ÎÒÊËŞ×ÈÒÜ ÎÒ ÀÂĞ</text>
+    <text x="350" y="142.5" id="bit4" fill="black">
+      <title>VB9 - 4</title>
+      <rt:dyn type="text" mode="constant" value="Has_OnOff" trans="bt">
+        <rt:xy value="false" value2="ÎÒÊĞÛÒÜ ÀÓ"/> 
+        <rt:xy value2="ÂÊËŞ×ÈÒÜ ÎÒ ÀÂĞ"/> 
+      </rt:dyn>
+ÂÊËŞ×ÈÒÜ ÎÒ ÀÂĞ</text>
+    <text x="5" y="130" id="bit5" fill="black">
+      <title>VB9 - 5</title>
+ÂÛÕÎÄÍÀß ÊÎÌÀÍÄÀ</text>
+    <text x="350" y="130" id="bit6" fill="black">
+      <title>VB9 - 6</title>
+ÂÛÕÎÄÍÀß ÊÎÌÀÍÄÀ</text>
+    <text x="5" y="117.5" id="bit8" fill="black">
+      <title>VB9 - 8</title>
+ĞÀÇĞÅØÅÍÎ</text>
+    <text x="350" y="117.5" id="bit9" fill="black">
+      <title>VB9 - 9</title>
+ĞÀÇĞÅØÅÍÎ</text>
+  </g>
+  <g id="VB10_gr">
+    <rt:dyn type="visibility" mode="constant" value="VB10 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="VB10.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="5" y="192.5" id="bit0" fill="black">
+      <title>VB10 - 0</title>
+      <rt:dyn type="text" mode="constant" value="Has_OnOff" trans="bt">
+        <rt:xy value="false" value2="ÊÎÍÖ. ÂÛÊË. ÇÀÊĞÛÒÎ"/> 
+        <rt:xy value2="ÑÎÑÒ. ÎÒÊË. (ÎÒ ß×ÅÉÊÈ)"/> 
+      </rt:dyn>
+ÊÎÍÖ. ÂÛÊË. ÇÀÊĞÛÒÎ</text>
+    <text x="350" y="192.5" id="bit1" fill="black">
+      <title>VB10 - 1</title>
+      <rt:dyn type="text" mode="constant" value="Has_OnOff" trans="bt">
+        <rt:xy value="false" value2="ÊÎÍÖ. ÂÛÊË. ÎÒÊĞÛÒÎ"/> 
+        <rt:xy value2="ÑÎÑÒ. ÂÊË. (ÎÒ ß×ÅÉÊÈ)"/> 
+      </rt:dyn>
+ÊÎÍÖ. ÂÛÊË. ÎÒÊĞÛÒÎ</text>
+    <text x="350" y="205" id="bit2" fill="black">
+      <title>VB10 - 2</title>
+      <rt:dyn type="visibility" mode="constant" value="Is_BUD" trans="bi">
+        <rt:xy value="false" value2="0"/> 
+        <rt:xy value2="1"/> 
+      </rt:dyn>
+ÊÎÍÖ. ÂÛÊË. ÍÅ ÇÀÊĞ.</text>
+    <text x="5" y="205" id="bit3" fill="black">
+      <title>VB10 - 3</title>
+      <rt:dyn type="visibility" mode="constant" value="Is_BUD" trans="bi">
+        <rt:xy value="false" value2="0"/> 
+        <rt:xy value2="1"/> 
+      </rt:dyn>
+ÊÎÍÖ. ÂÛÊË. ÍÅ ÎÒÊĞ.</text>
+    <text x="5" y="105" id="bit3a" fill="black">
+      <title>VB10 - 3</title>
+      <rt:dyn type="visibility" mode="constant" value="Is_BUD" trans="bi">
+        <rt:xy value="false" value2="1"/> 
+        <rt:xy value2="0"/> 
+      </rt:dyn>
+      <rt:dyn type="text" mode="constant" value="Has_OnOff" trans="bt">
+        <rt:xy value="false" value2="ÇÀÊĞÛÒÜ ÏÎ ÇÀÙÈÒÅ"/> 
+        <rt:xy value2="ÎÒÊËŞ×ÈÒÜ ÏÎ ÇÀÙÈÒÅ"/> 
+      </rt:dyn>
+ÎÒÊËŞ×ÈÒÜ ÏÎ ÇÀÙÈÒÅ</text>
+  </g>
+  <g id="VB12_gr">
+    <rt:dyn type="visibility" mode="constant" value="VB12 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="VB12.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="5" y="235" id="bit8" fill="black">
+      <title>VB12 - 8</title>
+      <rt:dyn type="text" mode="constant" value="Has_OnOff" trans="bt">
+        <rt:xy value="false" value2="ÇÀÊĞÛÒÜ ÎÒ ÑÁ"/> 
+        <rt:xy value2="ÎÒÊËŞ×ÈÒÜ ÎÒ ÑÁ"/> 
+      </rt:dyn>
+ÇÀÊĞÛÒÜ ÎÒ ÑÁ</text>
+    <text x="350" y="235" id="bit9" fill="black">
+      <title>VB12 - 9</title>
+      <rt:dyn type="text" mode="constant" value="Has_OnOff" trans="bt">
+        <rt:xy value="false" value2="ÎÒÊĞÛÒÜ ÎÒ ÑÁ"/> 
+        <rt:xy value2="ÂÊËŞ×ÈÒÜ ÎÒ ÑÁ"/> 
+      </rt:dyn>
+ÎÒÊĞÛÒÜ ÎÒ ÑÁ</text>
+  </g>
+  <text x="155" y="130" id="OOS_SUSP" fill="Col_Red">
+    <title>Âûâåäåíî èç ğàáîòû</title>
+    <rt:dyn type="visibility" mode="constant" value="pv_SUS == Nothing" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+ĞÅÌÎÍÒ</text>
+</svg>

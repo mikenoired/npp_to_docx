@@ -1,0 +1,46 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 150 15" width="150" height="15" id="bin_msg_txt" font-family="AAP_Font4" font-size="13" font-weight="bold">
+  <desc>Вывод строки TEXT бинарного сигнала для информац. окон</desc>
+  <rt:model modelversion="6.0" comment="Стандартная подмодель ПОРТАЛа">
+    <rt:param name="PvNumber" datatype="int" comment="номер переменной в БД"/> 
+    <rt:var name="pv" datatype="PlsPVBin" comment="ссылка на переменную БД"/> 
+    <rt:var name="pv_exists" datatype="boolean" value="false" comment="переменная была найдена"/> 
+    <rt:sub>Sub HighlightMessage()
+If pv.Quality == PLS_QUAL_BAD Then
+	msg_txt.text_decoration = &quot;password&quot;
+	msg_txt.fill = 0xa0a0a0
+	msg_txt.font_size = 11
+	msg_txt.font_weight = &quot;normal&quot;
+Else
+	msg_txt.text_decoration = &quot;none&quot;
+	If pv.Value != 0 Then
+		msg_txt.fill = 0
+		msg_txt.font_size = 13
+		msg_txt.font_weight = &quot;bold&quot;
+	Else
+		msg_txt.fill = 0xa0a0a0
+		msg_txt.font_size = 11
+		msg_txt.font_weight = &quot;normal&quot;
+	End If
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If PvNumber &gt; 0 Then
+	pv = BIN(PvNumber)
+	If !IsNull(pv) Then
+		pv_exists = True
+		msg_txt.text = PLStrCut(pv.PVText, 24)
+		msg_txt.title = pv.PVDescription
+	Else
+		msg_txt.text = &quot;-&quot;
+	End If
+Else
+	msg_txt.text = &quot;&quot;
+End If</rt:event>
+    <rt:changeTrigger name="Ch_property">
+      <rt:condition>pv_exists</rt:condition>
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:code>HighlightMessage()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <text x="-0.125" y="12.5" id="msg_txt" fill="black" text-anchor="start" rt:text-vertanchor="start">1234567890123456789012345</text>
+</svg>

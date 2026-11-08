@@ -1,0 +1,78 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 25 100" width="25" height="100" id="ps_ana_bar_reactivnost" stroke="black">
+  <desc>Барограф для отображения реактивности</desc>
+  <rt:model comment="Пользовательская подмодель ПОРТАЛа" revision="4.0">
+    <rt:param name="PointID" datatype="string" comment="Идентификатор сигнала заливки"/> 
+    <rt:var name="pv" datatype="PlsPVAna" value="" comment="DB PV"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="object in group"/> 
+    <rt:var name="FBar" datatype="float" value="1" comment="fill level"/> 
+    <rt:var name="FColor" datatype="uint" comment="цвет индикации"/> 
+    <rt:var name="ht" datatype="float" comment="высота барографа"/> 
+    <rt:var name="c1" datatype="double" comment="log10(25)"/> 
+    <rt:sub>Sub ValCalc()
+If pv != nothing Then
+	Dim val As double
+	val = pv.Value
+	If (val &lt;= -25) Then
+		FBar = 0
+	ElseIf (val &gt; -25) &amp;&amp; (val &lt; -1) Then
+		FBar = -0.3 * (1 - Log10(- val) / c1)
+	ElseIf (val &gt;= -1) &amp;&amp; (val &lt; 1) Then
+		FBar = -0.3 - 0.35 * (1.0 + val)
+	Else
+		FBar = -1
+	End If
+	If (pv.Quality == PLS_QUAL_BAD) Then
+		FColor = Color_Inval	
+	Else
+		FColor = Color_ANA_GOOD
+	End If
+Else
+	FBar = -1
+	FColor = Color_ErLink
+End If
+End Sub</rt:sub>
+    <rt:event type="OnResize">InGr.y = -2.5
+InGr.height = _This.height + 5</rt:event>
+    <rt:event type="OnInitialize">Set pv = ANA(PointID)
+If pv == Nothing Then
+	FColor = Color_ANA_ER_LINK
+End If
+ht = _This.height
+c1 = Log10(25)</rt:event>
+    <rt:changeTrigger name="GRP">
+      <rt:condition>pv != Nothing</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(pv.PVId) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc">
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="Backgr_rect" fill="Col_BGmain" stroke="none"/> 
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" rt:filly="-0.3" id="body" fill="Col_Green" stroke="none">
+    <rt:dyn type="fill" mode="onchange" value="FColor"/> 
+    <rt:dyn type="rt:filly" mode="onchange" value="FBar"/> 
+  </rect>
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="Backgr_frame" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <rect x="2.5" y="-2.5" width="20" height="105" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="1.5">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <line x1="5" y1="35" x2="20" y2="35" stroke="black"/> 
+  <rect x="0" y="-2.5" width="25" height="105" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If pv == nothing Then
+	NoLink(PointID)
+Else
+	Call_Win (&quot;ws_ANA_NB&quot;, pv.PVId + &quot;|-1&quot;)
+End If</rt:event>
+    <rt:event type="OnRightClick">If pv == nothing Then
+	NoLink(PointID)
+Else
+	LoadPopUpMenu(pv.PVId + &quot;|ANAi|ws_ANA_NB &quot; + pv.PVId + &quot;|-1&quot;)
+End If</rt:event>
+  </rect>
+</svg>

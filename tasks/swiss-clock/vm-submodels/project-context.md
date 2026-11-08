@@ -1,0 +1,2 @@
+# Контекст NPP converter
+Корень /Users/aleksandrkiko/Documents/npp_to_docx, база 753c4b8. Пользователь создаёт паспорта технологических кадров SVG. Core читает кодировки и rt:dyn, обогащает KKS описаниями PLS, встраивает ресурсы и создаёт DOCX; Electron/CLI вызывают общий batch. Ресурсы и паспорта локальные в игнорируемых input/output. Команды: npm run check, npm run build, bun run src/core/services/passport.test.ts. Исследованы README, svg-resources, convert-svg-to-docx и существующая история задачи; весь репозиторий заново не аудирован.

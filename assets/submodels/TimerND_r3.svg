@@ -1,0 +1,122 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 205 30" width="235" height="30" id="TimerND_r3">
+  <rt:model modelversion="7.2.0.0" comment="Создано VNIIAES-ASUTP\gubkina 17.04.2013 9:37:46">
+    <rt:param name="PID" datatype="string" comment="Полный идентификатор переменной"/> 
+    <rt:param name="STime" datatype="date" comment="Переменная времени сервера"/> 
+    <rt:var name="pv_BIN" datatype="PlsPVBin" comment="Бинарный сигнал"/> 
+    <rt:var name="TimeDetected" datatype="date" comment="Время срабатывания сигнализации"/> 
+    <rt:var name="HasError" datatype="boolean" value="false" comment="При иницализации произошла ошибка"/> 
+    <rt:var name="TimeString" datatype="string" value="&quot;__:__:__&quot;" comment="Строка времени"/> 
+    <rt:var name="days" datatype="uint" comment="" value="0"/> 
+    <rt:var name="hours" datatype="uint" comment="" value="0"/> 
+    <rt:var name="minutes" datatype="uint" comment="" value="0"/> 
+    <rt:var name="seconds" datatype="uint" comment="" value="0"/> 
+    <rt:var name="days_st" datatype="string" comment="" value=""/>
+    <rt:var name="hours_st" datatype="string" comment="" value=""/>
+    <rt:var name="minutes_st" datatype="string" comment="" value=""/>
+    <rt:var name="seconds_st" datatype="string" comment="" value=""/>
+    <rt:var name="time_string" datatype="string" comment="" value=""/>
+    <rt:var name="days_txt" datatype="string" comment="" value=""/>
+    <rt:var name="delta_time" datatype="uint" comment="" value="0"/>
+    <rt:sub>Sub TimeStr()
+If pv_BIN.Value == false Then
+	TimeValue.text = &quot;-&quot;	
+	SelArea.visibility=&quot;hidden&quot;
+	TimeValue.visibility=&quot;hidden&quot;
+Else
+	SelArea.visibility=&quot;visible&quot;
+	TimeValue.visibility=&quot;visible&quot;
+
+	Dim NowTime as Date
+	Dim Day_Now as Int
+	Dim Month_Now as Int
+	Dim Year_Now as Int
+	Dim Hour_Now as Int
+	Dim Minute_Now as Int
+	Dim Second_Now as Int
+
+	Dim Second_Passed_Now as UInt64
+	Dim Seconds_Difference as Uint64
+
+	Dim Days_Passed as Int
+	Dim Hours_Passed as Int
+	Dim Minutes_Passed as Int
+	Dim Seconds_Passed as Int
+
+	TimeDetected = (pv_BIN.FieldTime)
+
+	NowTime = STime
+	delta_time=DateDiff(NowTime, TimeDetected)
+
+	seconds=delta_time % 60
+	minutes=(delta_time/60) % 60
+	hours=((delta_time/60)/60) % 24
+	days=(((delta_time/60)/60)/24)	
+	
+	if (1 &lt; days) &amp;&amp; (days &lt; 5) then 
+		days_txt=&apos; дня &apos;
+	else
+		if (days == 1) then
+			days_txt=&apos; день &apos;
+		else
+			days_txt=&apos; дней &apos;
+		end if 
+	end if
+	
+	if(days&lt;10) then 
+		days_st=&apos;00&apos;+ CStr(days)
+	else
+		if(days&lt;100) then 
+			days_st=&apos;0&apos;+ CStr(days)
+		else
+			days_st=CStr(days)
+		end if
+	end if
+	
+	if(hours&lt;10) then 
+		hours_st=&apos;0&apos;+ CStr(hours)
+	else
+		hours_st=CStr(hours)
+	end if
+
+	if(minutes&lt;10) then 
+		minutes_st=&apos;0&apos;+ CStr(minutes)
+	else
+		minutes_st=CStr(minutes)
+	end if
+
+	if(seconds&lt;10) then 
+		seconds_st=&apos;0&apos;+ CStr(seconds)
+	else
+		seconds_st=CStr(seconds)
+	end if
+	
+	TimeString = days_st + days_txt + hours_st + &quot;:&quot; + minutes_st + &quot;:&quot; + seconds_st	
+	TimeValue.text = TimeString
+	
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">Set pv_BIN = BIN(PID)
+	If pv_BIN == Nothing Then
+		HasError = true
+		TimeValue.text = &quot;???&quot;
+		TimeValue.fill = &quot;Col_Grey2&quot;
+		SelArea.title = &quot;Ошибка привязки объекта &quot; + PID
+		Exit Sub
+	End If
+	SelArea.visibility=&quot;hidden&quot;
+	TimeValue.visibility=&quot;hidden&quot;	
+	//SelArea.title = SelArea.title + &quot; &quot; + PID</rt:event>
+    <rt:changeTrigger name="Timer">
+      <rt:condition>!HasError</rt:condition>	
+      <rt:chgItem>pv_BIN.Value</rt:chgItem>
+      <rt:chgItem>STime</rt:chgItem>
+      <rt:code>TimeStr()</rt:code>
+    </rt:changeTrigger>	
+  </rt:model>
+  <rect x="0" y="0" width="143.293" height="25" rx="0" ry="0" id="BGround" fill="none"/> 
+  <rect x="0" y="0" width="200" height="30" rx="0" ry="0" id="SelArea" fill="black">
+    <title>Время, прошедшее с момента нарушения ЛБ</title>
+  </rect>
+  <text x="101" y="21.5" id="TimeValue" fill="Col_Green" font-size="19" font-weight="bold" text-anchor="middle">000 дней 00:00:00</text>
+</svg>

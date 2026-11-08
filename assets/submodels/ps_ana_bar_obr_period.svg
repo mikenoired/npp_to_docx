@@ -1,0 +1,172 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 25 100" width="25" height="100" id="ps_ana_bar_obr_period" stroke="black">
+  <desc>Барограф для отображения обратного периода</desc>
+  <rt:model comment="Пользовательская подмодель ПОРТАЛа" revision="4.1">
+    <rt:param name="PointID" datatype="string" comment="Идентификатор сигнала заливки"/> 
+    <rt:param name="PointID_AZ" datatype="string" value="NULL" comment="идентификатор сигнала аварийной уставки"/> 
+    <rt:param name="MinVal" datatype="float" value="10" comment="Минимальное отображаемое значение"/> 
+    <rt:var name="pv" datatype="PlsPVAna" value="" comment="DB PV"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="object in group"/> 
+    <rt:var name="FBar" datatype="float" value="1" comment="fill level"/> 
+    <rt:var name="pv_AZ" datatype="PlsPVAna" comment="DB var"/> 
+    <rt:var name="Pos_AZ" datatype="float" value="2" comment="level AZ"/> 
+    <rt:var name="Pos_PZ" datatype="float" value="2" comment="level PZ"/> 
+    <rt:var name="FColor" datatype="uint" comment="цвет индикации"/> 
+    <rt:var name="ht" datatype="float" comment="высота барографа"/> 
+    <rt:sub>Sub ValCalc()
+If pv != nothing Then
+	FColor = Color_ANA_GOOD
+	Pos()
+	FBar = BarPos(pv.Value)
+	If (pv.Quality == PLS_QUAL_BAD) Then
+		FColor = Color_Inval	
+	ElseIf (pv_AZ != Nothing) Then
+		Dim SPA As Float
+		Dim SPP As Float
+		SPA = pv_AZ.Value
+		SPP = SPA * 2
+		If (pv.Value &lt; SPA) Then
+			FColor = Color_ANA_LO_A
+		ElseIf (pv.Value &lt; SPP) Then
+			FColor = Color_ANA_LO_P
+		End If
+		If (pv_AZ.Quality == PLS_QUAL_BAD) Then
+			line_AZ.stroke = Color_Inval
+			line_PZ.stroke = Color_Inval
+			FColor = Color_Inval
+		Else
+			line_AZ.stroke = Color_ANA_LO_A
+			line_PZ.stroke = Color_ANA_LO_P
+		End If	
+	End If
+Else
+	FBar = -1
+	FColor = Color_ErLink
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Pos()
+&apos;Вычисление позиций границ
+Dim Bound As Double
+If pv == Nothing Then
+	Pos_AZ = -1
+	Pos_PZ = -1
+ElseIf pv_AZ == Nothing Then
+	Pos_AZ = -1
+	Pos_PZ = -1
+Else
+	Pos_AZ = (1 + BarPos(pv_AZ.Value)) * ht
+	Pos_PZ = (1 + BarPos(pv_AZ.Value * 2)) * ht
+End If
+If (Pos_AZ &lt; 0) || (Pos_AZ &gt; ht) Then
+	Pos_AZ = 0
+	B_line_AZ.visibility = &quot;hidden&quot;
+	line_AZ.visibility = &quot;hidden&quot;
+Else
+	B_line_AZ.visibility = &quot;visible&quot;
+	line_AZ.visibility = &quot;visible&quot;
+End If
+If (Pos_PZ &lt; 0) || (Pos_PZ &gt; ht) Then
+	Pos_PZ = 0
+	B_line_PZ.visibility = &quot;hidden&quot;
+	line_PZ.visibility = &quot;hidden&quot;
+Else
+	B_line_PZ.visibility = &quot;visible&quot;
+	line_PZ.visibility = &quot;visible&quot;
+End If
+End Sub</rt:sub>
+    <rt:sub>Function BarPos(ByVal RawVal As Float) As Float
+If (RawVal &lt;= 0) Then
+	BarPos = 0
+ElseIf (RawVal &lt; MinVal) Then
+	BarPos = -1
+Else
+	BarPos = - MinVal / RawVal
+End If
+End Function</rt:sub>
+    <rt:event type="OnResize">InGr.y = -2.5
+InGr.height = _This.height + 5</rt:event>
+    <rt:event type="OnInitialize">Set pv = ANA(PointID)
+If PointID_AZ != &quot;NULL&quot; Then
+	Set pv_AZ = ANA(PointID_AZ)
+End If
+If pv == Nothing Then
+	FColor = Color_ANA_ER_LINK
+End If
+ht = _This.height</rt:event>
+    <rt:changeTrigger name="GRP">
+      <rt:condition>pv != Nothing</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(pv.PVId) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc">
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:chgItem>pv_AZ</rt:chgItem>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="Backgr_rect" fill="Col_BGmain" stroke="none"/> 
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" rt:filly="-0.3" id="body" fill="Col_Green" stroke="none">
+    <rt:dyn type="fill" mode="onchange" value="FColor"/> 
+    <rt:dyn type="rt:filly" mode="onchange" value="FBar"/> 
+  </rect>
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="Backgr_frame" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <rect x="2.5" y="-2.5" width="20" height="105" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="1.5">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <line x1="-1" y1="6.25" x2="26" y2="6.25" id="B_line_PZ" stroke="black" stroke-width="3">
+    <rt:dyn type="y1" mode="onchange" value="Pos_PZ"/> 
+    <rt:dyn type="y2" mode="onchange" value="Pos_PZ"/> 
+  </line>
+  <line x1="-1" y1="0" x2="26" y2="0" id="B_line_AZ" stroke="black" stroke-width="3">
+    <rt:dyn type="y1" mode="onchange" value="Pos_AZ"/> 
+    <rt:dyn type="y2" mode="onchange" value="Pos_AZ"/> 
+  </line>
+  <line x1="0" y1="6.25" x2="25" y2="6.25" id="line_PZ" stroke="Col_Yellow" stroke-width="2">
+    <rt:dyn type="y1" mode="onchange" value="Pos_PZ"/> 
+    <rt:dyn type="y2" mode="onchange" value="Pos_PZ"/> 
+    <rt:dyn type="stroke" mode="constant" value="Color_ANA_LO_P"/> 
+  </line>
+  <line x1="0" y1="0" x2="25" y2="0" id="line_AZ" stroke="Col_Red" stroke-width="2">
+    <rt:dyn type="y1" mode="onchange" value="Pos_AZ"/> 
+    <rt:dyn type="y2" mode="onchange" value="Pos_AZ"/> 
+    <rt:dyn type="stroke" mode="constant" value="Color_ANA_LO_A"/> 
+  </line>
+  <rect x="0" y="-2.5" width="25" height="105" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">Dim s As String
+If pv == Nothing Then
+	s = &quot;Ошибка привязки.\nPointID = \&quot;&quot; + PointID + &quot;\&quot;&quot;
+	ShowWarning (s, 0)
+ElseIf (PointID_AZ != &quot;NULL&quot;) &amp;&amp; (pv_AZ == Nothing) Then
+	s = &quot;Ошибка привязки.\nPointID_AZ = \&quot;&quot; + PointID_AZ + &quot;\&quot;&quot;
+	ShowWarning (s, 0)
+ElseIf (pv_AZ.Value &gt; pv.RangeHigh) || (pv_AZ.Value &lt; pv.RangeLow) Then
+	s = &quot;Ошибка.\nВеличина уставки\nвышла за диапазон.&quot;
+	ShowWarning (s, 0)
+ElseIf (PointID_AZ == &quot;NULL&quot;) Then
+	Call_Win (&quot;ws_ANA_NB&quot;, pv.PVId + &quot;|-1&quot;)
+Else
+	s = pv.PVId + &quot;|&quot; + pv_AZ.PVId
+	Open_Win_Uni(False, &quot;wi_&quot; + PointID, &quot;Составной объект &quot; + pv.CategoryText, &quot;wi_MultyPV&quot;, s)
+End If</rt:event>
+    <rt:event type="OnRightClick">Dim s As String
+If pv == Nothing Then
+	s = &quot;Ошибка привязки.\nPointID = \&quot;&quot; + PointID + &quot;\&quot;&quot;
+	ShowWarning (s, 0)
+ElseIf (PointID_AZ != &quot;NULL&quot;) &amp;&amp; (pv_AZ == Nothing) Then
+	s = &quot;Ошибка привязки.\nPointID_AZ = \&quot;&quot; + PointID_AZ + &quot;\&quot;&quot;
+	ShowWarning (s, 0)
+ElseIf (pv_AZ.Value &gt; pv.RangeHigh) || (pv_AZ.Value &lt; pv.RangeLow) Then
+	s = &quot;Ошибка.\nВеличина уставки\nвышла за диапазон.&quot;
+	ShowWarning (s, 0)
+ElseIf (PointID_AZ == &quot;NULL&quot;) Then
+	LoadPopUpMenu(pv.PVId + &quot;|ANAi|ws_ANA_NB &quot; + pv.PVId + &quot;|-1&quot;)
+Else
+	TmpBuffer(0) = pv.PVId
+	TmpBuffer(1) = pv_AZ.PVId
+	LoadPopUpMenu(PointID + &quot;|NONi|&quot;)
+End If</rt:event>
+  </rect>
+</svg>

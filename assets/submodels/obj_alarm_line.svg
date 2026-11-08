@@ -1,0 +1,256 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 780 20" width="780" height="20" id="obj_alarm_line" font-family="AAP_Font3" font-size="13" font-weight="bold">
+  <desc>Строка списка сигнализаций для RTA-7.2</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="4.6-6.0">
+    <rt:param name="Data_Type" datatype="int" value="0" comment="Тип переменной или номер бита в NARY"/> 
+    <rt:param name="PV_Nr" datatype="int" value="-1" comment="Номер переменной"/> 
+    <rt:var name="Back_Color" datatype="uint" value="0xafafaf" comment="Цвет фона строки"/> 
+    <rt:var name="Txt_Color" datatype="uint" value="0x1000" comment="Цвет строки сигнализации"/> 
+    <rt:var name="A_BIN_pv" datatype="PlsPVBin" comment="поинтер бинарной переменной"/> 
+    <rt:var name="A_ANA_pv" datatype="PlsPVAna" comment="поинтер аналоговой переменной"/> 
+    <rt:var name="Is_NotAcked" datatype="ubyte" value="3" comment="Неподтвержденная сигнализация"/> 
+    <rt:sub>Sub Calculate()
+Dim Al_Date As String
+Dim Al_Time As String
+Dim Al_ID As String
+Dim Al_PVName As String
+Dim Al_Descr As String
+Dim Al_Description As String
+Dim Date_Time As String
+Dim Al_Level As Byte
+Dim BoundIndex As Short
+Dim BoundType As UInt
+Dim PSN0 As Short
+
+If Data_Type == 1 Then	//бинарная переменная
+	A_BIN_pv = BIN(PV_Nr)
+	Date_Time = CStr(A_BIN_pv.FirstNotAckedAlarmTime)
+	Al_Date = PRJSPEC.ComSplit(Date_Time, Al_Time)
+	If AlarmShowRTM Then
+		Al_ID = A_BIN_pv.CategoryText
+	Else
+		Al_ID = A_BIN_pv.PVId
+	End If
+	Al_PVName = A_BIN_pv.PVId
+	If A_BIN_pv.NotAcknowledged Then
+		If A_BIN_pv.AlarmType == PLS_ALARMTYP_NONE Then
+			Is_NotAcked = 1	//снятая неквитированная сигнализация
+			Al_Level = 8	//8 - неактивные
+		Else
+			Is_NotAcked = 3	//нормальная неквитированная сигнализация
+			Al_Level = A_BIN_pv.AlarmLevel
+		End If
+	Else
+		Is_NotAcked = 0
+		Al_Level = A_BIN_pv.AlarmLevel
+	End If
+	&apos;для BIN переменных надо брать уровень из PRJSPECNR0
+	PSN0 = (A_BIN_pv.ProjSpecNr0 &amp; 0xF0) / 16
+	If ((PSN0 &amp; 7) == 0) || (Al_Level == 8) Then
+		BoundType = PLS_BOUNDVIOL_NONE
+		BoundIndex = -1
+	Else
+		BoundIndex = (PSN0 &amp; 7) - 1
+		If ((PSN0 &amp; 8) == 1) Then
+			BoundType = PLS_BOUNDVIOL_LO
+		Else
+			BoundType = PLS_BOUNDVIOL_HI
+		End If
+	End If
+	Al_Descr = PLStrCut(A_BIN_pv.PVDescription, 50)
+	Al_Description = A_BIN_pv.PVDescription
+	
+ElseIf Data_Type == 2 Then	//аналоговая переменная
+	A_ANA_pv = ANA(PV_Nr)
+	Date_Time = CStr(A_ANA_pv.FirstNotAckedAlarmTime)
+	Al_Date = PRJSPEC.ComSplit(Date_Time, Al_Time)
+	If AlarmShowRTM Then
+		Al_ID = A_ANA_pv.CategoryText
+	Else
+		Al_ID = A_ANA_pv.PVId
+	End If
+	Al_PVName = A_ANA_pv.PVId
+	If A_ANA_pv.NotAcknowledged Then
+		If A_ANA_pv.AlarmType == PLS_ALARMTYP_NONE Then
+			Is_NotAcked = 1	//снятая неквитированная сигнализация
+			Al_Level = 8	//8 - неактивные
+		Else
+			Is_NotAcked = 3	//нормальная неквитированная сигнализация
+			Al_Level = A_ANA_pv.AlarmLevel
+		End If
+	Else
+		Is_NotAcked = 0
+		Al_Level = A_ANA_pv.AlarmLevel
+	End If
+	BoundType = A_ANA_pv.BoundViolType
+	BoundIndex = A_ANA_pv.BoundViolIndex
+	Al_Descr = PLStrCut(A_ANA_pv.PVDescription, 50)
+	Al_Description = A_ANA_pv.PVDescription
+
+ElseIf (Data_Type &gt;=10) &amp;&amp; (Data_Type &lt;= 25) Then	//многобитовая переменная
+	A_BIN_pv = BIN(PV_Nr)
+	Date_Time = CStr(A_BIN_pv.FirstNotAckedAlarmTime)
+	Al_Date = PRJSPEC.ComSplit(Date_Time, Al_Time)
+	If AlarmShowRTM Then
+		Al_ID = A_BIN_pv.CategoryText
+	Else
+		Al_ID = A_BIN_pv.PVId
+	End If
+
+	If (((2 ** (Data_Type - 10)) &amp; A_BIN_pv.NaryAlarmOn) &gt; 0) Then
+		Is_NotAcked = 3	//нормальная неквитированная сигнализация
+		Al_Level = A_BIN_pv.AlarmLevel
+	Else
+		Is_NotAcked = 0
+		Al_Level = 8	//8 - неактивные
+	End If
+	&apos;для BIN переменных надо брать уровень из PRJSPECNR0
+	PSN0 = (A_BIN_pv.ProjSpecNr0 &amp; 0xF0) / 16
+	If ((PSN0 &amp; 7) == 0) Then
+		BoundType = PLS_BOUNDVIOL_NONE
+		BoundIndex = -1
+	Else
+		BoundIndex = (PSN0 &amp; 7) - 1
+		If ((PSN0 &amp; 8) == 1) Then
+			BoundType = PLS_BOUNDVIOL_LO
+		Else
+			BoundType = PLS_BOUNDVIOL_HI
+		End If
+	End If
+	Al_Description = PRJSPEC.Get_BST_Descr(A_BIN_pv.PVId, (Data_Type - 10))
+	Al_Descr = PLStrCut(Al_Description, 50)
+
+ElseIf (PV_Nr == -1) Then
+	//нет сигнализации
+	Al_Date = &quot;&quot;
+	Al_Time = &quot;&quot;
+	Al_ID = &quot;&quot;
+	Al_PVName = &quot;&quot;
+	Al_Level = -1
+	BoundType = PLS_BOUNDVIOL_NONE
+	BoundIndex = -1
+	Is_NotAcked = 0
+	Al_Descr = &quot;&quot;
+	Al_Description = &quot;Сигнализации нет&quot;
+Else
+	//неизвестный тип переменной
+	Al_Date = &quot;???&quot;
+	Al_Time = &quot;???&quot;
+	Al_ID = &quot;???&quot;
+	Al_PVName = &quot;&quot;
+	Al_Level = -1
+	BoundType = PLS_BOUNDVIOL_NONE
+	BoundIndex = -1
+	Is_NotAcked = 0
+	Al_Descr = &quot;Неизвестный тип сигнала&quot;
+	Al_Description = &quot;Неизвестный тип сигнала&quot;
+End If
+T_Date.text = Al_Date
+T_Time.text = Al_Time
+T_ID.text = Al_ID
+T_ID.title = Al_PVName
+T_Descr.text = Al_Descr
+T_Descr.title = Al_Description
+If (Al_Level &gt;= 0) &amp;&amp; (Al_Level &lt; 9) Then
+	If (AnaAlarms_AsBounds) &amp;&amp; (Data_Type == 2 ) Then
+		If (A_ANA_pv.BoundViolType == PLS_BOUNDVIOL_HI) Then
+			If (BoundIndex &gt;= 2) Then
+				Txt_Color = Color_ANA_HI_A
+			ElseIf (BoundIndex == 1) Then
+				Txt_Color = Color_ANA_HI_P
+			ElseIf (BoundIndex == 0) Then
+				Txt_Color = Color_ANA_HI_T
+			End If
+		ElseIf (A_ANA_pv.BoundViolType == PLS_BOUNDVIOL_LO) Then
+			If (BoundIndex &gt;= 2) Then
+				Txt_Color = Color_ANA_LO_A
+			ElseIf (BoundIndex == 1) Then
+				Txt_Color = Color_ANA_LO_P
+			ElseIf (BoundIndex == 0) Then
+				Txt_Color = Color_ANA_LO_T
+			End If
+		Else
+			Txt_Color = ColorAlarm(Al_Level)
+		End If
+	Else
+		Txt_Color = ColorAlarm(Al_Level)
+	End If
+Else
+	Txt_Color = 0
+End If
+T_Date.fill = Txt_Color
+T_Time.fill = Txt_Color
+T_ID.fill = Txt_Color
+T_Descr.fill = Txt_Color
+
+Border_Circle.visibility = &quot;hidden&quot;
+Border_Up.visibility = &quot;hidden&quot;
+Border_Dn.visibility = &quot;hidden&quot;
+
+	If (BoundType == PLS_BOUNDVIOL_HI) Then
+		Border_Up.visibility = &quot;visible&quot;
+		If (Al_Level == 8) Then
+			Border_Up.fill = Color_ANA_GOOD
+		ElseIf (BoundIndex &gt;= 2) Then
+			Border_Up.fill = Color_ANA_HI_A
+		ElseIf (BoundIndex == 1) Then
+			Border_Up.fill = Color_ANA_HI_P
+		ElseIf (BoundIndex == 0) Then
+			Border_Up.fill = Color_ANA_HI_T
+		Else
+			Border_Up.fill = ColorAlarm(Al_Level)
+		End If
+	ElseIf (BoundType == PLS_BOUNDVIOL_LO) Then
+		Border_Dn.visibility = &quot;visible&quot;
+		If (Al_Level == 8) Then
+			Border_Dn.fill = Color_ANA_GOOD
+		ElseIf (BoundIndex &gt;= 2) Then
+			Border_Dn.fill = Color_ANA_LO_A
+		ElseIf (BoundIndex == 1) Then
+			Border_Dn.fill = Color_ANA_LO_P
+		ElseIf (BoundIndex == 0) Then
+			Border_Dn.fill = Color_ANA_LO_T
+		Else
+			Border_Dn.fill = ColorAlarm(Al_Level)
+		End If
+/*	Решили показывать только верхние или нижние нарушения. Без нарушений гр. - ничего не показывать.
+	ElseIf (BoundIndex != -1) Then
+		Border_Circle.visibility = &quot;visible&quot;
+		If (Al_Level == 8) Then
+			Border_Circle.fill = Color_ANA_GOOD
+		ElseIf (BoundIndex &gt;= 2) Then
+			Border_Circle.fill = Color_ANA_LO_A
+		ElseIf (BoundIndex == 1) Then
+			Border_Circle.fill = Color_ANA_LO_P
+		ElseIf (BoundIndex == 0) Then
+			Border_Circle.fill = Color_ANA_LO_T
+		Else
+			Border_Circle.fill = ColorAlarm(Al_Level)
+		End If
+*/
+	End If
+End Sub</rt:sub>
+    <rt:cycleTrigger name="RefreshState" cycle="500" unit="millisecond">
+      <rt:code>Calculate()</rt:code>
+    </rt:cycleTrigger>
+    <rt:changeTrigger name="CallCalcs">
+      <rt:chgItem>PV_Nr</rt:chgItem>
+      <rt:chgItem>Data_Type</rt:chgItem>
+      <rt:code>Calculate()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="780" height="20" rx="0" ry="0" id="Backgr" fill="Col_Grey2" stroke="Col_Grey5">
+    <rt:dyn type="fill" mode="cyclic" value="ShowInAlarmColor(Is_NotAcked, ColorAlarm(9), ColorAlarm(10))"/> 
+  </rect>
+  <line x1="80" y1="0" x2="80" y2="20" stroke="Col_Grey5"/> 
+  <line x1="180" y1="0" x2="180" y2="20" stroke="Col_Grey5"/> 
+  <line x1="370" y1="0" x2="370" y2="20" stroke="Col_Grey5"/> 
+  <line x1="755" y1="0" x2="755" y2="20" stroke="Col_Grey5"/> 
+  <text x="75" y="15" id="T_Date" text-anchor="end">88.88.8888</text>
+  <text x="85" y="15" id="T_Time" text-anchor="start">HH:MM:SS.mls</text>
+  <text x="185" y="15" id="T_ID" text-anchor="start">ИДЕНТИФИКАТОР_20симв</text>
+  <text x="375" y="15" id="T_Descr" text-anchor="start">Описание сигнализации</text>
+  <circle cx="767.5" cy="10" r="7.5" id="Border_Circle" fill="Col_Grey3" stroke="Col_Grey5"/> 
+  <polygon points="760,15 767.5,5 775,15" id="Border_Up" fill="Col_Grey2" stroke="Col_Grey5"/> 
+  <polygon points="760,9.66668 767.5,-0.33332 775,9.66668" id="Border_Dn" fill="Col_Grey2" stroke="Col_Grey5" transform="flipY(7.33334)"/> 
+</svg>

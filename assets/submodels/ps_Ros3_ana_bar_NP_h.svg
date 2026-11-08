@@ -1,0 +1,445 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="codedlayout meet" viewBox="0 0 100 50" width="100" height="50" id="ps_Ros3_ana_bar_NP_h" stroke="black" font-size="13">
+  <desc>Барограф для отображения нейтронной мощности горизонтальный</desc>
+  <rt:model comment="Пользовательская подмодель ПОРТАЛа" revision="6.0" modelversion="0.0.0.0">
+    <rt:param name="FKKS1" datatype="string" comment="Идентификатор сигнала заливки"/> 
+    <rt:param name="FKKS2" datatype="string" comment="Идентификатор уставки"/> 
+    <rt:param name="FKKS3" datatype="string" comment="Идентификатор бинарного сигнала"/> 
+    <rt:param name="val_HWB" datatype="double" value="-999" comment="Значение верхней предупредительной уставки"/> 
+    <rt:param name="val_LWB" datatype="double" value="-999" comment="Значение нижней предупредительной уставки"/> 
+    <rt:param name="ShowDigits" datatype="boolean" value="true" comment="Показывать значения шкалы"/> 
+    <rt:param name="IsLogScale" datatype="boolean" value="false" comment="Логарифмический масштаб"/> 
+    <rt:var name="pv" datatype="PlsPVAna" value="" comment="DB PV"/> 
+    <rt:var name="pv_ana" datatype="PlsPVAna" comment="DB PV"/> 
+    <rt:var name="pv_bin" datatype="PlsPVBin" comment="DB PV"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="object in group"/> 
+    <rt:var name="FBar" datatype="float" value="1" comment="fill level"/> 
+    <rt:var name="FColor" datatype="uint" comment="цвет индикации"/> 
+    <rt:var name="M_Color" datatype="uint" comment="Приглушенный цвет"/> 
+    <rt:var name="HasError" datatype="boolean" value="false" comment="Ошибка данных"/> 
+    <rt:var name="pvRH" datatype="double" comment="Верхняя граница диапазона"/> 
+    <rt:var name="pvRL" datatype="double" comment="Нижняя граница диапазона"/> 
+    <rt:var name="diap" datatype="double" comment="диапазон значениий"/> 
+    <rt:var name="val_AB" datatype="double" comment="Значение аварийной уставки" value="-999"/> 
+    <rt:sub>Sub ValCalc()
+If pv != nothing Then
+	Dim val As double
+	val = pv.Value
+
+	if val &lt;= pvRL Then
+		FBar = 0
+	ElseIf val&gt;= pvRH Then
+		FBar = -1
+	ElseIf !IsLogScale Then
+		FBar = -1 * (val - pvRL) / diap
+	Else
+		FBar = -1 * (Log10(val) - Log10(pvRL)) / (Log10(pvRH) - Log10(pvRL) )
+	End If
+
+	If (pv.Quality == PLS_QUAL_BAD) || (pv_bin.Quality == PLS_QUAL_BAD) || (pv_ana.Quality == PLS_QUAL_BAD) Then
+		FColor = Color_Inval	
+	ElseIf pv_bin.Value == 0 Then
+		FColor = Color_ANA_HI_P
+	Else
+		FColor = M_Color
+	End If
+Else
+	FBar = -1 
+	FColor = Color_ErLink
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub ShowScale()
+Dim s as string
+Dim Num_points as Uint
+dim delta as double
+dim i as ubyte
+dim x as double
+Dim a as double
+Dim b as float
+dim thh as float
+s = &quot;&quot;
+thh = _This.height
+If thh &lt;=  40 Then 
+	thh = 40
+End If	
+	If !IsLogScale Then
+		a = pvRH / 10
+		b = diap / 10
+		If (a - CInt(a)) == 0 then
+			Num_points = CInt(b) - 1			//количество чир (верхнюю не рисуем, если она совпадает с верхней границей диапазона)
+		Else
+			Num_points = CInt(b)
+		End If
+		delta = _This.width / diap		//расстояние между чирами
+		for i = 1 to Num_points
+			a = (pvRL+ 10 * i)					// что пишем до округления
+			x = (CInt(a) - pvRL) * delta
+			s = s + &quot; M&quot; + CStr(x) + &quot; 0 L&quot; + CStr(x) + &quot; &quot; + CStr(thh - 10)
+			If (i &lt;= 30) &amp;&amp; ShowDigits Then
+				Digits.Child(i - 1).text = CStr(CInt(a))
+				Digits.Child(i - 1).x = x
+				Digits.Child(i - 1).visibility = &quot;visible&quot;
+			End If
+		next i
+		PvRL_Dig.text = pvRL
+		PvRH_Dig.text = pvRH
+	Else
+		Num_points = Log10(pvRH) - Log10(pvRL) - 1
+		delta = _This.width / (Num_points + 1)
+		for i = 1 to Num_points
+			a = pvRL * (10 ** i) 
+			x = ((Log10(a)   - Log10(pvRL)) * delta)
+			s = s + &quot; M&quot; + CStr(x) + &quot; 0 L&quot; + CStr(x) + &quot; &quot; + CStr(thh - 10)
+			If (i &lt;= 30) &amp;&amp; ShowDigits Then
+				Digits.Child(i - 1).text = Round(Log10(a),0)
+				Digits.Child(i - 1).x = x + 10
+				Tens.Child(i - 1).x = x
+				Digits.Child(i - 1).font_size = 9
+				Digits.Child(i - 1).visibility = &quot;visible&quot;
+				Tens.Child(i - 1).visibility = &quot;visible&quot;
+			End If
+		next i
+		PvRL_Dig.text = Round(Log10(pvRL),0)
+		PvRH_Dig.text = Round(Log10(pvRH),0)
+	End If
+Shkala.d = s
+End Sub</rt:sub>
+    <rt:sub>Sub ShowBoard(board as double, B_Border as RtSvgObj, B_Line as RtSvgObj)
+Dim x as float
+Dim delta as float
+If (board &gt;= pvRL) &amp;&amp; (board &lt;= pvRH) Then
+	If !IsLogScale Then
+		delta = _This.width / diap	
+		x = (board - pvRL) * delta
+	Else
+		delta = _This.width / (Log10(pvRH) - Log10(pvRL) )
+		x = (Log10(board) - Log10(pvRL)) * delta
+
+	End If
+
+	B_Border.x1 = x
+	B_Border.x2 = x
+	B_Line.x1 = x
+	B_Line.x2 = x
+
+End If
+End Sub</rt:sub>
+    <rt:event type="OnResize">Dim thh as double
+Dim thw as double
+Dim i as ubyte
+
+thh = _This.height
+thw = _This.width
+
+InGr.x = -2.5
+InGr.width = thw + 5
+Backgr_frame.width = thw
+Backgr_rect.width = thw
+RightLineBorder.x1 = thw
+RightLineBorder.x2 = thw
+RightLine.x1 = thw
+RightLine.x2 = thw
+SelArea.width = thw
+If !IsLogScale Then
+	PvRH_Dig.x = thw
+
+Else
+	PvRH_Dig.x = thw + 10
+	PvRH_Ten.x = thw
+	PvRL_Dig.x = 10
+End If
+
+						// высота
+If thh &lt;=  40 Then 
+	thh = 40
+End If	
+
+Backgr_frame.height = thh - 35
+Backgr_rect.height = thh - 35
+InGr.height = thh - 30
+RightLineBorder.y2 = thh - 10
+LeftLineBorder.y2 = thh - 10
+RightLine.y2 = thh - 10
+LeftLine.y2 = thh - 10
+HWB_Group_HWB_Border.y2 = thh - 25
+HWB_Group_HWB_Line.y2  =  thh - 25
+LWB_Group_LWB_Border.y2 = thh - 25
+LWB_Group_LWB_Line.y2 = thh - 25
+AB_Group_AB_Border.y2 = thh - 25
+AB_Group_AB_Line.y2 = thh - 25
+If !IsLogScale Then
+	PvRH_Dig.y = thh
+	PvRL_Dig.y = thh
+Else
+	PvRH_Dig.y = thh - 7.5
+	PvRL_Dig.y = thh - 7.5
+	PvRL_Ten.y = thh
+	PvRH_Ten.y = thh
+End If
+
+For i = 0 to 30
+	If !IsLogScale Then
+		Digits.Child(i).y = thh
+	Else
+		Digits.Child(i).y = thh - 7.5
+		Tens.Child(i).y = thh
+	End If
+Next i
+body.height = thh - 35
+SelArea.height = thh - 10</rt:event>
+    <rt:event type="OnInitialize">Set pv = RTAPLS.AnaPV(FKKS1)
+Set pv_ana = RTAPLS.AnaPV(FKKS2)
+Set pv_bin = RTAPLS.BinPV(FKKS3)
+body.visibility = &quot;visible&quot;
+M_Color = Middle_Color_Wieghted(Color_ANA_GOOD, 0xcdcdcd, 0.5)
+If (pv == Nothing) || (pv_bin == Nothing) || (pv_ana == Nothing) Then
+	HasError = true
+	FColor = Color_ANA_ER_LINK
+	Exit Sub
+End If
+pvRH = pv.RangeHigh
+pvRL = pv.RangeLow
+If ((pvRL &lt;= 0) || (pvRH &lt;= 0)) &amp;&amp; IsLogScale Then			// не может быть логарифмический масштаб при 0 начале диапазона
+	HasError = true
+	FColor = Color_ANA_ER_LINK
+	Exit Sub
+End IF
+diap = pvRH  - pvRL
+If diap &lt;= 0  Then
+	HasError = true
+	FColor = Color_ANA_ER_LINK
+	Exit Sub
+End If
+
+ShowScale()
+ShowBoard(val_LWB, HWB_Group_HWB_Border, HWB_Group_HWB_Line)
+ShowBoard(val_HWB, LWB_Group_LWB_Border, LWB_Group_LWB_Line)
+val_AB = pv_ana.Value
+ShowBoard(val_AB, AB_Group_AB_Border, AB_Group_AB_Line)</rt:event>
+    <rt:changeTrigger name="GRP">
+      <rt:condition>pv != Nothing</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(pv.PVId) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc">
+      <rt:condition>!HasError</rt:condition>
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:chgItem>pv_ana</rt:chgItem>
+      <rt:chgItem>pv_bin</rt:chgItem>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="On_pvANA">
+      <rt:condition>!HasError &amp;&amp; (pv_ana != Nothing)</rt:condition>
+      <rt:chgItem>pv_ana</rt:chgItem>
+      <rt:code>ShowBoard(pv_ana.Value, AB_Group_AB_Border, AB_Group_AB_Line)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <path d="M0 5 L0 30 Z" id="Shkala" stroke="black" stroke-width="2"/> 
+  <rect x="0" y="5" width="100" height="15" rx="0" ry="0" id="Backgr_rect" fill="Col_BGmain" stroke="none">
+    <rt:dyn type="width" mode="constant" value="_This.width"/> 
+  </rect>
+  <rect x="0" y="5" width="100" height="15" rx="0" ry="0" id="Backgr_frame" fill="none" stroke="Col_Grey5" stroke-width="1">
+    <rt:dyn type="width" mode="constant" value="_This.width"/> 
+  </rect>
+  <rect x="-2.5" y="2.5" width="105" height="20" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="1.5">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="0" y="5" width="100" height="15" rx="0" ry="0" rt:fillx="0.3" id="body" visibility="hidden" rt:detect="disabled" fill="Col_Green" stroke="none">
+    <rt:dyn type="fill" mode="onchange" value="FColor"/> 
+    <rt:dyn type="rt:fillx" mode="onchange" value="-FBar"/> 
+    <rt:dyn type="width" mode="unknown" value="_This.width"/> 
+  </rect>
+  <line x1="0" y1="0" x2="0" y2="40" id="LeftLineBorder" stroke="black" stroke-width="3"/> 
+  <line x1="0" y1="0" x2="0" y2="40" id="LeftLine" stroke="black" stroke-width="2">
+    <rt:dyn type="stroke" mode="unknown" value="M_Color"/> 
+  </line>
+  <line x1="100" y1="0" x2="100" y2="40" id="RightLineBorder" stroke="black" stroke-width="3">
+    <rt:dyn type="x1" mode="constant" value="_This.width"/> 
+    <rt:dyn type="x2" mode="constant" value="_This.width"/> 
+  </line>
+  <line x1="100" y1="0" x2="100" y2="40" id="RightLine" stroke="black" stroke-width="2">
+    <rt:dyn type="stroke" mode="unknown" value="M_Color"/> 
+    <rt:dyn type="x1" mode="constant" value="_This.width"/> 
+    <rt:dyn type="x2" mode="constant" value="_This.width"/> 
+  </line>
+  <g id="Digits" visibility="hidden" rt:detect="disabled" text-anchor="middle">
+    <text x="15" y="50" id="Dig0">0</text>
+    <text x="17.5" y="50" id="Dig1">1</text>
+    <text x="20" y="50" id="Dig2">2</text>
+    <text x="22.5" y="50" id="Dig3">3</text>
+    <text x="25" y="50" id="Dig4">4</text>
+    <text x="27.5" y="50" id="Dig5">4</text>
+    <text x="30" y="50" id="Dig6">4</text>
+    <text x="32.5" y="50" id="Dig7">4</text>
+    <text x="32.5" y="50" id="Dig8">4</text>
+    <text x="32.5" y="50" id="Dig9">4</text>
+    <text x="32.5" y="50" id="Dig10">4</text>
+    <text x="32.5" y="50" id="Dig11">4</text>
+    <text x="32.5" y="50" id="Dig12">4</text>
+    <text x="32.5" y="50" id="Dig13">4</text>
+    <text x="32.5" y="50" id="Dig14">4</text>
+    <text x="32.5" y="50" id="Dig15">4</text>
+    <text x="32.5" y="50" id="Dig16">4</text>
+    <text x="32.5" y="50" id="Dig17">4</text>
+    <text x="32.5" y="50" id="Dig18">4</text>
+    <text x="32.5" y="50" id="Dig19">4</text>
+    <text x="32.5" y="50" id="Dig20">4</text>
+    <text x="32.5" y="50" id="Dig21">4</text>
+    <text x="32.5" y="50" id="Dig22">4</text>
+    <text x="32.5" y="50" id="Dig23">4</text>
+    <text x="32.5" y="50" id="Dig24">4</text>
+    <text x="32.5" y="50" id="Dig25">4</text>
+    <text x="32.5" y="50" id="Dig26">4</text>
+    <text x="32.5" y="50" id="Dig27">4</text>
+    <text x="32.5" y="50" id="Dig28">4</text>
+    <text x="32.5" y="50" id="Dig29">4</text>
+    <text x="32.5" y="50" id="Dig30">4</text>
+  </g>
+  <text x="0" y="48.5833" id="PvRH_Dig" visibility="hidden" rt:detect="disabled" text-anchor="middle">
+    <rt:dyn type="y" mode="constant" value="IsLogScale" trans="bt">
+      <rt:xy value="false" value2="50"/> 
+      <rt:xy value2="35"/> 
+    </rt:dyn>
+    <rt:dyn type="visibility" mode="constant" value="ShowDigits &amp;&amp; !HasError" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="font-size" mode="constant" value="IsLogScale" trans="bd">
+      <rt:xy value="false" value2="13"/> 
+      <rt:xy value2="9"/> 
+    </rt:dyn>
+    <rt:dyn type="x" mode="constant" value="_This.width"/> 
+PvRL</text>
+  <text x="0" y="50" id="PvRH_Ten" visibility="hidden" rt:detect="disabled" text-anchor="middle">
+    <rt:dyn type="visibility" mode="unknown" value="ShowDigits &amp;&amp; !HasError &amp;&amp; IsLogScale" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="x" mode="constant" value="_This.width"/> 
+10</text>
+  <text x="0" y="50" id="PvRL_Dig" visibility="hidden" rt:detect="disabled" text-anchor="middle">
+    <rt:dyn type="visibility" mode="constant" value="ShowDigits &amp;&amp; !HasError" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="font-size" mode="constant" value="IsLogScale" trans="bd">
+      <rt:xy value="false" value2="13"/> 
+      <rt:xy value2="9"/> 
+    </rt:dyn>
+PvRL</text>
+  <text x="0" y="50" id="PvRL_Ten" visibility="hidden" rt:detect="disabled" text-anchor="middle">
+    <rt:dyn type="visibility" mode="unknown" value="ShowDigits &amp;&amp; !HasError &amp;&amp; IsLogScale" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+10</text>
+  <g id="HWB_Group" visibility="hidden" rt:detect="disabled">
+    <rt:dyn type="visibility" mode="constant" value="(val_HWB &gt;= pvRL) &amp;&amp; (val_HWB &lt;= pvRH) &amp;&amp; !HasError" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <line x1="15" y1="0" x2="15" y2="25" id="HWB_Border" stroke="black" stroke-width="3">
+      <rt:dyn type="y2" mode="constant" value="_This.height - 15"/> 
+    </line>
+    <line x1="15" y1="0" x2="15" y2="25" id="HWB_Line" stroke="black" stroke-width="2">
+      <rt:dyn type="stroke" mode="constant" value="Color_ANA_HI_P"/> 
+      <rt:dyn type="y2" mode="constant" value="_This.height - 15"/> 
+    </line>
+  </g>
+  <g id="LWB_Group" visibility="hidden" rt:detect="disabled">
+    <rt:dyn type="visibility" mode="constant" value="(val_LWB &gt;= pvRL) &amp;&amp; (val_LWB &lt;= pvRH) &amp;&amp; !HasError" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <line x1="90" y1="0" x2="90" y2="25" id="LWB_Border" stroke="black" stroke-width="3">
+      <rt:dyn type="y2" mode="constant" value="_This.height - 15"/> 
+    </line>
+    <line x1="90" y1="0" x2="90" y2="25" id="LWB_Line" stroke="black" stroke-width="2">
+      <rt:dyn type="stroke" mode="constant" value="Color_ANA_LO_P"/> 
+      <rt:dyn type="y2" mode="constant" value="_This.height - 15"/> 
+    </line>
+  </g>
+  <g id="AB_Group" visibility="hidden" rt:detect="disabled">
+    <rt:dyn type="visibility" mode="constant" value="(val_AB &gt;= pvRL) &amp;&amp; (val_AB &lt;= pvRH) &amp;&amp; !HasError" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <line x1="90" y1="0" x2="90" y2="25" id="AB_Border" stroke="black" stroke-width="3">
+      <rt:dyn type="y2" mode="constant" value="_This.height - 15"/> 
+    </line>
+    <line x1="90" y1="0" x2="90" y2="25" id="AB_Line" stroke="black" stroke-width="2">
+      <rt:dyn type="stroke" mode="constant" value="Color_ANA_HI_A"/> 
+      <rt:dyn type="y2" mode="constant" value="_This.height - 15"/> 
+    </line>
+  </g>
+  <g id="Tens" visibility="hidden" rt:detect="disabled" text-anchor="middle">
+    <text x="5" y="35" id="Ten0" font-size="13">10</text>
+    <text x="5" y="35" id="Ten1" font-size="13">10</text>
+    <text x="5" y="35" id="Ten2" font-size="13">10</text>
+    <text x="5" y="35" id="Ten3" font-size="13">10</text>
+    <text x="5" y="35" id="Ten4" font-size="13">10</text>
+    <text x="5" y="35" id="Ten5" font-size="13">10</text>
+    <text x="5" y="35" id="Ten6" font-size="13">10</text>
+    <text x="5" y="35" id="Ten7" font-size="13">10</text>
+    <text x="5" y="35" id="Ten8" font-size="13">10</text>
+    <text x="5" y="35" id="Ten9" font-size="13">10</text>
+    <text x="5" y="35" id="Ten10" font-size="13">10</text>
+    <text x="5" y="35" id="Ten11" font-size="13">10</text>
+    <text x="5" y="35" id="Ten12" font-size="13">10</text>
+    <text x="5" y="35" id="Ten13" font-size="13">10</text>
+    <text x="5" y="35" id="Ten14" font-size="13">10</text>
+    <text x="5" y="35" id="Ten15" font-size="13">10</text>
+    <text x="5" y="35" id="Ten16" font-size="13">10</text>
+    <text x="5" y="35" id="Ten17" font-size="13">10</text>
+    <text x="5" y="35" id="Ten18" font-size="13">10</text>
+    <text x="5" y="35" id="Ten19" font-size="13">10</text>
+    <text x="5" y="35" id="Ten20" font-size="13">10</text>
+    <text x="5" y="35" id="Ten21" font-size="13">10</text>
+    <text x="5" y="35" id="Ten22" font-size="13">10</text>
+    <text x="5" y="35" id="Ten23" font-size="13">10</text>
+    <text x="5" y="35" id="Ten24" font-size="13">10</text>
+    <text x="5" y="35" id="Ten25" font-size="13">10</text>
+    <text x="5" y="35" id="Ten26" font-size="13">10</text>
+    <text x="5" y="35" id="Ten27" font-size="13">10</text>
+    <text x="5" y="35" id="Ten28" font-size="13">10</text>
+    <text x="5" y="35" id="Ten29" font-size="13">10</text>
+    <text x="5" y="35" id="Ten30" font-size="13">10</text>
+  </g>
+  <rect x="-2.5" y="0" width="105" height="25" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If  (pv == Nothing) || (pv_bin == Nothing) || (pv_ana == Nothing) Then
+	NoLink(FKKS1)
+ElseIf (pvRL &lt;= 0) &amp;&amp; IsLogScale Then			// не может быть логарифмический масштаб при 0 начале диапазона
+	ShowWarning(&quot;Нижняя граница диапазона = 0&quot;, 10)
+ElseIf (diap &gt;= 300) &amp;&amp; !IsLogScale Then
+	ShowWarning(&quot;Слишком большой диапазон для линейного масштаба&quot;, 10)
+ElseIf (diap &lt;= 0 ) then
+	ShowWarning(&quot;Ошибка ввода данных&quot;, 10)
+Else
+	Open_Win_Uni(False, &quot;multyKKS&quot;, &quot;Составной объект&quot;, &quot;wi_MultyPV&quot;, FKKS1 + &quot;|&quot; + FKKS2 + &quot;|&quot; + FKKS3)
+/*
+ElseIf !IsLogScale Then
+		Call_Win (&quot;ws_ANA_FN&quot;, FKKS1 + &quot;|&quot; + CStr(-1))
+Else
+		Call_Win (&quot;ws_ANA_FN&quot;, FKKS1 + &quot;|&quot; + CStr(3))
+*/
+End If</rt:event>
+    <rt:event type="OnRightClick">If  (pv == Nothing) || (pv_bin == Nothing) || (pv_ana == Nothing) Then
+	NoLink(FKKS1)
+ElseIf (pvRL &lt;= 0) &amp;&amp; IsLogScale Then			// не может быть логарифмический масштаб при 0 начале диапазона
+	ShowWarning(&quot;Нижняя граница диапазона = 0&quot;, 10)
+ElseIf (diap &gt;= 300) &amp;&amp; !IsLogScale Then
+	ShowWarning(&quot;Слишком большой диапазон для линейного масштаба&quot;, 10)
+ElseIf (diap &lt;= 0 ) then
+	ShowWarning(&quot;Ошибка ввода данных&quot;, 10)
+ElseIf !IsLogScale Then
+		LoadPopUpMenu(FKKS1 + &quot;|ANAi|ws_ANA_FN &quot; + FKKS1 + &quot;|&quot;+CStr(-1))
+
+Else
+		LoadPopUpMenu(FKKS1 + &quot;|ANAi|ws_ANA_FN &quot; + FKKS1 + &quot;|&quot;+CStr(3))
+
+End If</rt:event>
+  </rect>
+</svg>

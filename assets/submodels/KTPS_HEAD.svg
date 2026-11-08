@@ -1,0 +1,113 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 50 75" width="50" height="75" id="KTPS_HEAD">
+  <desc>Модуль КТПС-ПН обобщенный</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="4.1-6.0">
+    <rt:param name="PointID" datatype="string" value="NULL" comment="Идентификатор сигнала диагностики модуля"/> 
+    <rt:param name="MN" datatype="string" value="****" comment="Строка с именем модуля"/> 
+    <rt:param name="OneLinkOnly" datatype="boolean" value="false" comment="имеется связь толко с одним ПК"/> 
+    <rt:var name="pv" datatype="PlsPVBin" comment="Переменная диагностики многобитовая"/> 
+    <rt:var name="Fail_value" datatype="boolean" value="true" comment="Отказ диагностики модуля"/> 
+    <rt:var name="DG1" datatype="boolean" value="false" comment="Отказ DG1"/> 
+    <rt:var name="DG2" datatype="boolean" value="false" comment="Отказ DG2"/> 
+    <rt:var name="Fail_is_valid" datatype="ubyte" enumname="EPlsQuality" value="3" comment="Значение отказа достоверно"/> 
+    <rt:var name="DG1_is_valid" datatype="ubyte" enumname="EPlsQuality" value="0" comment="Достоверность DG1"/> 
+    <rt:var name="DG2_is_valid" datatype="ubyte" enumname="EPlsQuality" value="0" comment="Достоверность DG2"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:sub>Sub Calculate()
+If (pv == Nothing) Then
+	Fail_value = True
+	Fail_is_valid = PLS_QUAL_GOOD
+	DG1_is_valid = PLS_QUAL_BAD
+	DG2_is_valid = PLS_QUAL_BAD
+ElseIf (pv.Quality == PLS_QUAL_BAD) Then
+	Fail_is_valid = PLS_QUAL_BAD
+	DG1_is_valid = PLS_QUAL_BAD
+	DG2_is_valid = PLS_QUAL_BAD
+Else
+	Fail_value = ((pv.Value &amp; 16) &gt; 0)
+	If ((pv.Value &amp; 32) &gt; 0) Then
+		Fail_is_valid = PLS_QUAL_GOOD
+	Else
+		Fail_is_valid = PLS_QUAL_BAD
+	End If
+	DG1 = ((pv.Value &amp; 1) &gt; 0)
+	If ((pv.Value &amp; 2) &gt; 0) Then
+		DG1_is_valid = PLS_QUAL_GOOD
+	Else
+		DG1_is_valid = PLS_QUAL_BAD
+	End If
+	DG2 = ((pv.Value &amp; 4) &gt; 0)
+	If ((pv.Value &amp; 8) &gt; 0) Then
+		DG2_is_valid = PLS_QUAL_GOOD
+	Else
+		DG2_is_valid = PLS_QUAL_BAD
+	End If
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If PointID != &quot;NULL&quot; Then
+	pv = BIN(PointID)
+End If</rt:event>
+    <rt:changeTrigger name="ChPV">
+      <rt:condition>PointID != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:code>Calculate()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>PointID != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(PointID) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="50" height="75" rx="0" ry="0" id="backgr" fill="Col_Grey2" stroke="Col_Grey5" stroke-linejoin="miter" stroke-width="2"/> 
+  <polyline points="0,75 0,0 50,0" id="LT_border" fill="none" stroke="Col_Grey1" stroke-linecap="butt" stroke-linejoin="miter" stroke-width="2"/> 
+  <image x="7.5" y="30" width="35" height="15" xlink:href="bool_indicator.svg" id="Ind_Fail">
+    <rt:dyn type="Stat" mode="onchange" value="Fail_value"/> 
+    <rt:dyn type="Qual" mode="onchange" value="Fail_is_valid"/> 
+  </image>
+  <image x="7.5" y="55" width="15" height="15" xlink:href="bool_indicator.svg" id="Ind_DG_1">
+    <rt:dyn type="Stat" mode="onchange" value="DG1"/> 
+    <rt:dyn type="Qual" mode="onchange" value="DG1_is_valid"/> 
+  </image>
+  <image x="27.5" y="55" width="15" height="15" xlink:href="bool_indicator.svg" id="Ind_DG_2">
+    <rt:dyn type="Qual" mode="onchange" value="DG2_is_valid"/> 
+    <rt:dyn type="Stat" mode="onchange" value="DG2"/> 
+    <rt:dyn type="visibility" mode="constant" value="OneLinkOnly" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </image>
+  <rect x="2.5" y="2.5" width="45" height="70" rx="0" ry="0" id="InGr" visibility="hidden" rt:detect="disabled" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <g fill="black" font-family="AAR_Font2">
+    <text x="25" y="20" id="Mod_name" font-size="15" font-weight="bold" text-anchor="middle">
+      <rt:dyn type="text" mode="constant" value="MN"/> 
+XXXX</text>
+    <text x="15" y="52.5" font-size="9" text-anchor="middle">1</text>
+    <text x="35" y="52.5" font-size="9" text-anchor="middle">
+      <rt:dyn type="visibility" mode="constant" value="OneLinkOnly" trans="bi">
+        <rt:xy value="false" value2="0"/> 
+        <rt:xy value2="1"/> 
+      </rt:dyn>
+2</text>
+  </g>
+  <rect x="0" y="0" width="50" height="75" rx="0" ry="0" id="Sel_frame" fill="Col_Grey2" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">Dim MsgStr As String
+If (pv == nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPID = \&quot;&quot; + PointID + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+Else
+	Call_Win(&quot;wi_BIN&quot;, PointID)
+End If</rt:event>
+    <rt:event type="OnRightClick">Dim MsgStr As String
+If (pv == nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPID = \&quot;&quot; + PointID + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+Else
+	LoadPopUpMenu(PointID + &quot;|BINi|wi_BIN &quot; + PointID)
+End If</rt:event>
+  </rect>
+</svg>
