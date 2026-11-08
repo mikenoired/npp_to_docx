@@ -1,0 +1,318 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="-35 -42.5 70 65" width="70" height="65" id="DS_TPTS_SR_ERL_Reg_valve">
+  <desc>регулирующий клапан для работы с ТПТС SR плюс ERL</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа (Dull Screen)" revision="6.0" modelversion="0.0.0.0">
+    <rt:param name="KKS_ERL" datatype="string" value="NULL" comment="KKS канального оператора ERL (модуль 1718)"/> 
+    <rt:param name="KKS_SR" datatype="string" value="NULL" comment="KKS канального оператора SR (модуль 1411)"/> 
+    <rt:param name="Operate" datatype="boolean" value="False" comment="Сделать объект управляемым"/> 
+    <rt:param name="NoSP" datatype="boolean" value="False" comment="окна управления без области ввода задания"/> 
+    <rt:var name="SR_CVpv" datatype="PlsPVAna" comment="указатель на переменную Положение"/> 
+    <rt:var name="ERL_F1" datatype="PlsPVBin" comment="указатель на переменную BST телеграммы"/> 
+    <rt:var name="ERL_Z0" datatype="PlsPVBin" comment="указатель на переменную BST телеграммы"/> 
+    <rt:var name="ERL_VB11" datatype="PlsPVBin" comment="указатель на переменную BST телеграммы"/> 
+    <rt:var name="ERL_OU" datatype="PlsPVBin" comment="указатель на переменную управления, которая может встретиться для любого объекта"/> 
+    <rt:var name="SR_F2" datatype="PlsPVBin" comment="указатель на переменную BST телеграммы"/> 
+    <rt:var name="SR_Z0" datatype="PlsPVBin" comment="указатель на переменную BST телеграммы"/> 
+    <rt:var name="SR_VB11" datatype="PlsPVBin" comment="указатель на переменную BST телеграммы"/> 
+    <rt:var name="SR_OU" datatype="PlsPVBin" comment="указатель на переменную управления, которая может встретиться для любого объекта"/> 
+    <rt:var name="STrig" datatype="boolean" value="false" comment="состояние ремонта"/> 
+    <rt:var name="MyStrokeWidth" datatype="float" value="2" comment="толщина рамки"/> 
+    <rt:var name="TE_mode" datatype="boolean" value="false" comment="тестовый режим"/> 
+    <rt:var name="Status" datatype="int" comment="обобщенное сотояние"/> 
+    <rt:var name="ACol" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="HCol" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="SR_AStat" datatype="ushort" value="0" comment="код сигнализации SR"/> 
+    <rt:var name="ERL_AStat" datatype="ushort" value="0" comment="код сигнализации ERL"/> 
+    <rt:var name="AStat" datatype="ushort" value="0" comment="код сигнализации общий"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:var name="IsStatic" datatype="boolean" value="false" comment="это статический объект без привязки"/> 
+    <rt:sub>Sub AckMe()
+If (AStat &amp; 1) != 0 Then
+	If Operate &amp;&amp; Check_Oper_Rights(SR_OU) Then
+		PRJSPEC.Operate(KKS_SR, SR_BHA)
+	End If
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub ERL_Get_Open_State()
+If STrig Then
+	g_body_l.fill = Color_Remont
+	g_body_r.fill = Color_Remont
+ElseIf (ERL_Z0 != Nothing) Then
+	If (ERL_Z0.Quality == PLS_QUAL_BAD) Then
+		g_body_l.fill = Color_Inval
+		g_body_r.fill = Color_Inval
+	ElseIf (ERL_Z0.Value &amp; 3) == 2 Then
+		g_body_l.fill = Color_OPEN_M
+		g_body_r.fill = Color_OPEN_M
+	ElseIf (ERL_Z0.Value &amp; 3) == 1 Then
+		g_body_l.fill = Color_CLOSE_M
+		g_body_r.fill = Color_CLOSE_M
+	ElseIf (ERL_Z0.Value &amp; 3) == 0 Then
+		g_body_l.fill = Color_CLOSE_M
+		g_body_r.fill = Color_OPEN_M
+	Else
+		g_body_l.fill = Color_Inval
+		g_body_r.fill = Color_Inval
+	End If
+Else
+	g_body_l.fill = Color_ErLink	//Color_Inval
+	g_body_r.fill = Color_ErLink	//Color_Inval
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub SR_Show_Pos()
+If SR_CVpv != Nothing Then
+	Dim Pos As Double
+	Pos = SR_CVpv.Value
+	g_Position_bg.visibility = &quot;visible&quot;
+	g_Position_val.visibility = &quot;visible&quot;
+	If Pos &lt;= 1 Then
+		Pos = 1
+	ElseIf Pos &gt; 100 Then
+		Pos = 100
+	End If
+	g_Position_val.x2 = -25.0 + Pos / 2
+Else
+	g_Position_bg.visibility = &quot;hidden&quot;
+	g_Position_val.visibility = &quot;hidden&quot;
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Set_Stroke_width()
+Dim Strk1 As Float
+Dim Strk2 As Float
+Strk1 = FrameStrokeWidth (Operate, ERL_OU)
+Strk2 = FrameStrokeWidth (Operate, SR_OU)
+If Strk1 &lt; Strk2 Then
+	MyStrokeWidth = Strk1
+Else
+	MyStrokeWidth = Strk2
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub SR_Status()
+	Status = PRJSPEC.TPTS_SR(KKS_SR, ACol, HCol, SR_AStat)
+	AStat = SR_AStat | ERL_AStat
+End Sub</rt:sub>
+    <rt:sub>Sub ERL_Status()
+If ERL_VB11 != Nothing Then
+	ERL_AStat = (ERL_VB11.Value &amp; 3) * (!STrig)
+End If
+AStat = SR_AStat | ERL_AStat
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">g.transform=&quot;&quot;
+g_InGr.visibility = &quot;hidden&quot;
+If (KKS_ERL == &quot;NULL&quot;) &amp;&amp; (KKS_SR == &quot;NULL&quot;) Then
+	IsStatic = true
+	g.transform = &quot;scale(0.75 0.75 0 0)&quot;
+	g_body_l.fill = Color_Static
+	g_body_r.fill = Color_Static
+	g_bg_1.visibility = &quot;hidden&quot;
+	g_bg_2.visibility = &quot;hidden&quot;
+	g_indic_H.visibility = &quot;hidden&quot;
+	g_indic_A.visibility = &quot;hidden&quot;
+	g_Position_bg.visibility = &quot;hidden&quot;
+	g_Position_val.visibility = &quot;hidden&quot;
+	g_Al_frame.visibility = &quot;hidden&quot;
+End If
+If (KKS_ERL != &quot;NULL&quot;) Then
+	ERL_F1 = BIN(KKS_ERL + &quot;_F1&quot;)
+	ERL_Z0 = BIN(KKS_ERL + &quot;_Z0&quot;)
+	ERL_OU = BIN(KKS_ERL + &quot;_OU&quot;)
+	If requests_allown Then
+		ERL_VB11 = BIN(KKS_ERL + &quot;_VB11&quot;)
+	End If
+End If
+If ERL_Z0 == Nothing Then
+	g_body_l.fill = &quot;Col_Grey2&quot;
+	g_body_r.fill = &quot;Col_Grey2&quot;
+End If
+If (KKS_SR != &quot;NULL&quot;) Then
+	SR_F2 = BIN(KKS_SR + &quot;_F2&quot;)
+	SR_Z0 = BIN(KKS_SR + &quot;_Z0&quot;)
+	SR_OU = BIN(KKS_SR + &quot;_OU&quot;)
+	If requests_allown Then
+		SR_VB11 = BIN(KKS_SR + &quot;_VB11&quot;)
+		SR_CVpv = ANA(KKS_SR + &quot;_AA1&quot;)
+		If SR_CVpv == nothing Then
+			SR_CVpv = ANA(KKS_SR + &quot;_&quot; + Signal_RegValve_Pos)
+		End If
+	Else
+		SR_CVpv = ANA(KKS_SR + &quot;_&quot; + Signal_RegValve_Pos)
+	End If
+End If</rt:event>
+    <rt:changeTrigger name="sh_Pos">
+      <rt:condition>!IsStatic</rt:condition>
+      <rt:chgItem>SR_CVpv</rt:chgItem>
+      <rt:code>SR_Show_Pos()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="check_TestMode">
+      <rt:condition>!IsStatic</rt:condition>
+      <rt:chgItem>ERL_OU</rt:chgItem>
+      <rt:chgItem>ERL_F1</rt:chgItem>
+      <rt:chgItem>SR_F2</rt:chgItem>
+      <rt:chgItem>SR_OU</rt:chgItem>
+      <rt:code>TE_mode = (((ERL_F1.Value &amp; 32) != 0) &amp;&amp; !PRJSPEC.GET_Susp(KKS_ERL, True)) || (((SR_F2.Value &amp; 1) != 0) &amp;&amp; !PRJSPEC.GET_Susp(KKS_SR, True))</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Get_SR_State">
+      <rt:condition>!IsStatic</rt:condition>
+      <rt:chgItem>SR_Z0</rt:chgItem>
+      <rt:chgItem>SR_OU</rt:chgItem>
+      <rt:chgItem>SR_VB11</rt:chgItem>
+      <rt:code>SR_Status()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>!IsStatic</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS_SR) &gt; 0) || (PRJSPEC.GRP_In(KKS_ERL) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Get_ERL_State">
+      <rt:condition>!IsStatic</rt:condition>
+      <rt:chgItem>ERL_VB11</rt:chgItem>
+      <rt:code>ERL_Status()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="chesk_SUS">
+      <rt:condition>!IsStatic</rt:condition>
+      <rt:chgItem>ERL_OU</rt:chgItem>
+      <rt:chgItem>SR_OU</rt:chgItem>
+      <rt:code>STrig = PRJSPEC.GET_Susp(KKS_ERL, True) || PRJSPEC.GET_Susp(KKS_SR, True)</rt:code>
+      <rt:code>ERL_Get_Open_State()</rt:code>
+      <rt:code>ERL_Status()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Get_ERL_Pos">
+      <rt:condition>!IsStatic</rt:condition>
+      <rt:chgItem>ERL_Z0</rt:chgItem>
+      <rt:code>ERL_Get_Open_State()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChRights">
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>Set_Stroke_width()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <g id="g">
+    <polygon points="0,0 -25,-12.5 -25,0" id="body_l" fill="Col_LtGreen" stroke="none"/> 
+    <polygon points="0,0 25,-12.5 25,12.5" id="body_r" fill="Col_LtYellow" stroke="none"/> 
+    <polygon points="0,0 -25,12.5 -25,0" id="body_2" fill="Col_Grey5" stroke="none"/> 
+    <g id="contour" stroke="Col_Grey5" stroke-width="1">
+      <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWidth"/> 
+      <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS_ERL) &amp;&amp; PRJSPEC.Selected(KKS_SR)" trans="bt">
+        <rt:xy value="false" value2="Col_Grey1"/> 
+        <rt:xy value2="Col_Grey5"/> 
+      </rt:dyn>
+      <polygon points="-25,-12.5 -25,12.5 25,-12.5 25,12.5" id="contour_1" fill="none"/> 
+    </g>
+    <g id="moto" stroke="Col_Grey5" stroke-width="1">
+      <rt:dyn type="stroke-dasharray" mode="onchange" value="TE_mode" trans="bt">
+        <rt:xy value="false" value2="inherit"/> 
+        <rt:xy value2="2,1"/> 
+      </rt:dyn>
+      <line x1="0" y1="-15" x2="0" y2="0" id="obj_moto_line">
+        <rt:dyn type="y1" mode="onchange" value="TE_mode" trans="bd">
+          <rt:xy value="false" value2="-20"/> 
+          <rt:xy value2="-15"/> 
+        </rt:dyn>
+      </line>
+      <circle cx="0" cy="-22.5" r="7.5" id="obj_moto_circle" fill="none">
+        <rt:dyn type="fill" mode="onchange" value="CUInt(_Blink3 || !TE_mode) * 0xffffffff | Color_Imitation"/> 
+        <rt:dyn type="visibility" mode="onchange" value="TE_mode" trans="bi">
+          <rt:xy value="false" value2="1"/> 
+          <rt:xy value2="0"/> 
+        </rt:dyn>
+      </circle>
+      <path d="M-5.625 -22.5 C-2.8125 -18.75 -2.8125 -18.75 0 -22.5 C2.8125 -26.25 2.8125 -26.25 5.625 -22.5 " id="obj_moto_path" fill="none">
+        <rt:dyn type="visibility" mode="onchange" value="TE_mode" trans="bi">
+          <rt:xy value="false" value2="1"/> 
+          <rt:xy value2="0"/> 
+        </rt:dyn>
+      </path>
+      <polyline points="-4,-10 0,0 4,-10" id="obj_moto_arrow" fill="Col_Grey5" stroke="none"/> 
+    </g>
+    <circle cx="-20.125" cy="-24.875" r="7.625" id="bg_1" fill="url(#DS_circle)" stroke="none"/> 
+    <circle cx="19.875" cy="-24.875" r="7.625" id="bg_2" fill="url(#DS_circle)" stroke="none"/> 
+    <circle cx="-20.125" cy="-24.875" r="7.625" id="indic_H" fill="Col_Green" fill-opacity="0.349997" stroke="Col_Grey5" stroke-width="1">
+      <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, HCol, 11)"/> 
+      <rt:dyn type="fill-opacity" mode="onchange" value="(Status &lt; 0) || ((Status &amp; 4096)!= 0) || ((Status &amp; 0xC) == 0)" trans="bd">
+        <rt:xy value="false" value2="0.35"/> 
+        <rt:xy value2="1"/> 
+      </rt:dyn>
+    </circle>
+    <circle cx="20" cy="-24.5" r="7.625" id="indic_A" fill="Col_Yellow" fill-opacity="0.349997" stroke="Col_Grey5" stroke-width="1">
+      <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, ACol, 11)"/> 
+      <rt:dyn type="fill-opacity" mode="onchange" value="(Status &lt; 0) || ((Status &amp; 4096)!= 0) || ((Status &amp; 0x30) == 0)" trans="bd">
+        <rt:xy value="false" value2="0.35"/> 
+        <rt:xy value2="1"/> 
+      </rt:dyn>
+    </circle>
+    <line x1="-25" y1="15" x2="25" y2="15" id="Position_bg" stroke="Col_Grey5" stroke-linecap="round" stroke-width="3"/> 
+    <line x1="-25" y1="15" x2="10" y2="15" id="Position_val" stroke="Col_LtYellow" stroke-width="2"/> 
+    <rect x="-30" y="-37.5" width="60" height="55" rx="0" ry="0" id="Al_frame" fill="gray" fill-opacity="0" stroke="Col_Red" stroke-width="2">
+      <rt:dyn type="stroke" mode="constant" value="Color_Alarm"/> 
+      <rt:dyn type="visibility" mode="cyclic" value="PRJSPEC.AlarmVis(AStat)" trans="bi">
+        <rt:xy value="false" value2="1"/> 
+        <rt:xy value2="0"/> 
+      </rt:dyn>
+    </rect>
+    <rect x="-35" y="-42.5" width="70" height="65" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+      <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+        <rt:xy value="false" value2="1"/> 
+        <rt:xy value2="0"/> 
+      </rt:dyn>
+    </rect>
+    <rect x="-30" y="-37.5" width="60" height="55" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+      <rt:event type="OnMiddleClick">If (KKS_ERL == &quot;NULL&quot;) &amp;&amp; (KKS_SR == &quot;NULL&quot;) Then
+	ShowMessage (&quot;Это статический элемент.&quot;, 5)
+ElseIf ERL_Z0 == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nKKS_ERL = \&quot;&quot; + KKS_ERL + &quot;\&quot;&quot;, 0)
+ElseIf SR_Z0 == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nKKS_SR = \&quot;&quot; + KKS_SR + &quot;\&quot;&quot;, 0)
+ElseIf (KKS_ERL != &quot;NULL&quot;) &amp;&amp; (ERL_OU != nothing) &amp;&amp; (KKS_SR != &quot;NULL&quot;) &amp;&amp; (SR_OU != nothing) Then
+	Open_Win_Uni(False, &quot;rights_ERL&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS_ERL + &quot;|&quot; + CStr(Operate))
+	Open_Win_Uni(False, &quot;rights_SR&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS_SR + &quot;|&quot; + CStr(Operate))
+ElseIf (ERL_OU == nothing) Then
+	ShowWarning (&quot;Нет переменной управления ERL.&quot;, 5)
+ElseIf (SR_OU == nothing) Then
+	ShowWarning (&quot;Нет переменной управления SR.&quot;, 5)
+Else
+	ShowMessage (&quot;Управление не предусмотрено.&quot;, 5)
+End If</rt:event>
+      <rt:event type="OnClick">If (KKS_ERL == &quot;NULL&quot;) &amp;&amp; (KKS_SR == &quot;NULL&quot;) Then
+	ShowMessage (&quot;Это статический элемент.&quot;, 5)
+ElseIf ERL_Z0 == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nKKS_ERL = \&quot;&quot; + KKS_ERL + &quot;\&quot;&quot;, 0)
+ElseIf SR_Z0 == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nKKS_SR = \&quot;&quot; + KKS_SR + &quot;\&quot;&quot;, 0)
+ElseIf (ERL_OU != Nothing) &amp;&amp; (SR_OU != Nothing) Then
+//KKS_ERL|KKS_SR|&lt;нет области ввода задания&gt;
+	Open_ws_wf_wi(&quot;SR_ERL_Reg_valve&quot;, KKS_ERL + &quot;|&quot; + KKS_SR + &quot;|&quot; + CStr(NoSP), Operate)
+ElseIf (ERL_OU == nothing) Then
+	ShowWarning (&quot;Нет переменной управления ERL.&quot;, 5)
+ElseIf (SR_OU == nothing) Then
+	ShowWarning (&quot;Нет переменной управления SR.&quot;, 5)
+Else
+	ShowWarning (&quot;Управление невозможно - проверьте привязку.&quot;, 5)
+End If</rt:event>
+      <rt:event type="OnRightClick">If (KKS_ERL == &quot;NULL&quot;) &amp;&amp; (KKS_SR == &quot;NULL&quot;) Then
+	ShowMessage (&quot;Это статический элемент.&quot;, 5)
+ElseIf ERL_Z0 == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nKKS_ERL = \&quot;&quot; + KKS_ERL + &quot;\&quot;&quot;, 0)
+ElseIf SR_Z0 == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nKKS_SR = \&quot;&quot; + KKS_SR + &quot;\&quot;&quot;, 0)
+ElseIf (ERL_OU != Nothing) &amp;&amp; (SR_OU != Nothing) Then
+//KKS_SR|KKS_ERL|&lt;нет области ввода задания&gt;
+	TmpBuffer(0) = KKS_ERL
+	TmpBuffer(1) = KKS_SR
+	If Operate &amp;&amp; Check_Oper_Rights(ERL_OU) &amp;&amp; Check_Oper_Rights(SR_OU) Then
+		TmpMnuPar = KKS_ERL + &quot;|REGo|SR_ERL_Reg_valve &quot; + KKS_ERL + &quot;|&quot; + KKS_SR + &quot;|&quot; + CStr(NoSP)
+		LoadPopUpMenu(TmpMnuPar)	//было NON вместо REG
+	Else
+		TmpMnuPar = KKS_ERL + &quot;|REGi|SR_ERL_Reg_valve &quot; + KKS_ERL + &quot;|&quot; + KKS_SR + &quot;|&quot; + CStr(NoSP)
+		LoadPopUpMenu(TmpMnuPar)
+	End If
+ElseIf (ERL_OU == nothing) Then
+	ShowWarning (&quot;Нет переменной управления ERL.&quot;, 5)
+ElseIf (SR_OU == nothing) Then
+	ShowWarning (&quot;Нет переменной управления SR.&quot;, 5)
+Else
+	ShowWarning (&quot;Управление невозможно - проверьте привязку.&quot;, 5)
+End If</rt:event>
+    </rect>
+  </g>
+</svg>

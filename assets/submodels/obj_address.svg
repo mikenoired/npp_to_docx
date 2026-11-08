@@ -1,0 +1,22 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 25 25" width="25" height="25" id="obj_address">
+  <desc>Вывод адреса сигнала в виде всплывающей подсказки</desc>
+  <rt:model comment="Служебная подмодель ПОРТАЛа" revision="4.3-6.0">
+    <rt:param name="PointID" datatype="string" value="NULL" comment="идентификатор сигнала"/> 
+    <rt:param name="Is_ANA" datatype="boolean" value="false" comment="Это аналоговый сигнал"/> 
+    <rt:var name="Source_Info" datatype="string" comment=""/> 
+    <rt:event type="OnInitialize">If (PointID != &quot;NULL&quot;) Then
+	Source_Info = PRJSPEC.GetSourceInfo(PointID, Is_ANA)
+	If Source_Info == &quot;&quot; Then
+		Source_Info = &quot;Нет данных&quot;
+	End If
+Else
+	Source_Info = &quot;Нет привязки&quot;
+End If</rt:event>
+  </rt:model>
+  <circle cx="15" cy="12.5" r="7.5" fill="none" stroke="Col_Grey4"/> 
+  <polyline points="2.5,12.5 17.5,12.5 12.5,10 12.5,15 12.5,15 17.5,12.5" fill="Col_Grey4" stroke="Col_Grey4" stroke-linecap="round" stroke-linejoin="round"/> 
+  <rect x="0" y="0" width="25" height="25" rx="0" ry="0" id="Sel_Area" fill="silver" fill-opacity="0">
+    <rt:dyn type="title" mode="constant" value="Source_Info"/> 
+  </rect>
+</svg>

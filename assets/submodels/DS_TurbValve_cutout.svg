@@ -1,0 +1,282 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="-27.5 -27.5 55 55" width="55" height="55" id="DS_TurbValve_cutout">
+  <desc>Стопорный клапан турбины</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.2">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS клапана"/> 
+    <rt:param name="SIG_Open" datatype="string" value="NULL" comment="при KKS - нестандартный суффикс, а без KKS - идентификатор сигнала «ОТКРЫТО»"/> 
+    <rt:param name="SIG_Close" datatype="string" value="NULL" comment="при KKS - нестандартный суффикс, а без KKS - идентификатор сигнала  «ЗАКРЫТО»"/> 
+    <rt:param name="SIG_NotClose" datatype="string" value="NULL" comment="при KKS - нестандартный суффикс, а без KKS - идентификатор сигнала  «НЕ ЗАКРЫТО»"/> 
+    <rt:param name="SIG_Fail" datatype="string" value="NULL" comment="при KKS - нестандартный суффикс, а без KKS - идентификатор сигнала  «Неисправность»"/> 
+    <rt:var name="pv_O" datatype="PlsPVBin" comment="указатель переменной ОТКР."/> 
+    <rt:var name="pv_C" datatype="PlsPVBin" comment="указатель переменной ЗАКР."/> 
+    <rt:var name="pv_NC" datatype="PlsPVBin" comment="указатель переменной НЕ ЗАКР."/> 
+    <rt:var name="pv_Fail" datatype="PlsPVBin" comment="указатель переменной Неисправность"/> 
+    <rt:var name="MyAlarm_frame" datatype="boolean" value="true" comment="синализация сигнала неисправности принадлежит текущему пользователю"/> 
+    <rt:var name="In_Alarm_frame" datatype="ubyte" value="0" comment="Наличие сигнализации неисправности"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="Group_parameter" datatype="string" comment="KKS или PVId для добавления в группу"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub AckMe()
+If Allow_Confirm &amp;&amp; flag_confirm &amp;&amp; (In_Alarm_frame &gt; 0) &amp;&amp; MyAlarm_frame Then
+	If pv_Fail.NotAcknowledged Then
+		pv_Fail.AcknowledgeAlarm(0)
+	End If
+	In_Alarm_frame = False
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Calculate()
+If (KKS == &quot;NULL&quot;) &amp;&amp; (SIG_Open == &quot;NULL&quot;) &amp;&amp; (SIG_Close == &quot;NULL&quot;) &amp;&amp; (SIG_NotClose == &quot;NULL&quot;) Then
+	_This.transform = &quot;scale(0.75 0.75 0 0)&quot;
+	Al_frame.visibility = &quot;hidden&quot;
+	Cir_big.fill = Color_Static
+	Cir_small.fill = Color_Static
+ElseIf (pv_O == Nothing) Then
+	Cir_big.fill = Color_ErLink
+	Cir_small.fill = Color_ErLink
+ElseIf (pv_NC == Nothing) Then
+	Calculate_OC()
+ElseIf ((pv_NC.SuspendedFlags &amp; PLS_SUSP_CMD) != 0) || (pv_NC.Quality == PLS_QUAL_BAD) Then //если вывели в ремонт или недостоверный, то просто не обрабатываем этот сигнал
+	Calculate_OC()
+ElseIf ((pv_O.SuspendedFlags &amp; PLS_SUSP_CMD) != 0) Then	//А вот если &quot;открыто&quot; в ремонте, тогда надо показать РЕМОНТ
+	Cir_big.fill = Color_Remont
+	Cir_small.fill = Color_Remont
+ElseIf (pv_O.Quality == PLS_QUAL_BAD) Then	//Если &quot;открыто&quot; недостоверно, то - НЕДОСТОВЕРНО
+	Cir_big.fill = Color_Inval
+	Cir_small.fill = Color_Inval
+ElseIf pv_NC.Value Then
+	If pv_O.Value != 0 Then
+		Cir_big.fill = Color_OPEN_M
+		Cir_small.fill = Color_OPEN_M
+	Else
+		Cir_big.fill = Color_CLOSE_M
+		Cir_small.fill = Color_OPEN_M
+	End If
+Else
+	Calculate_OC()	//так используется традиционная логика
+/*	хотя, по логике, должно быть состояние ЗАКРЫТО, когда НЕ ЗАКРЫТО = 0
+	Cir_big.fill = Color_CLOSE_M
+	Cir_small.fill = Color_CLOSE_M
+*/
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Calculate_OC()
+Dim State As ushort
+State = 0
+If ((pv_O.SuspendedFlags &amp; PLS_SUSP_CMD)  &gt; 0) Then
+	State = 4
+ElseIf (pv_O.Quality == PLS_QUAL_BAD) Then
+	State = 3
+ElseIf pv_O.Value Then
+	State = 1
+End If
+If ((pv_C.SuspendedFlags &amp; PLS_SUSP_CMD)  &gt; 0) Then
+	State = State | 4
+ElseIf (pv_C.Quality == PLS_QUAL_BAD) Then
+	State = State | 3
+ElseIf pv_C.Value Then
+	State = State | 2
+End If
+If ((State &amp; 4) == 4) Then
+	Cir_big.fill = Color_Remont
+	Cir_small.fill = Color_Remont
+ElseIf (State == 0) Then
+	Cir_big.fill = Color_CLOSE_M
+	Cir_small.fill = Color_OPEN_M
+ElseIf (State == 1) Then
+	Cir_big.fill = Color_OPEN_M
+	Cir_small.fill = Color_OPEN_M
+ElseIf (State == 2) Then
+	Cir_big.fill = Color_CLOSE_M
+	Cir_small.fill = Color_CLOSE_M
+Else
+	Cir_big.fill = Color_Inval
+	Cir_small.fill = Color_Inval
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub CheckUsrGr()
+If Alarms_ForUser Then	//если надо распределять сигнализаци по пользователям
+	MyAlarm_frame = PRJSPEC.CheckPvOwner(pv_Fail.PVId, False)
+	If !MyAlarm_frame Then
+		In_Alarm_frame = 0
+	End If
+Else
+	MyAlarm_frame = True
+End If
+Calculate_Fail()
+End Sub</rt:sub>
+    <rt:sub>Sub Calculate_Fail()
+If pv_Fail != Nothing Then
+	If pv_Fail.Value Then
+		Al_frame.visibility = &quot;visible&quot;
+		If Allow_Confirm &amp;&amp; Blink_on_NACK Then
+			If MyAlarm_frame &amp;&amp; pv_Fail.NotAcknowledged Then
+				If pv_Fail.AlarmType != PLS_ALARMTYP_NONE Then
+					In_Alarm_frame = 3	//нормальная неквитированная сигнализация
+				Else
+					In_Alarm_frame = 0
+				End If
+			Else
+				In_Alarm_frame = 0
+			End If
+		Else
+			In_Alarm_frame = 0
+		End If
+
+	Else
+		In_Alarm_frame = 0
+		Al_frame.visibility = &quot;hidden&quot;
+	End If
+Else
+	In_Alarm_frame = 0
+	Al_frame.visibility = &quot;hidden&quot;
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (KKS != &quot;NULL&quot;) Then
+	Group_parameter = KKS
+	If (SIG_Open == &quot;NULL&quot;) Then
+		pv_O = BIN(KKS + &quot;_&quot; + Signal_COValve_Open)
+	Else 
+		pv_O = BIN(KKS + &quot;_&quot; + SIG_Open)
+	End If
+	If (SIG_Close == &quot;NULL&quot;) Then
+		pv_C = BIN(KKS + &quot;_&quot; + Signal_COValve_Close)
+	Else
+		pv_C = BIN(KKS + &quot;_&quot; + SIG_Close)
+	End If
+	If (SIG_NotClose == &quot;NULL&quot;) Then
+		pv_NC = BIN(KKS + &quot;_&quot; + Signal_COValve_NClose)
+	Else
+		pv_NC = BIN(KKS + &quot;_&quot; + SIG_NotClose)
+	End If
+	If (SIG_Fail == &quot;NULL&quot;) Then
+		pv_Fail = BIN(KKS + &quot;_&quot; + Signal_COValve_Fail)
+	Else
+		pv_Fail = BIN(KKS + &quot;_&quot; + SIG_Fail)
+	End If
+Else
+	Group_parameter = SIG_Open
+	If (SIG_Open != &quot;NULL&quot;) Then
+		pv_O = BIN(SIG_Open)
+	End If
+	If (SIG_Close != &quot;NULL&quot;) Then
+		pv_C = BIN(SIG_Close)
+	End If
+	If (SIG_NotClose != &quot;NULL&quot;) Then
+		pv_NC = BIN(SIG_NotClose)
+	End If
+	If (SIG_Fail != &quot;NULL&quot;) Then
+		pv_Fail = BIN(SIG_Fail)
+	End If
+End If
+Calculate()</rt:event>
+    <rt:changeTrigger name="IsItMyAlarm">
+      <rt:condition>Blink_on_NACK &amp;&amp; Alarms_ForUser</rt:condition>
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>CheckUsrGr()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChPV_O">
+      <rt:condition>pv_O != Nothing</rt:condition>
+      <rt:chgItem>pv_O</rt:chgItem>
+      <rt:code>Calculate()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChPV_C">
+      <rt:condition>pv_C != Nothing</rt:condition>
+      <rt:chgItem>pv_C</rt:chgItem>
+      <rt:code>Calculate()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChPV_NC">
+      <rt:condition>pv_NC != Nothing</rt:condition>
+      <rt:chgItem>pv_NC</rt:chgItem>
+      <rt:code>Calculate()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChPV_Fail">
+      <rt:condition>pv_Fail != Nothing</rt:condition>
+      <rt:chgItem>pv_Fail</rt:chgItem>
+      <rt:code>Calculate_Fail()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>pv_O != Nothing</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(Group_parameter) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <circle cx="0" cy="0" r="20" id="Cir_big" fill="Col_LtGreen" stroke="Col_Grey5" stroke-width="1"/> 
+  <line x1="-20" y1="0" x2="20" y2="0" stroke="Col_Grey5" stroke-width="1"/> 
+  <circle cx="0.25" cy="-0.375" r="12.25" id="Cir_small" fill="Col_LtYellow" stroke="Col_Grey5" stroke-width="1"/> 
+  <rect x="-27.5" y="-27.5" width="55" height="55" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="-22.5" y="-22.5" width="45" height="45" rx="0" ry="0" id="Al_frame" fill="none" stroke="Col_Red" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="ShowInAlarmColor(In_Alarm_frame, Color_Alarm, 0xffffffff)"/> 
+  </rect>
+  <rect x="-27.5" y="-27.5" width="55" height="55.5" rx="0" ry="0" id="SelFrame" fill="Col_BGmain" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">Dim MsgStr As String
+If (KKS == &quot;NULL&quot;) &amp;&amp; (SIG_Open == &quot;NULL&quot;) &amp;&amp; (SIG_Close == &quot;NULL&quot;) &amp;&amp; (SIG_NotClose == &quot;NULL&quot;) Then
+	ShowMessage (&quot;Это статический объект.&quot;, 5)
+ElseIf (pv_O == Nothing) Then	//сигналы ОТКР и ЗАКР должны быть всегда!
+	MsgStr = &quot;Ошибка привязки.\nSIG_Open = \&quot;&quot; + SIG_Open + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (pv_C == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nSIG_Close = \&quot;&quot; + SIG_Close + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (SIG_NotClose != &quot;NULL&quot;) &amp;&amp; (pv_NC == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nSIG_NotClose = \&quot;&quot; + SIG_NotClose + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (SIG_Fail != &quot;NULL&quot;) &amp;&amp; (pv_Fail == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nSIG_Fail = \&quot;&quot; + SIG_Fail + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+Else
+	Dim s As String
+	s = pv_O.PVId + &quot;|&quot; + pv_C.PVId + &quot;|&quot;
+	If (pv_NC != Nothing)Then
+		s = s + pv_NC.PVId
+	End If
+	If (pv_Fail != Nothing)Then
+		s = s + &quot;|&quot; + pv_Fail.PVId
+	End If
+	Open_Win_Uni(False, &quot;wi_&quot; + pv_O.PVId , &quot;Сигналы &quot; + pv_O.CategoryText, &quot;wi_TurbValve_cutout&quot;, s)
+End If</rt:event>
+    <rt:event type="OnRightClick">Dim MsgStr As String
+If (KKS == &quot;NULL&quot;) &amp;&amp; (SIG_Open == &quot;NULL&quot;) &amp;&amp; (SIG_Close == &quot;NULL&quot;) &amp;&amp; (SIG_NotClose == &quot;NULL&quot;) Then
+	ShowMessage (&quot;Это статический объект.&quot;, 5)
+ElseIf (pv_O == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nSIG_Open = \&quot;&quot; + SIG_Open + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (pv_C == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nSIG_Close = \&quot;&quot; + SIG_Close + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (SIG_NotClose != &quot;NULL&quot;) &amp;&amp; (pv_NC == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nSIG_NotClose = \&quot;&quot; + SIG_NotClose + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (SIG_Fail != &quot;NULL&quot;) &amp;&amp; (pv_Fail == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nSIG_Fail = \&quot;&quot; + SIG_Fail + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+Else
+	Dim i As UShort
+	Dim s As String
+	s = pv_O.PVId + &quot;|&quot; + pv_C.PVId + &quot;|&quot;
+	TmpBuffer(0) = pv_O.PVId
+	TmpBuffer(1) = pv_C.PVId
+	If (pv_NC != Nothing)Then
+		s = s + pv_NC.PVId
+		TmpBuffer(2) = pv_NC.PVId
+		i = 3
+	Else
+		i = 2
+	End If
+	If (pv_Fail != Nothing)Then
+		TmpBuffer(i) = pv_Fail.PVId
+		s = s + &quot;|&quot; + pv_Fail.PVId
+	End If
+	If KKS != &quot;NULL&quot; Then
+		TmpMnuPar = KKS + &quot;|COVi|TurbValve_cutout &quot; + s
+		LoadPopUpMenu(TmpMnuPar)
+	Else
+		LoadPopUpMenu(pv_O.PVId + &quot;|ONEi|wi_TurbValve_cutout &quot; + s)
+	End If
+End If</rt:event>
+  </rect>
+</svg>

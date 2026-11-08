@@ -1,0 +1,840 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="defer xMidYMid meet" viewBox="-50 -50 100 100" width="100" height="100" id="DS_ana_circle">
+  <desc>Аналоговый индикатор стрелочный для Dull Screen</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа Dull Screen">
+    <rt:param name="FKKS" datatype="string" comment="KKS или полный идентификатор сигнала"/> 
+    <rt:param name="FName" datatype="boolean" value="false" comment="идентификатор (True) или KKS (False)"/> 
+    <rt:param name="Suffix" datatype="string" value="XQ01" comment="суффикс в идентификаторе после KKS"/> 
+    <rt:param name="NoBounds" datatype="boolean" value="false" comment="не обрабатывать границы"/> 
+    <rt:param name="UseExternalBounds" datatype="boolean" value="false" comment="Использовать пользовательские уставки из параметров привязки (только при NoBounds = False)"/> 
+    <rt:param name="val_LR" datatype="float" comment="Начальное значение диапазона" value="-9999"/> 
+    <rt:param name="val_HR" datatype="float" comment="Конечное значение диапазона" value="-9999"/> 
+    <rt:param name="val_HAB" datatype="double" value="-9999" comment="значение верхней аварийной уставки"/> 
+    <rt:param name="val_HWB" datatype="double" value="-9999" comment="значение верхней предупредительной уставки"/> 
+    <rt:param name="val_HTB" datatype="double" value="-9999" comment="значение верхней технологической уставки"/> 
+    <rt:param name="val_LTB" datatype="double" value="-9999" comment="значение нижней технологической уставки"/> 
+    <rt:param name="val_LWB" datatype="double" value="-9999" comment="значение нижней предупредительной уставки"/> 
+    <rt:param name="val_LAB" datatype="double" value="-9999" comment="значение нижней аварийной уставки"/> 
+    <rt:param name="RangesNumber" datatype="byte" value="10" comment="Количество диапазонов, минимум - 2, максимум - 10"/> 
+    <rt:param name="SubRangesNumber" datatype="byte" value="10" comment="Количество подделений в каждом диапазоне, минимум - 1, максимум - 10"/> 
+    <rt:param name="ShowNums" datatype="boolean" value="false" comment="Выводить промежуточные значения диапазона"/> 
+    <rt:param name="ScaleValue" datatype="float" value="1,0" comment="Коеффициент масштабирования"/> 
+    <rt:param name="ShowEU" datatype="boolean" value="false" comment="Показывать единицы измерения"/> 
+    <rt:param name="OutsideMarks" datatype="boolean" value="false" comment="Разместить значения во внешней части циферблата"/> 
+    <rt:param name="Koeff_Color_Mix" datatype="double" value="0,3" comment="Коеффициент яркости. Максимум = 1"/> 
+    <rt:var name="pv" datatype="PlsPVAna" comment="аналоговый сигнал БД"/> 
+    <rt:var name="EU" datatype="string" comment="Единицы измерения"/> 
+    <rt:var name="RR" datatype="float" value="45" comment="Радиус большей окружности"/> 
+    <rt:var name="rr" datatype="double" comment="радиус малой окружности"/> 
+    <rt:var name="l" datatype="double" value="8" comment="Длина деления"/> 
+    <rt:var name="alfa" datatype="float" comment="Угол между делениями"/> 
+    <rt:var name="beta" datatype="float" comment="Угол между подделениями"/> 
+    <rt:var name="pi" datatype="float" comment="Число Pi"/> 
+    <rt:var name="NumDijits" datatype="int" value="2" comment="Количество знаков после запятой"/> 
+    <rt:var name="B_HIHI" datatype="PlsPVBin" value="" comment="DB var"/> 
+    <rt:var name="B_HI" datatype="PlsPVBin" value="" comment="DB var"/> 
+    <rt:var name="B_H" datatype="PlsPVBin" value="" comment="DB var"/> 
+    <rt:var name="B_L" datatype="PlsPVBin" value="" comment="DB var"/> 
+    <rt:var name="B_LO" datatype="PlsPVBin" value="" comment="DB var"/> 
+    <rt:var name="B_LOLO" datatype="PlsPVBin" value="" comment="DB var"/> 
+    <rt:var name="B_IMITATION" datatype="PlsPVBin" value="" comment="DB var"/> 
+    <rt:var name="In_Group" datatype="boolean" comment="в группе" value="false"/> 
+    <rt:var name="In_Alarm" datatype="ubyte" comment="Наличие сигнализации" value="0"/> 
+    <rt:var name="MyAlarm" datatype="boolean" value="true" comment="синализации сигнала принадлежат текущему пользователю"/> 
+    <rt:var name="HasError" datatype="boolean" value="false" comment="при инициализации произошла ошибка"/> 
+    <rt:var name="Value" datatype="double" comment="Значение"/> 
+    <rt:var name="ValColor" datatype="uint" comment="Цвет серединки" value="0x555555"/> 
+    <rt:var name="ShowScale" datatype="boolean" value="false" comment="Выводить коеффициент масштабирования"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub AckMe()
+If Allow_Confirm &amp;&amp; Blink_on_NACK &amp;&amp; flag_confirm &amp;&amp; (In_Alarm &gt; 0) &amp;&amp; MyAlarm Then
+	If pv.NotAcknowledged Then
+		pv.AcknowledgeAlarm(0)
+	End If
+	AckThisBinPV(B_HIHI)
+	AckThisBinPV(B_HI)
+	AckThisBinPV(B_H)
+	AckThisBinPV(B_L)
+	AckThisBinPV(B_LO)
+	AckThisBinPV(B_LOLO)
+&apos;	AckThisBinPV(B_IMITATION)
+	In_Alarm = False
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub AckThisBinPV(ByVal curPV As PlsPVBin)
+	If (curPV != Nothing) Then
+		If curPV.NotAcknowledged Then
+			curPV.AcknowledgeAlarm(0)
+		End If
+	End If
+End Sub</rt:sub>
+    <rt:sub>Sub ValCalc()
+dim c as UInt
+If pv == Nothing Then
+	Exit Sub
+End If
+
+Value = pv.Value
+
+Dim B_Viol As UInt	&apos;нарушения границ
+B_Viol = PLS_BOUNDVIOL_NONE
+
+BGround.fill = &quot;#949494&quot;
+//ValColor = 0x555555
+
+If NoBounds Then
+	c = Color_NB(pv)
+	If (c != Color_ANA_GOOD) Then
+		BGround.fill = c
+	End If
+ElseIf UseExternalBounds Then
+	Dim LR As Double
+	Dim HR As Double
+
+	LR = pv.RangeLow
+	HR = pv.RangeHigh
+
+	If ((pv.SuspendedFlags &amp; PLS_SUSP_CMD) &gt; 0 ) Then
+		BGround.fill = Color_Remont
+	ElseIf (pv.Quality == PLS_QUAL_BAD) Then
+		BGround.fill = Color_Inval
+		
+	ElseIf (pv.OriginalQualitySubstatus == PLS_QUALSUB_LOCALOVERRIDE) Then
+		BGround.fill = Color_Imitation
+		
+	ElseIf (pv.OriginalQualitySubstatus == PLS_QUALSUB_RANGEEXCEEDED) Then
+		BGround.fill = Color_Inval
+	End If
+		
+	If ((val_HAB != -9999) &amp;&amp; (val_HAB &gt; LR) &amp;&amp; (val_HAB &lt; HR) &amp;&amp; (Value &gt; val_HAB)) Then
+		ValColor = Color_ANA_HI_A
+		B_Viol = PLS_BOUNDVIOL_HI
+	ElseIf ((val_LAB != -9999) &amp;&amp; (val_LAB &gt; LR) &amp;&amp; (val_LAB &lt; HR) &amp;&amp; (Value &lt; val_LAB)) Then
+		ValColor = Color_ANA_LO_A
+		B_Viol = PLS_BOUNDVIOL_LO
+	ElseIf ((val_HWB != -9999) &amp;&amp; (val_HWB &gt; LR) &amp;&amp; (val_HWB &lt; HR) &amp;&amp; (Value &gt; val_HWB)) Then
+		ValColor = Color_ANA_HI_P
+		B_Viol = PLS_BOUNDVIOL_HI
+	ElseIf ((val_LWB != -9999) &amp;&amp; (val_LWB &gt; LR) &amp;&amp; (val_LWB &lt; HR) &amp;&amp; (Value &lt; val_LWB)) Then
+		ValColor = Color_ANA_LO_P
+		B_Viol = PLS_BOUNDVIOL_LO
+	ElseIf ((val_HTB != -9999) &amp;&amp; (val_HTB &gt; LR) &amp;&amp; (val_HTB &lt; HR) &amp;&amp; (Value &gt; val_HTB)) Then
+		ValColor = Color_ANA_HI_T
+		B_Viol = PLS_BOUNDVIOL_HI
+	ElseIf ((val_LTB != -9999) &amp;&amp; (val_LTB &gt; LR) &amp;&amp; (val_LTB &lt; HR) &amp;&amp; (Value &lt; val_LTB)) Then
+		ValColor = Color_ANA_LO_T
+		B_Viol = PLS_BOUNDVIOL_LO
+	End If
+ElseIf FName Then
+	c = PRJSPEC.ANA_Color_pv(pv)
+	if (c == Color_Remont) || (c == Color_Inval) || (c == Color_Imitation) Then
+		BGround.fill = c
+	Else
+		ValColor = c	
+	End If
+/*	If (c != Color_ANA_GOOD) &amp;&amp; (c != Color_Remont) &amp;&amp; (c != Color_Inval) &amp;&amp; (c != Color_Imitation)  Then
+		ValColor = c
+	End If
+*/
+Else
+	c = PRJSPEC.ANA_Color_XH(FKKS, Suffix)
+	if (c == Color_Remont) || (c == Color_Inval) || (c == Color_Imitation) Then
+		BGround.fill = c
+	Else
+		ValColor = c
+	End If
+	//If (c != Color_ANA_GOOD) &amp;&amp; (c != Color_Remont) &amp;&amp; (c != Color_Inval) &amp;&amp; (c != Color_Imitation)  Then
+/*	If (c != Color_Remont) &amp;&amp; (c != Color_Inval) &amp;&amp; (c != Color_Imitation)  Then
+		ValColor = c
+	End If
+*/
+End If
+
+	If (ValColor == Color_ANA_GOOD)  &amp;&amp; !pv.NotAcknowledged &amp;&amp; (In_Alarm == 0) Then
+		ValColor = 0x555555
+	End If
+
+Show_Pointer()
+
+End Sub</rt:sub>
+    <rt:sub>Sub DetectAlarms()
+If PRJSPEC.GET_Susp(pv.PVId, False) Then
+	In_Alarm = 0
+	Exit Sub
+End If
+If MyAlarm &amp;&amp; pv.NotAcknowledged Then
+	If pv.OriginalQualitySubstatus == PLS_QUALSUB_LOCALOVERRIDE Then
+		In_Alarm = 0	//имитация значения
+	ElseIf pv.AlarmType == PLS_ALARMTYP_NONE Then
+		In_Alarm = 1	//снятая неквитированная сигнализация
+	Else
+		In_Alarm = 3	//нормальная неквитированная сигнализация
+	End If
+Else
+	In_Alarm = 0
+End If
+If FName Then
+	Exit Sub
+End If
+If B_HIHI != Nothing Then
+	If MyAlarm &amp;&amp; B_HIHI.NotAcknowledged Then
+		If B_HIHI.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+If B_HI != Nothing Then
+	If MyAlarm &amp;&amp; B_HI.NotAcknowledged Then
+		If B_HI.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+If B_H != Nothing Then
+	If MyAlarm &amp;&amp; B_H.NotAcknowledged Then
+		If B_H.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+If B_L != Nothing Then
+	If MyAlarm &amp;&amp; B_L.NotAcknowledged Then
+		If B_L.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+If B_LO != Nothing Then
+	If MyAlarm &amp;&amp; B_LO.NotAcknowledged Then
+		If B_LO.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+If B_LOLO != Nothing Then
+	If MyAlarm &amp;&amp; B_LOLO.NotAcknowledged Then
+		If B_LOLO.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+End Sub
+
+/*Sub DetectAlarms()
+If PRJSPEC.GET_Susp(pv.PVId, False) Then
+	In_Alarm = 0
+	Exit Sub
+End If
+If MyAlarm &amp;&amp; pv.NotAcknowledged Then
+	If pv.OriginalQualitySubstatus == PLS_QUALSUB_LOCALOVERRIDE Then
+		In_Alarm = 0	//имитация значения
+	ElseIf pv.AlarmType == PLS_ALARMTYP_NONE Then
+		In_Alarm = 1	//снятая неквитированная сигнализация
+	Else
+		In_Alarm = 3	//нормальная неквитированная сигнализация
+	End If
+Else
+	In_Alarm = 0
+End If
+If FName Then
+	Exit Sub
+End If
+If B_HIHI != Nothing Then
+	If MyAlarm &amp;&amp; B_HIHI.NotAcknowledged Then
+		If B_HIHI.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+If B_HI != Nothing Then
+	If MyAlarm &amp;&amp; B_HI.NotAcknowledged Then
+		If B_HI.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+If B_H != Nothing Then
+	If MyAlarm &amp;&amp; B_H.NotAcknowledged Then
+		If B_H.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+If B_L != Nothing Then
+	If MyAlarm &amp;&amp; B_L.NotAcknowledged Then
+		If B_L.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+If B_LO != Nothing Then
+	If MyAlarm &amp;&amp; B_LO.NotAcknowledged Then
+		If B_LO.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+If B_LOLO != Nothing Then
+	If MyAlarm &amp;&amp; B_LOLO.NotAcknowledged Then
+		If B_LOLO.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+End Sub*/</rt:sub>
+    <rt:sub>Sub Shkala()
+dim i as uint
+dim j as uint
+dim xx1 as float
+dim yy1 as float
+dim xx2 as float
+dim yy2 as float
+dim alfa1 as float
+dim s_shkala as string
+dim s_podshkala as string
+dim tick as RtSvgObj
+s_shkala = &quot;&quot;
+for i = 1 to RangesNumber
+	s_podshkala = &quot;&quot;
+	alfa1  = (pi / 4) + alfa * (i - 1)
+	xx1 = -(rr * Sin (alfa1))
+	xx2 = -(RR * Sin (alfa1))
+	yy1 = (rr * Cos (alfa1))
+	yy2 = (RR * Cos (alfa1))
+
+	s_shkala = s_shkala + &quot; M&quot; + CStr(xx1) + &quot; &quot; + CStr(yy1) + &quot; L&quot; + CStr(xx2) + &quot; &quot; + CStr(yy2)
+	if i &lt; RangesNumber Then
+	  	for j = 1 to SubRangesNumber
+			xx1 = -((rr + l / 2.0)  * Sin (alfa1 + beta * j))
+			xx2 = -(RR  * Sin (alfa1 + beta * j))
+			yy1 = ((rr + l / 2.0)  * Cos (alfa1 + beta * j))
+			yy2 = (RR  * Cos (alfa1 + beta * j))
+			s_podshkala = s_podshkala + &quot; M&quot; + CStr(xx1) + &quot; &quot; + CStr(yy1) + &quot; L&quot; + CStr(xx2) + &quot; &quot; + CStr(yy2)
+		next j
+		tick = Podshkaly.Child(i - 1)
+		tick.d = s_podshkala
+		tick.visibility = &quot;visible&quot;
+	End If
+next i
+	Shkala.visibility = &quot;visible&quot;
+	Shkala.d = s_shkala
+End Sub</rt:sub>
+    <rt:sub>Sub Marks()
+	
+	dim i as uint
+	dim alfa1 as float
+	dim Znach as double	
+	dim Diap as double
+	dim r_m as float
+	dim a as double
+	dim label as RtSvgObj
+	
+	NumDijits = pv.RoundDigits
+	Diap = (val_HR - val_LR)/(RangesNumber - 1)
+	If OutsideMarks Then
+		r_m = RR + 10		&apos;радиус окружности, на которой располагаются значения
+	Else
+		If Len(CStr(val_HR / ScaleValue)) &lt;= 3 Then
+			r_m = rr - 6
+		Else
+			r_m = rr - 10
+		End If
+	End If
+	
+	For i = 1 to RangesNumber
+		label = Marks.Child(i - 1)
+		alfa1  = (pi / 4) + alfa * (i - 1)
+		label.x = -(r_m * Sin (alfa1))
+		label.y = (r_m * Cos (alfa1))
+		a = val_LR + Diap * (i - 1)
+		a = a / ScaleValue
+		Znach = Round(a, NumDijits)
+		
+		If ShowNums || (i = 1) || (i = RangesNumber) Then
+			
+			If OutsideMarks Then
+				dim sdvig as float
+				sdvig = label.font_size - 2
+				If (alfa1 &lt; (pi / 2) - (pi / 18)) Then
+					label.text_anchor = &quot;end&quot;
+					label.rt_text_vertanchor = &quot;start&quot;
+					label.dy = sdvig
+				ElseIf (alfa1 &gt;= (pi / 2) - (pi / 18)) &amp;&amp; (alfa1 &lt;= (pi / 2) + (pi / 18)) Then
+					label.text_anchor = &quot;end&quot;
+				ElseIf (alfa1 &gt; (pi / 2) + (pi / 18)) &amp;&amp; (alfa1 &lt; pi) Then
+					label.text_anchor = &quot;end&quot;
+					label.rt_text_vertanchor = &quot;start&quot;
+				ElseIf (alfa1 == pi) Then
+					label.text_anchor = &quot;middle&quot;
+					label.rt_text_vertanchor = &quot;start&quot;
+				ElseIf (alfa1 &gt; pi) &amp;&amp; (alfa1 &lt; (3 * pi / 2) - (pi / 18)) Then
+					label.text_anchor = &quot;start&quot;
+					label.rt_text_vertanchor = &quot;start&quot;
+				ElseIf (alfa1 &gt;= (3 * pi / 2) - (pi / 18)) &amp;&amp; (alfa1 &lt;= (3 * pi / 2) + (pi / 18)) Then
+					label.text_anchor = &quot;start&quot;
+				Else 
+					label.text_anchor = &quot;start&quot;
+					label.rt_text_vertanchor = &quot;start&quot;
+					label.dy = sdvig
+				End If
+			End If
+			label.text = RoundAscii (Znach, NumDijits, true)
+			label.visibility = &quot;visible&quot;
+		End If
+	next i
+End Sub</rt:sub>
+    <rt:sub>Sub Sectors()
+dim alfa1 as float
+dim i as int
+dim val_LR_num as int
+
+val_LR_num = 1
+
+
+If UseExternalBounds Then
+	Dim LR As Double
+	Dim HR As Double
+	
+	LR = pv.RangeLow
+	HR = pv.RangeHigh
+	
+
+	If ((val_LTB != -9999) &amp;&amp; (val_LTB &gt; LR) &amp;&amp; (val_LTB &lt; HR)) Then
+		Show_Sector(val_LR_num + 1, val_LR, val_LTB - val_LR, Color_ANA_LO_T)
+	End If
+
+	If ((val_HTB != -9999) &amp;&amp; (val_HTB &gt; LR) &amp;&amp; (val_HTB &lt; HR)) Then
+		Show_Sector(val_LR_num + 2, val_HTB - val_LR, val_HR - val_LR, Color_ANA_HI_T)
+		
+	End If
+
+	If ((val_LWB != -9999) &amp;&amp; (val_LWB &gt; LR) &amp;&amp; (val_LWB &lt; HR)) Then
+		Show_Sector(val_LR_num + 3, val_LR, val_LWB - val_LR, Color_ANA_LO_P)
+		
+	End If
+
+	If ((val_HWB != -9999) &amp;&amp; (val_HWB &gt; LR) &amp;&amp; (val_HWB &lt; HR)) Then
+		Show_Sector(val_LR_num + 4, val_HWB - val_LR, val_HR - val_LR, Color_ANA_HI_P)
+	End If
+
+	If ((val_LAB != -9999) &amp;&amp; (val_LAB &gt; LR) &amp;&amp; (val_LAB &lt; HR)) Then
+		Show_Sector(val_LR_num + 5, val_LR, val_LAB - val_LR, Color_ANA_LO_A)
+	End If	
+	
+	If ((val_HAB != -9999) &amp;&amp; (val_HAB &gt; LR) &amp;&amp; (val_HAB &lt; HR)) Then
+		Show_Sector(val_LR_num + 6, val_HAB - val_LR, val_HR - val_LR, Color_ANA_HI_A)
+	End If
+
+Else
+	
+	If pv.UseBoundsHigh(0) Then
+		Show_Sector(val_LR_num + 2, pv.BoundsHigh(0) - val_LR, val_HR - val_LR, Color_ANA_HI_T)
+	End If
+
+	If pv.UseBoundsHigh(1) Then
+		Show_Sector(val_LR_num + 4, pv.BoundsHigh(1) - val_LR, val_HR - val_LR, Color_ANA_HI_P)
+	End If
+
+	If pv.UseBoundsHigh(2) Then
+		Show_Sector(val_LR_num + 6, pv.BoundsHigh(2) - val_LR, val_HR - val_LR, Color_ANA_HI_A)
+	End If
+
+	If pv.UseBoundsLow(0) Then
+		Show_Sector(val_LR_num + 1, val_LR, pv.BoundsLow(0) - val_LR, Color_ANA_LO_T)
+	End If
+
+	If pv.UseBoundsLow(1)  Then
+		Show_Sector(val_LR_num + 3, val_LR, pv.BoundsLow(1) - val_LR, Color_ANA_LO_P)
+	End If
+
+	If pv.UseBoundsLow(2)  Then
+		Show_Sector(val_LR_num + 5, val_LR, pv.BoundsLow(2) - val_LR, Color_ANA_LO_A)
+	End If
+End If
+
+End Sub</rt:sub>
+    <rt:sub>Sub Show_Pointer()
+Dim alfa1 as double	
+Dim xx as float
+Dim yy as float
+
+If (Value &gt;= val_LR) &amp;&amp; (Value &lt;= val_HR) Then
+	alfa1 = pi / 4 + ((3 * pi / 2) * (Value - val_LR) / (val_HR - val_LR))
+ElseIf Value &lt;= val_LR Then
+	alfa1 = pi / 4 - 0.06
+Else
+	alfa1 = 7 * pi / 4 + 0.06
+End If
+xx = -(RR * Sin (alfa1))
+yy = (RR * Cos (alfa1))
+Pointer.x2 = xx
+Pointer.y2 = yy
+End Sub</rt:sub>
+    <rt:sub>Sub Show_Sector(ByVal Child_num as int, ByVal val_LR_Pos as double, ByVal val_HR_Pos as double, ByVal col_sector as uint)
+
+dim xx1 as float
+dim xx2 as float
+dim yy1 as float
+dim yy2 as float
+dim s as string
+dim s_inv as string
+
+
+dim beta_val_LR as double
+dim beta_val_HR as double
+
+If val_LR_Pos &lt; 0 Then
+	val_LR_Pos = 0
+End If
+If (val_LR_Pos &lt;= val_HR_Pos) Then
+	beta_val_LR = pi / 4 + (3 * pi / 2) * val_LR_Pos / (val_HR - val_LR)
+	beta_val_HR = pi / 4 + (3 * pi / 2) * val_HR_Pos / (val_HR - val_LR)
+
+	xx1 = -(RR * Sin (beta_val_HR))
+	xx2 = -(RR * Sin (beta_val_LR))
+	yy1 = (RR * Cos (beta_val_HR))
+	yy2 = (RR * Cos (beta_val_LR))
+
+	If ((beta_val_HR - beta_val_LR) &gt; pi) Then
+		s = &quot; M0 0 L&quot; + CStr(xx1) + &quot; &quot; + CStr(yy1) + &quot; A&quot; + CStr(RR) + &quot; &quot; + CStr(RR) + &quot; 0 1 0 &quot; + CStr(xx2) + &quot; &quot; + CStr(yy2) + &quot; Z&quot;
+	else
+		s = &quot; M0 0 L&quot; + CStr(xx1) + &quot; &quot; + CStr(yy1) + &quot; A&quot; + CStr(RR) + &quot; &quot; + CStr(RR) + &quot; 0 0 0 &quot; + CStr(xx2) + &quot; &quot; + CStr(yy2) + &quot; Z&quot;
+	End If
+
+	_This.Child(Child_num).d = s
+	_This.Child(Child_num).visibility = &quot;visible&quot;
+	_This.Child(Child_num).fill = col_sector
+End If	
+
+End Sub</rt:sub>
+    <rt:sub>Sub CheckUsrGr()
+If UseExternalBounds || NoBounds Then
+	MyAlarm = False
+ElseIf Alarms_ForUser Then	//если надо распределять сигнализаци по пользователям
+	MyAlarm = PRJSPEC.CheckPvOwner(pv.PVId, True)
+Else
+	MyAlarm = True
+End If
+
+/*
+If FName Then
+	DetectAlarms()
+	Exit Sub
+End If
+*/
+If !(FName || NoBounds) Then
+	If B_HIHI != Nothing Then
+		If Alarms_ForUser Then
+			MyAlarm = MyAlarm || PRJSPEC.CheckPvOwner(B_HIHI.PVId, False)
+		End If
+	End If
+	If B_HI != Nothing Then
+		If Alarms_ForUser Then
+			MyAlarm = MyAlarm || PRJSPEC.CheckPvOwner(B_HI.PVId, False)
+		End If
+	End If
+	If B_H != Nothing Then
+		If Alarms_ForUser Then
+			MyAlarm = MyAlarm || PRJSPEC.CheckPvOwner(B_H.PVId, False)
+		End If
+	End If
+	If B_L != Nothing Then
+		If Alarms_ForUser Then
+			MyAlarm = MyAlarm || PRJSPEC.CheckPvOwner(B_L.PVId, False)
+		End If
+	End If
+	If B_LO != Nothing Then
+		If Alarms_ForUser Then
+			MyAlarm = MyAlarm || PRJSPEC.CheckPvOwner(B_LO.PVId, False)
+		End If
+	End If
+	If B_LOLO != Nothing Then
+		If Alarms_ForUser Then
+			MyAlarm = MyAlarm || PRJSPEC.CheckPvOwner(B_LOLO.PVId, False)
+		End If
+	End If
+End If
+DetectAlarms()
+End Sub</rt:sub>
+    <rt:sub>Sub Show_AddInfo()
+dim s as string
+
+If ShowScale Then
+	s = &quot;x&quot; + CStr(ScaleValue)
+else
+	s = EU
+End If
+
+Add_Info.visibility = &quot;visible&quot;
+Add_Info.T_String = s
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If RangesNumber &gt; 10 Then	&apos;проверяем на корректность ввода
+	RangesNumber = 10
+ElseIf RangesNumber &lt; 2 Then
+	RangesNumber = 2
+End If
+If SubRangesNumber &gt; 10 Then
+	SubRangesNumber = 10
+ElseIf SubRangesNumber &lt; 1 Then
+	SubRangesNumber = 1
+End If 
+If Koeff_Color_Mix &lt; 0.3 Then
+	Koeff_Color_Mix = 0.3
+ElseIf Koeff_Color_Mix &gt;1 Then
+	Koeff_Color_Mix = 1
+End If
+
+pi = 355.0 / 113.0
+RR = BGround.r - 5.0
+RangesNumber = RangesNumber + 1		&apos; чир должно быть на одну больше, чем диапазонов
+SubRangesNumber = SubRangesNumber - 1		&apos; чир должно быть на одну меньше, чем поддиапазонов
+rr = RR - l
+beta = (3 * pi / (2 * (RangesNumber - 1))) / (SubRangesNumber + 1)		&apos;угол между подделениями
+alfa  = (3 * pi  / 2) / (RangesNumber - 1)					&apos;угoл между делениями
+
+If FName Then
+	Set pv = ANA(FKKS)
+Else
+	Set pv = ANA(FKKS + &quot;_&quot; + Suffix)
+
+	If !NoBounds Then
+		Set B_IMITATION = GetImitationPV(pv.PVId)
+		If (PRJSPEC.GET_KKS (FKKS, 1) == &quot;Н.Д.&quot;) Then
+			Set B_HIHI = BIN(FKKS + &quot;_&quot; + BIN_HI_A)
+			Set B_HI = BIN(FKKS + &quot;_&quot; + BIN_HI_P)
+			Set B_H = BIN(FKKS + &quot;_&quot; + BIN_HI_T)
+			Set B_L = BIN(FKKS + &quot;_&quot; + BIN_LO_T)
+			Set B_LO = BIN(FKKS + &quot;_&quot; + BIN_LO_P)
+			Set B_LOLO = BIN(FKKS + &quot;_&quot; + BIN_LO_A)
+		Else
+			Set B_HIHI = BIN(FKKS + &quot;_&quot; + PRJSPEC.GET_KKS (FKKS, 6))
+			Set B_HI = BIN(FKKS + &quot;_&quot; + PRJSPEC.GET_KKS (FKKS, 5))
+			Set B_H = BIN(FKKS + &quot;_&quot; + PRJSPEC.GET_KKS (FKKS, 4))
+			Set B_L = BIN(FKKS + &quot;_&quot; + PRJSPEC.GET_KKS (FKKS, 3))
+			Set B_LO = BIN(FKKS + &quot;_&quot; + PRJSPEC.GET_KKS (FKKS, 2))
+			Set B_LOLO = BIN(FKKS + &quot;_&quot; + PRJSPEC.GET_KKS (FKKS, 1))
+		End If
+	End If
+
+End If
+
+
+
+If pv == Nothing Then
+
+	HasError = True
+	BGround.fill = Color_ANA_ER_LINK
+	EU = &quot;&quot;
+	Pointer.visibility = &quot;hidden&quot;
+	Shkala ()
+	If (val_LR &lt;&gt; -9999) &amp;&amp; (val_HR &lt;&gt; -9999) Then
+		Marks()
+	End If
+	Exit Sub
+End If
+
+
+If val_LR == -9999 Then
+	val_LR = pv.RangeLow
+End If
+If val_HR == -9999 Then
+	val_HR = pv.RangeHigh
+End If
+If ScaleValue &lt;= 1 Then
+	ScaleValue = 1
+	ShowScale = false
+Else 
+	ShowScale = true
+End If 
+If !ShowScale &amp;&amp; ShowEU Then 
+	EU = pv.DimString
+Else
+	EU = &quot;&quot;
+End If
+If ShowEU || ShowScale Then
+	Show_AddInfo()
+End If
+Shkala ()
+Marks()
+If !NoBounds Then
+	Sectors()
+End If
+//MyAlarm = Blink_on_NACK &amp;&amp; Alarms_ForUser &amp;&amp; !HasError
+CheckUsrGr()</rt:event>
+    <rt:event type="OnResize">BGround.r = _This.height
+Hat.r = BGround.r - 5.0 - l/2.0
+Hat1.r = BGround.r - 5.0
+InGr.r = BGround.r + 2.5
+InGr.stroke_width = 2
+SelFrame.r = BGround.r</rt:event>
+    <rt:changeTrigger name="GRP">
+      <rt:condition>!HasError</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(pv.PVId) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_pv">
+      <rt:condition>!HasError</rt:condition>
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="IsItMyAlarm">
+      <rt:condition>Blink_on_NACK &amp;&amp; Alarms_ForUser &amp;&amp; !HasError</rt:condition>
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>CheckUsrGr()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_HIHI">
+      <rt:condition>!HasError &amp;&amp; (B_HIHI != Nothing)</rt:condition>
+      <rt:chgItem>B_HIHI</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_HI">
+      <rt:condition>!HasError &amp;&amp; (B_HI != Nothing)</rt:condition>
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:chgItem>B_HI</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_H">
+      <rt:condition>!HasError &amp;&amp; (B_H != Nothing)</rt:condition>
+      <rt:chgItem>B_H</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_LOLO">
+      <rt:condition>!HasError &amp;&amp; (B_LOLO != Nothing)</rt:condition>
+      <rt:chgItem>B_LOLO</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_LO">
+      <rt:condition>!HasError &amp;&amp; (B_LO != Nothing)</rt:condition>
+      <rt:chgItem>B_LO</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_L">
+      <rt:condition>!HasError &amp;&amp; (B_L != Nothing)</rt:condition>
+      <rt:chgItem>B_L</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_Imitation">
+      <rt:condition>!HasError &amp;&amp; (B_IMITATION != Nothing)</rt:condition>
+      <rt:chgItem>B_IMITATION</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <circle cx="0" cy="0" r="50" id="BGround" fill="#949494" fill-opacity="1" stroke="Col_Grey4"/> 
+  <circle cx="0" cy="0" r="45" id="Hat1" visibility="visible" rt:detect="enabled" fill="#949494"/> 
+  <path d="M2.86102e-006 2.14577e-006 L-44.8791 23.7725 A51.2686 49.1725 0 0 0 -30.5238 39.5077 Z" id="Low_Tech" visibility="hidden" rt:detect="disabled" fill="Col_Cyan">
+    <rt:dyn type="fill" mode="constant" value="Middle_Color_Wieghted(Color_ANA_LO_T, 0xe0e0e0, Koeff_Color_Mix)"/> 
+  </path>
+  <path d="M2.86102e-006 2.14577e-006 L-44.8791 23.7725 A51.2686 49.1725 0 0 0 -30.5238 39.5077 Z" id="High_Tech" visibility="hidden" rt:detect="disabled" fill="Col_Cyan">
+    <rt:dyn type="fill" mode="constant" value="Middle_Color_Wieghted(Color_ANA_HI_T, 0xe0e0e0, Koeff_Color_Mix)"/> 
+  </path>
+  <path d="M2.86102e-006 2.14577e-006 L-44.8791 23.7725 A51.2686 49.1725 0 0 0 -30.5238 39.5077 Z" id="Low_Pred" visibility="hidden" rt:detect="disabled" fill="Col_Yellow">
+    <rt:dyn type="fill" mode="constant" value="Middle_Color_Wieghted(Color_ANA_LO_P, 0xe0e0e0, Koeff_Color_Mix)"/> 
+  </path>
+  <path d="M2.86102e-006 2.14577e-006 L-44.8791 23.7725 A51.2686 49.1725 0 0 0 -30.5238 39.5077 Z" id="High_Pred" visibility="hidden" rt:detect="disabled" fill="Col_Yellow">
+    <rt:dyn type="fill" mode="constant" value="Middle_Color_Wieghted(Color_ANA_HI_P, 0xe0e0e0, Koeff_Color_Mix)"/> 
+  </path>
+  <path d="M0 0 L-44.8791 23.7725 A50 50 0 0 0 -30.5238 39.5077 Z" id="Low_Alarm" visibility="hidden" rt:detect="disabled" fill="Col_IRD_AL_HH">
+    <rt:dyn type="fill" mode="constant" value="Middle_Color_Wieghted(Color_ANA_LO_A, 0xe0e0e0, Koeff_Color_Mix)"/> 
+  </path>
+  <path d="M2.86102e-006 2.14577e-006 L-44.8791 23.7725 A51.2686 49.1725 0 0 0 -30.5238 39.5077 Z" id="High_Alarm" visibility="hidden" rt:detect="disabled" fill="Col_IRD_AL_HH">
+    <rt:dyn type="fill" mode="constant" value="Middle_Color_Wieghted(Color_ANA_HI_A, 0xe0e0e0, Koeff_Color_Mix)"/> 
+  </path>
+  <circle cx="0" cy="0" r="41" id="Hat" visibility="visible" rt:detect="enabled" fill="url(#DS_circle)"/> 
+  <path d="M-16 -32.5 " id="Shkala" stroke="black"/> 
+  <g id="Podshkaly">
+    <path d="M0 0 L0 5 " id="Podshkala1" visibility="hidden" rt:detect="disabled" fill="none" stroke="black"/> 
+    <path d="M-31 -38.6667 L-33.5 -34.1667 " id="Podshkala2" visibility="hidden" rt:detect="disabled" stroke="black"/> 
+    <path d="M-27.6666 -35.3333 L-30.1666 -30.8333 " id="Podshkala3" visibility="hidden" rt:detect="disabled" stroke="black"/> 
+    <path d="M-24.3333 -32 L-26.8333 -27.5 " id="Podshkala4" visibility="hidden" rt:detect="disabled" stroke="black"/> 
+    <path d="M-21 -28.6667 L-23.5 -24.1667 " id="Podshkala5" visibility="hidden" rt:detect="disabled" stroke="black"/> 
+    <path d="M-17.6666 -25.3333 L-20.1666 -20.8333 " id="Podshkala6" visibility="hidden" rt:detect="disabled" stroke="black"/> 
+    <path d="M-14.3333 -22 L-16.8333 -17.5 " id="Podshkala7" visibility="hidden" rt:detect="disabled" stroke="black"/> 
+    <path d="M-11 -18.6667 L-13.5 -14.1667 " id="Podshkala8" visibility="hidden" rt:detect="disabled" stroke="black"/> 
+    <path d="M-7.66664 -15.3333 L-10.1666 -10.8333 " id="Podshkala9" visibility="hidden" rt:detect="disabled" stroke="black"/> 
+    <path d="M-4.3333 -12 L-6.8333 -7.5 " id="Podshkala10" visibility="hidden" rt:detect="disabled" stroke="black"/> 
+  </g>
+  <g id="Marks" text-anchor="middle" rt:text-vertanchor="middle">
+    <text x="-31.5" y="29.6667" id="Mark1" visibility="hidden" rt:detect="disabled" text-anchor="middle" rt:text-vertanchor="middle">1</text>
+    <text x="-6.50005" y="-22.5" id="Mark2" visibility="hidden" rt:detect="disabled" text-anchor="middle" rt:text-vertanchor="middle">1</text>
+    <text x="-24.8333" y="36.3334" id="Mark3" visibility="hidden" rt:detect="disabled" text-anchor="middle" rt:text-vertanchor="middle">1</text>
+    <text x="-21.5" y="39.6667" id="Mark4" visibility="hidden" rt:detect="disabled" text-anchor="middle" rt:text-vertanchor="middle">1</text>
+    <text x="-16.8333" y="-2.28882e-005" id="Mark5" visibility="hidden" rt:detect="disabled" text-anchor="middle" rt:text-vertanchor="middle">1</text>
+    <text x="-24.8333" y="-26.1666" id="Mark6" visibility="hidden" rt:detect="disabled" text-anchor="middle" rt:text-vertanchor="middle">1</text>
+    <text x="-21.5" y="-22.8333" id="Mark7" visibility="hidden" rt:detect="disabled" text-anchor="middle" rt:text-vertanchor="middle">1</text>
+    <text x="-18.1667" y="-19.5" id="Mark8" visibility="hidden" rt:detect="disabled" text-anchor="middle" rt:text-vertanchor="middle">1</text>
+    <text x="17.5" y="-8.49995" id="Mark9" visibility="hidden" rt:detect="disabled" text-anchor="middle" rt:text-vertanchor="middle">1</text>
+    <text x="20" y="11.1667" id="Mark10" visibility="hidden" rt:detect="disabled" text-anchor="middle" rt:text-vertanchor="middle">1</text>
+    <text x="-1.83334" y="21.1667" id="Mark11" visibility="hidden" rt:detect="disabled" text-anchor="middle" rt:text-vertanchor="middle">1</text>
+  </g>
+  <line x1="0" y1="0" x2="38.125" y2="-25" id="Pointer" stroke="black"/> 
+  <circle cx="0" cy="0" r="4" id="Center" fill="Col_Grey5" stroke="Col_Grey5">
+    <rt:dyn type="fill" mode="cyclic" value="ShowInAlarmColor(In_Alarm, ValColor, 0x555555)"/> 
+  </circle>
+  <rect x="-25" y="30" width="50" height="10" rx="0" ry="0" id="Add_Area" fill="none" stroke="none"/> 
+  <image x="-25" y="22.5" width="50" height="25" xlink:href="TextAutoScale.svg" id="Add_Info" visibility="hidden" rt:detect="disabled">
+    <rt:dyn type="Parent" mode="constant" value="_This.Add_Area"/> 
+    <rt:dyn type="T_Size" mode="constant" value="10"/> 
+  </image>
+  <circle cx="0" cy="0" r="52.5" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </circle>
+  <circle cx="0" cy="0" r="50" id="SelFrame" fill-opacity="0">
+    <rt:event type="OnClick">If pv == nothing Then
+	NoLink(FKKS)
+Else
+	If NoBounds || UseExternalBounds Then
+		Call_Win (&quot;ws_ANA_NB&quot;, pv.PVId + &quot;|-1&quot;)
+	ElseIf FName Then
+		Call_Win (&quot;ws_ANA_FN&quot;, FKKS + &quot;|-1&quot;)
+	Else
+		Call_Win (&quot;ws_ANA&quot;, FKKS + &quot;|&quot; + Suffix + &quot;|-1&quot;)
+	End If
+End If</rt:event>
+    <rt:event type="OnRightClick">If pv == nothing Then
+	NoLink(FKKS)
+Else
+	If NoBounds || UseExternalBounds Then
+		LoadPopUpMenu(pv.PVId + &quot;|ANAi|ws_ANA_NB &quot; + pv.PVId + &quot;|-1&quot;)
+	ElseIf FName Then
+		LoadPopUpMenu(FKKS + &quot;|ANAi|ws_ANA_FN &quot; + FKKS + &quot;|-1&quot;)
+	Else
+		LoadPopUpMenu(pv.PVId + &quot;|ANAi|ws_ANA &quot; + FKKS+&quot;|&quot; + Suffix + &quot;|-1&quot;)
+	End If
+End If</rt:event>
+  </circle>
+</svg>

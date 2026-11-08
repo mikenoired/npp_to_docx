@@ -1,0 +1,134 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 130 280" width="130" height="280" id="BARs_r3">
+  <rt:model modelversion="7.2.0.23" comment="Создано VNIIAES-ASUTP\geskin 18.07.2012 14:37:41">
+    <rt:param name="dist_mag" datatype="string" comment="Уровень сигнала"/> 
+    <rt:param name="dist_mag_vis_ram" datatype="string" comment="Рамка при недостоверности"/> 
+    <rt:var name="HasError" datatype="boolean" value="false" comment="При иницализации произошла ошибка"/> 
+    <rt:var name="pv_MAG" datatype="PlsPVBin" comment="Бинарный сигнал уровня"/> 
+    <rt:var name="pv_RMAG" datatype="PlsPVBin" comment="Бинарный сигнал рамки"/> 
+    <rt:var name="dist_mag_height1" datatype="int" comment=""/> 
+    <rt:var name="dist_mag_color1" datatype="string" comment=""/> 
+    <rt:var name="dist_mag_height2" datatype="int" comment=""/> 
+    <rt:var name="dist_mag_color2" datatype="string" comment=""/> 
+    <rt:var name="title1" datatype="string" comment=""/> 
+    <rt:var name="title2" datatype="string" comment=""/> 
+    <rt:sub>Sub BARs()
+		if (HasError == false) Then
+			If pv_MAG.Value == 0 Then
+				dist_mag_height1 = 240
+				dist_mag_color1 = &quot;white&quot;
+				dist_mag_height2 = 0
+				dist_mag_color2 = &quot;none&quot;		
+				title2 = &quot;Недостоверное&quot;				
+			Else
+				If pv_MAG.Value == 1 or pv_MAG.Value == 11 Then
+					dist_mag_height1 = 60
+					dist_mag_color1 = &quot;Col_Green&quot;
+					title2 = &quot;Нормальное&quot;					
+					if pv_MAG.Value == 11 then
+						dist_mag_height2 = 240
+						dist_mag_color2 = &quot;white&quot;		
+						title2 = &quot;Нормальное + Недостоверное&quot;						
+					else
+						dist_mag_height2 = 0
+						dist_mag_color2 = &quot;none&quot;	
+					end if
+				Else
+					If pv_MAG.Value == 2 or pv_MAG.Value == 12 Then
+						dist_mag_height1 = 120
+						dist_mag_color1 = &quot;Col_Yellow&quot;
+						title2 = &quot;Неудовлетворительное&quot;
+						if pv_MAG.Value == 12 then
+							dist_mag_height2 = 240
+							dist_mag_color2 = &quot;white&quot;					
+							title2 = &quot;Неудовлетворительное + Недостоверное&quot;
+						else
+							dist_mag_height2 = 0
+							dist_mag_color2 = &quot;none&quot;								
+						end if						
+					Else
+						If pv_MAG.Value == 3 or pv_MAG.Value == 13 Then
+							dist_mag_height1 = 180
+							dist_mag_color1 = &quot;Col_Orange&quot;
+							title2 = &quot;Тяжелое&quot;
+							if pv_MAG.Value == 13 then
+								dist_mag_height2 = 240
+								dist_mag_color2 = &quot;white&quot;					
+								title2 = &quot;Тяжелое + Недостоверное&quot;															
+								else
+									dist_mag_height2 = 0
+									dist_mag_color2 = &quot;none&quot;									
+							end if							
+						Else
+							If pv_MAG.Value == 4 or pv_MAG.Value == 14 Then
+								dist_mag_height1 = 240
+								dist_mag_color1 = &quot;Col_Red&quot;
+								title2 = &quot;Экстремальное&quot;
+								if pv_MAG.Value == 14 then
+									dist_mag_height2 = 240
+									dist_mag_color2 = &quot;white&quot;	
+									title2 = &quot;Экстремальное + Недостоверное&quot;
+								else
+									dist_mag_height2 = 0
+									dist_mag_color2 = &quot;none&quot;																		
+								end if								
+							Else
+								dist_mag_height1 = 0
+								dist_mag_color1 = &quot;none&quot;
+								dist_mag_height2 = 0
+								dist_mag_color2 = &quot;none&quot;			
+								title2 = &quot;Не активен&quot;
+							End if	
+						End if
+					End If
+				End If
+			End If
+		End If
+		
+		if (pv_RMAG.Value == True) Then
+			title1 = &quot;Есть недостоверность лог. блоков&quot;
+		else	
+			title1 = &quot;&quot;
+		End If
+		
+	End Sub</rt:sub>
+    <rt:event type="OnInitialize">Set pv_MAG = BIN(dist_mag)
+	Set pv_RMAG = BIN(dist_mag_vis_ram)
+		If (pv_MAG == Nothing || pv_RMAG == Nothing) Then
+			HasError = true
+			Rectangle.fill=&quot;black&quot;
+			body1.fill=&quot;black&quot;
+			Exit Sub
+		End If</rt:event>
+    <rt:changeTrigger name="Bar">
+      <rt:condition>!HasError</rt:condition>
+      <rt:chgItem>pv_MAG.Value</rt:chgItem>
+      <rt:chgItem>pv_RMAG.Value</rt:chgItem>
+      <rt:code>BARs()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="16" y="16" width="100" height="242" rx="0" ry="0" id="Rectangle" fill="Col_Grey2" stroke="black" stroke-width="1">
+    <rt:dyn type="title" mode="onchange" value="title2"/> 
+  </rect>
+  <rect x="17" y="734" width="98" height="240" rx="0" ry="0" id="body2" fill="Col_Yellow" stroke="none" transform="flipY(495.5)">
+    <rt:dyn type="height" mode="onchange" value="dist_mag_height2"/> 
+    <rt:dyn type="fill" mode="onchange" value="dist_mag_color2"/> 
+    <rt:dyn type="title" mode="onchange" value="title2"/> 
+  </rect>
+  <rect x="17" y="734" width="98" height="240" rx="0" ry="0" id="body1" fill="Col_Yellow" stroke="none" transform="flipY(495.5)">
+    <rt:dyn type="height" mode="onchange" value="dist_mag_height1"/> 
+    <rt:dyn type="fill" mode="onchange" value="dist_mag_color1"/> 
+    <rt:dyn type="title" mode="onchange" value="title2"/> 
+  </rect>
+  <line x1="17" y1="197.5" x2="115.5" y2="197.5" id="line_9" stroke="Col_Green" stroke-width="3"/> 
+  <line x1="17" y1="137.5" x2="115.5" y2="137.5" id="line_10" stroke="Col_Yellow" stroke-width="3"/> 
+  <line x1="17" y1="77.5" x2="115.5" y2="77.5" id="line_11" stroke="Col_Orange" stroke-width="3"/> 
+  <line x1="116.5" y1="257.5" x2="16.3334" y2="257.5" id="line_12" stroke="Col_Red" stroke-width="1"/> 
+  <rect x="9" y="9" width="114" height="256" rx="0" ry="0" fill="none" stroke="white" stroke-width="14">
+    <rt:dyn type="visibility" mode="onchange" value="pv_RMAG.Value" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="title" mode="onchange" value="title1"/> 
+  </rect>
+</svg>

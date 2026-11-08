@@ -1,0 +1,253 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 150 20" width="150" height="20" id="bin_mode_1o6_a" font-family="AAP_Font1">
+  <desc>Индикатор выбранного режима 1 из 6 (пользовательский текст)</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.1">
+    <rt:param name="PointID_1" datatype="string" value="NULL" comment="Идентификатор переменной выбора режима 1"/> 
+    <rt:param name="Text_1" datatype="string" value="Режим 1" comment="строка режима 1"/> 
+    <rt:param name="Col_1" datatype="string" value="none" comment="цвет фона для режима 1"/> 
+    <rt:param name="PointID_2" datatype="string" value="NULL" comment="Идентификатор переменной выбора режима 2"/> 
+    <rt:param name="Text_2" datatype="string" value="Режим 2" comment="строка режима 2"/> 
+    <rt:param name="Col_2" datatype="string" value="none" comment="цвет фона для режима 2"/> 
+    <rt:param name="PointID_3" datatype="string" value="NULL" comment="Идентификатор переменной выбора режима 3"/> 
+    <rt:param name="Text_3" datatype="string" value="Режим 3" comment="строка режима 3"/> 
+    <rt:param name="Col_3" datatype="string" value="none" comment="цвет фона для режима 3"/> 
+    <rt:param name="PointID_4" datatype="string" value="NULL" comment="Идентификатор переменной выбора режима 4"/> 
+    <rt:param name="Text_4" datatype="string" value="Режим 4" comment="строка режима 4"/> 
+    <rt:param name="Col_4" datatype="string" value="none" comment="цвет фона для режима 4"/> 
+    <rt:param name="PointID_5" datatype="string" value="NULL" comment="Идентификатор переменной выбора режима 5"/> 
+    <rt:param name="Text_5" datatype="string" value="Режим 5" comment="строка режима 5"/> 
+    <rt:param name="Col_5" datatype="string" value="none" comment="цвет фона для режима 5"/> 
+    <rt:param name="PointID_6" datatype="string" value="NULL" comment="Идентификатор переменной выбора режима 6"/> 
+    <rt:param name="Text_6" datatype="string" value="Режим 6" comment="строка режима 6"/> 
+    <rt:param name="Col_6" datatype="string" value="none" comment="цвет фона для режима 6"/> 
+    <rt:param name="Grad_Style" datatype="boolean" value="true" comment="Индикатор имеет градиентную заливку - объёмный фон"/> 
+    <rt:param name="Auto_Scale" datatype="boolean" value="false" comment="Автомасштабировать текст под размер объекта"/> 
+    <rt:var name="pv1" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="pv2" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="pv3" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="pv4" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="pv5" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="pv6" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="InUse" datatype="ushort" value="0" comment="используемые состояния"/> 
+    <rt:sub>Sub StatusColor()
+Dim FinStat As UShort
+FinStat = 0
+&apos;Состояние 1
+If ((InUse &amp; 1) &gt; 0) Then
+	If (pv1.Quality != PLS_QUAL_BAD) &amp;&amp; (pv1.Value != 0) Then
+		FinStat = 1
+	End If
+End If
+If ((InUse &amp; 2) &gt; 0) &amp;&amp; (FinStat == 0) Then
+	If (pv2.Quality != PLS_QUAL_BAD) &amp;&amp; (pv2.Value != 0) Then
+		FinStat = 2
+	End If
+End If
+If ((InUse &amp; 4) &gt; 0) &amp;&amp; (FinStat == 0) Then
+	If (pv3.Quality != PLS_QUAL_BAD) &amp;&amp; (pv3.Value != 0) Then
+		FinStat = 4
+	End If
+End If
+If ((InUse &amp; 8) &gt; 0) &amp;&amp; (FinStat == 0) Then
+	If (pv4.Quality != PLS_QUAL_BAD) &amp;&amp; (pv4.Value != 0) Then
+		FinStat = 8
+	End If
+End If
+If ((InUse &amp; 16) &gt; 0) &amp;&amp; (FinStat == 0) Then
+	If (pv5.Quality != PLS_QUAL_BAD) &amp;&amp; (pv5.Value != 0) Then
+		FinStat = 16
+	End If
+End If
+If ((InUse &amp; 32) &gt; 0) &amp;&amp; (FinStat == 0) Then
+	If (pv6.Quality != PLS_QUAL_BAD) &amp;&amp; (pv6.Value != 0) Then
+		FinStat = 32
+	End If
+End If
+If (FinStat == 0) Then
+	My_Text.T_String = &quot;-&quot;
+	body.fill = Color_NotSel
+ElseIf (FinStat == 1) Then
+	My_Text.T_String = Text_1
+	body.fill = Col_1
+ElseIf (FinStat == 2) Then
+	My_Text.T_String = Text_2
+	body.fill = Col_2
+ElseIf (FinStat == 4) Then
+	My_Text.T_String = Text_3
+	body.fill = Col_3
+ElseIf (FinStat == 8) Then
+	My_Text.T_String = Text_4
+	body.fill = Col_4
+ElseIf (FinStat == 16) Then
+	My_Text.T_String = Text_5
+	body.fill = Col_5
+ElseIf (FinStat == 32) Then
+	My_Text.T_String = Text_6
+	body.fill = Col_6
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">main_text.visibility = &quot;hidden&quot;
+My_Text.visibility = &quot;visible&quot;
+If (PointID_1 != &quot;NULL&quot;) Then
+	pv1 = BIN(PointID_1)
+	If (pv1 != Nothing) Then
+		InUse = 1
+	End If
+End If
+If (PointID_2 != &quot;NULL&quot;) Then
+	pv2 = BIN(PointID_2)
+	If (pv2 != Nothing) Then
+		InUse = InUse | 2
+	End If
+End If
+If (PointID_3 != &quot;NULL&quot;) Then
+	pv3 = BIN(PointID_3)
+	If (pv3 != Nothing) Then
+		InUse = InUse | 4
+	End If
+End If
+If (PointID_4 != &quot;NULL&quot;) Then
+	pv4 = BIN(PointID_4)
+	If (pv4 != Nothing) Then
+		InUse = InUse | 8
+	End If
+End If
+If (PointID_5 != &quot;NULL&quot;) Then
+	pv5 = BIN(PointID_5)
+	If (pv5 != Nothing) Then
+		InUse = InUse | 16
+	End If
+End If
+If (PointID_6 != &quot;NULL&quot;) Then
+	pv6 = BIN(PointID_6)
+	If (pv6 != Nothing) Then
+		InUse = InUse | 32
+	End If
+End If</rt:event>
+    <rt:event type="OnResize">My_Text.width = 50
+My_Text.height = 25
+My_Text.x = (_This.width - 50.0) / 2.0
+My_Text.y = (_This.height - 25.0) / 2.0</rt:event>
+    <rt:changeTrigger name="GetStatus">
+      <rt:chgItem>pv1</rt:chgItem>
+      <rt:chgItem>pv2</rt:chgItem>
+      <rt:chgItem>pv3</rt:chgItem>
+      <rt:chgItem>pv4</rt:chgItem>
+      <rt:chgItem>pv5</rt:chgItem>
+      <rt:chgItem>pv6</rt:chgItem>
+      <rt:code>StatusColor()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="150" height="20" rx="0" ry="0" id="Grad_BG" fill="url(#Cylinder_horizontal2)" stroke="none">
+    <rt:dyn type="visibility" mode="constant" value="Grad_Style" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="0" y="0" width="150" height="20" rx="0" ry="0" id="body" fill="none" stroke="none">
+    <rt:dyn type="fill-opacity" mode="constant" value="Grad_Style" trans="bd">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0.6"/> 
+    </rt:dyn>
+  </rect>
+  <text x="75" y="15" id="main_text" fill="black" font-family="AAP_Font3" font-size="15" font-weight="bold" text-anchor="middle">режим 1/6</text>
+  <polyline points="0,20 150,20 150,0" id="RB_edge" fill="none" stroke="Col_Grey1" stroke-width="1"/> 
+  <polyline points="0,20 0,0 150,0" id="LU_edge" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <image x="50" y="-2.5" width="50" height="25" xlink:href="TextAutoScale.svg" id="My_Text" visibility="hidden" rt:detect="disabled">
+    <rt:dyn type="Parent" mode="constant" value="_This"/> 
+    <rt:dyn type="T_Font" mode="constant" value="&quot;AAP_Font3&quot;"/> 
+    <rt:dyn type="T_Weight" mode="constant" value="&quot;bold&quot;"/> 
+    <rt:dyn type="Auto_Scale" mode="constant" value="Auto_Scale"/> 
+    <rt:dyn type="T_Style" mode="constant" value="&quot;inherit&quot;"/> 
+  </image>
+  <rect x="0" y="0" width="150" height="20" rx="0" ry="0" id="SelFrame" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">Dim MsgStr As String
+If (PointID_1 == &quot;NULL&quot;) Then
+	ShowWarning (&quot;Объект неправильно привязан.&quot;, 0)
+ElseIf (PointID_1 != &quot;NULL&quot;) &amp;&amp; (pv1 == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_1 = \&quot;&quot; + PointID_1 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (PointID_2 != &quot;NULL&quot;) &amp;&amp; (pv2 == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_2 = \&quot;&quot; + PointID_2 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (PointID_3 != &quot;NULL&quot;) &amp;&amp; (pv3 == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_3 = \&quot;&quot; + PointID_3 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (PointID_4 != &quot;NULL&quot;) &amp;&amp; (pv4 == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_4 = \&quot;&quot; + PointID_4 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (PointID_5 != &quot;NULL&quot;) &amp;&amp; (pv5 == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_5 = \&quot;&quot; + PointID_5 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (PointID_6 != &quot;NULL&quot;) &amp;&amp; (pv6 == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_6 = \&quot;&quot; + PointID_6 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+Else
+	Dim s As String
+	s = PointID_1
+	If (PointID_2 != &quot;NULL&quot;) Then
+		s = s + &quot;|&quot; + PointID_2
+	End If
+	If (PointID_3 != &quot;NULL&quot;) Then
+		s = s + &quot;|&quot; + PointID_3
+	End If
+	If (PointID_4 != &quot;NULL&quot;) Then
+		s = s + &quot;|&quot; + PointID_4
+	End If
+	If (PointID_5 != &quot;NULL&quot;) Then
+		s = s + &quot;|&quot; + PointID_5
+	End If
+	If (PointID_6 != &quot;NULL&quot;) Then
+		s = s + &quot;|&quot; + PointID_6
+	End If
+	Open_Win_Uni(False, &quot;wi_&quot; + PointID_1, &quot;Составной объект &quot; + pv1.CategoryText, &quot;wi_MultyPV&quot;, s)
+End If</rt:event>
+    <rt:event type="OnRightClick">Dim MsgStr As String
+If (PointID_1 == &quot;NULL&quot;) Then
+	ShowWarning (&quot;Объект неправильно привязан.&quot;, 0)
+ElseIf (PointID_1 != &quot;NULL&quot;) &amp;&amp; (pv1 == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_1 = \&quot;&quot; + PointID_1 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (PointID_2 != &quot;NULL&quot;) &amp;&amp; (pv2 == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_2 = \&quot;&quot; + PointID_2 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (PointID_3 != &quot;NULL&quot;) &amp;&amp; (pv3 == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_3 = \&quot;&quot; + PointID_3 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (PointID_4 != &quot;NULL&quot;) &amp;&amp; (pv4 == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_4 = \&quot;&quot; + PointID_4 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (PointID_5 != &quot;NULL&quot;) &amp;&amp; (pv5 == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_5 = \&quot;&quot; + PointID_5 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (PointID_6 != &quot;NULL&quot;) &amp;&amp; (pv6 == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_6 = \&quot;&quot; + PointID_6 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+Else
+	Dim s As String
+	Dim i As UShort
+	TmpBuffer(0) = PointID_1
+	i = 1
+	If (PointID_2 != &quot;NULL&quot;) Then
+		TmpBuffer(i) = PointID_2
+		i = i + 1
+	End If
+	If (PointID_3 != &quot;NULL&quot;) Then
+		TmpBuffer(i) = PointID_3
+		i = i + 1
+	End If
+	If (PointID_4 != &quot;NULL&quot;) Then
+		TmpBuffer(i) = PointID_4
+		i = i + 1
+	End If
+	If (PointID_5 != &quot;NULL&quot;) Then
+		TmpBuffer(i) = PointID_5
+		i = i + 1
+	End If
+	If (PointID_6 != &quot;NULL&quot;) Then
+		TmpBuffer(i) = PointID_6
+	End If
+	LoadPopUpMenu(PointID_1 + &quot;|NONi|&quot;)
+End If</rt:event>
+  </rect>
+</svg>

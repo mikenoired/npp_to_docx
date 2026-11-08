@@ -1,0 +1,38 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 60 60" width="60" height="60" id="GW" fill="white" stroke="black">
+  <rt:model modelversion="7.2.0.21" comment="Ïîäìîäåëü ÏÎÐÒÀËà">
+    <rt:param name="Color" datatype="uint" comment="Öâåò"/> 
+  </rt:model>
+  <polygon points="28,7 53,19 32,29 8,16" fill="Col_BGItemSel" stroke="black"/> 
+  <polygon points="53,19 53,43 32,54 32,29" fill="#dbd28a" stroke="black"/> 
+  <polygon points="32,54 8,41 8,16 32,29" fill="#e3dca6" stroke="black"/> 
+  <polygon points="22.625,46.5625 22.625,44.125 28.6,47.3125 28.6,50.125" fill="lime">
+    <rt:dyn type="fill" mode="unknown" value="Color"/> 
+  </polygon>
+  <polygon points="10.8125,40.1875 10.8125,37.75 16.8,40.9375 16.8,43.75" fill="lime">
+    <rt:dyn type="fill" mode="unknown" value="Color"/> 
+  </polygon>
+  <line x1="19.5" y1="22" x2="19.5" y2="47" stroke="black"/> 
+  <line x1="19.55" y1="21.9" x2="39.25" y2="12.4" stroke="black"/> 
+  <polygon points="10.5,20 10.5,23.5 17,27 17,23.5" fill="Col_Grey3"/> 
+  <polygon points="22.5,27 22.5,30.5 29,34 29,30.5" fill="Col_Grey3"/> 
+  <polygon points="28,7 53,19 53,43 32,54 8,41 8,16" fill="none" stroke="black" stroke-width="2"/> 
+  <polygon points="15.501,29.7845 16.301,34.6845 16.901,30.4845"/> 
+  <polygon points="27.35,36.6 28.15,41.5 28.75,37.3"/> 
+  <line x1="52.95" y1="39.7" x2="40.15" y2="46.2" stroke="Col_Grey4"/> 
+  <line x1="52.95" y1="37.3" x2="41.15" y2="43.2" stroke="Col_Grey4"/> 
+  <line x1="52.95" y1="34.8" x2="42.15" y2="40.2" stroke="Col_Grey4"/> 
+  <line x1="52.95" y1="32.2" x2="43.15" y2="37.2" stroke="Col_Grey4"/> 
+  <line x1="52.85" y1="29.7" x2="44.15" y2="34.2" stroke="Col_Grey4"/> 
+  <line x1="52.95" y1="27.3" x2="45.15" y2="31.2" stroke="Col_Grey4"/> 
+  <line x1="53.05" y1="24.8" x2="46.15" y2="28.2" stroke="Col_Grey4"/> 
+  <line x1="52.85" y1="22.5" x2="47.15" y2="25.2" stroke="Col_Grey4"/> 
+  <polygon points="28,2 58,14 58,46 32,59 3,44 3,13" fill-opacity="0.0699811" stroke="none" stroke-opacity="0.299609">
+    <rt:dyn type="fill" mode="unknown" value="Color"/> 
+    <rt:dyn type="stroke" mode="unknown" value="Color"/> 
+  </polygon>
+  <polygon points="28,5.5 54.5,18 54.5,44 32,55.5 6.5,42 6.5,15" fill="none">
+    <rt:dyn type="stroke" mode="unknown" value="Color"/> 
+  </polygon>
+  <rect x="0" y="0" width="60" height="60" rx="0" ry="0" id="Sel_Area" fill="silver" fill-opacity="0" stroke="none"/> 
+</svg>

@@ -1,0 +1,155 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="codedlayout meet" viewBox="0 0 40 100" width="40" height="100" id="ps_Ros3_ana_bar_reactivnost" stroke="black">
+  <desc>Барограф для отображения реактивности</desc>
+  <rt:model comment="Пользовательская подмодель ПОРТАЛа" revision="4.0">
+    <rt:param name="PointID" datatype="string" comment="Идентификатор сигнала заливки"/> 
+    <rt:param name="ShowDigits" datatype="boolean" value="true" comment="Показывать значения шкалы"/> 
+    <rt:var name="pv" datatype="PlsPVAna" value="" comment="DB PV"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="object in group"/> 
+    <rt:var name="FBar" datatype="float" value="1" comment="fill level"/> 
+    <rt:var name="FColor" datatype="uint" comment="цвет индикации"/> 
+    <rt:var name="ht" datatype="float" comment="высота барографа"/> 
+    <rt:var name="c1" datatype="double" comment="log10(25)"/> 
+    <rt:var name="M_Color" datatype="uint" comment="Приглушенный цвет"/> 
+    <rt:sub>Sub ValCalc()
+If pv != nothing Then
+	Dim val As double
+	val = pv.Value
+	If (val &lt;= -25) Then
+		FBar = 0
+	ElseIf (val &gt; -25) &amp;&amp; (val &lt; -1) Then
+		FBar = -0.3 * (1 - Log10(- val) / c1)
+	ElseIf (val &gt;= -1) &amp;&amp; (val &lt; 1) Then
+		FBar = -0.3 - 0.35 * (1.0 + val)
+	Else
+		FBar = -1
+	End If
+	If (pv.Quality == PLS_QUAL_BAD) Then
+		FColor = Color_Inval	
+	Else
+		FColor = M_Color
+	End If
+Else
+	FBar = -1 
+	FColor = Color_ErLink
+End If
+End Sub</rt:sub>
+    <rt:event type="OnResize">Dim thh as double
+Dim thw as double
+thh = _This.height
+thw = _This.width
+InGr.y = -2.5
+InGr.height = thh + 5
+Backgr_frame.height = thh
+Backgr_rect.height = thh
+Lines_Lin0.y1 = thh * 0.35
+Lines_Lin0.y2 = thh * 0.35
+Lines_Lin1.y1 = thh * 0.7
+Lines_Lin1.y2 = thh * 0.7
+Lines_Lin3.y1 = thh 
+Lines_Lin3.y2 = thh 
+BotLineBorder.y1 = thh
+BotLineBorder.y2 = thh
+Digits_DigMin25.y = thh - 4.0
+Digits_DigMin1.y = thh * 0.7 - 4.0
+Digits_Dig0.y = thh * 0.35 - 4
+//body.Scale(1 , 0.3 , 5 , thh )
+SelArea.height = thh
+						// ширина
+If thw &lt;=  30 Then 
+	thw = 30
+End If	
+
+Backgr_frame.width = thw - 25
+Backgr_rect.width = thw - 25
+InGr.width = thw - 20
+Lines_Lin0.x2 = thw
+Lines_Lin1.x2 = thw
+Lines_Lin2.x2 = thw 
+Lines_Lin3.x2 = thw 
+BotLineBorder.x2 = thw
+TopLineBorder.x2 = thw
+Digits_DigMin25.x = thw - 15
+Digits_DigMin1.x = thw - 15
+Digits_Dig0.x = thw - 9
+Digits_Dig1.x = thw - 9
+body.width = thw - 25
+SelArea.width = thw - 25</rt:event>
+    <rt:event type="OnInitialize">Set pv = RTAPLS.AnaPV(PointID)
+If pv == Nothing Then
+	FColor = Color_ANA_ER_LINK
+End If
+ht = _This.height
+c1 = Log10(25)
+body.visibility = &quot;visible&quot;
+M_Color = Middle_Color_Wieghted(Color_ANA_GOOD, 0xcdcdcd, 0.5)</rt:event>
+    <rt:changeTrigger name="GRP">
+      <rt:condition>pv != Nothing</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(pv.PVId) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc">
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="Backgr_rect" fill="Col_BGmain" stroke="none"/> 
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="Backgr_frame" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <rect x="2.5" y="-2.5" width="20" height="105" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="1.5">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <line x1="-0.5" y1="0" x2="41" y2="0" id="TopLineBorder" stroke="black" stroke-width="3"/> 
+  <line x1="0" y1="100" x2="40" y2="100" id="BotLineBorder" stroke="black" stroke-width="3"/> 
+  <g id="Lines" stroke-width="2">
+    <line x1="0" y1="35" x2="40" y2="35" id="Lin0" stroke="black"/> 
+    <line x1="0" y1="70" x2="40" y2="70" id="Lin1" stroke="black"/> 
+    <line x1="0" y1="0" x2="40" y2="0" id="Lin2" stroke="black">
+      <rt:dyn type="stroke" mode="unknown" value="M_Color"/> 
+    </line>
+    <line x1="0" y1="100" x2="40" y2="100" id="Lin3" stroke="black">
+      <rt:dyn type="stroke" mode="unknown" value="M_Color"/> 
+    </line>
+  </g>
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" rt:filly="-0.3" id="body" visibility="hidden" rt:detect="disabled" fill="Col_Green" stroke="none">
+    <rt:dyn type="fill" mode="onchange" value="FColor"/> 
+    <rt:dyn type="rt:filly" mode="onchange" value="FBar"/> 
+    <rt:dyn type="height" mode="unknown" value="_This.height"/> 
+  </rect>
+  <g id="Digits" visibility="hidden" rt:detect="disabled" font-size="13">
+    <rt:dyn type="visibility" mode="unknown" value="ShowDigits" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <text x="31" y="13" id="Dig1">
+      <rt:dyn type="font-size" mode="unknown" value="13"/> 
+      <rt:dyn type="y" mode="unknown" value="13"/> 
+1</text>
+    <text x="31" y="32.5" id="Dig0">
+      <rt:dyn type="font-size" mode="unknown" value="13"/> 
+      <rt:dyn type="y" mode="unknown" value="Backgr_frame.height * 0.35 - 4"/> 
+0</text>
+    <text x="25" y="67.5" id="DigMin1">
+      <rt:dyn type="font-size" mode="unknown" value="13"/> 
+      <rt:dyn type="y" mode="unknown" value="Backgr_frame.height * 0.7 - 4"/> 
+-1</text>
+    <text x="25" y="97.5" id="DigMin25">
+      <rt:dyn type="font-size" mode="unknown" value="13"/> 
+      <rt:dyn type="y" mode="unknown" value="Backgr_frame.height - 4"/> 
+-25</text>
+  </g>
+  <rect x="0" y="-2.5" width="25" height="105" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If pv == nothing Then
+	NoLink(PointID)
+Else
+	Call_Win (&quot;ws_ANA_NB&quot;, pv.PVId + &quot;|-1&quot;)
+End If</rt:event>
+    <rt:event type="OnRightClick">If pv == nothing Then
+	NoLink(PointID)
+Else
+	LoadPopUpMenu(pv.PVId + &quot;|ANAi|ws_ANA_NB &quot; + pv.PVId + &quot;|-1&quot;)
+End If</rt:event>
+  </rect>
+</svg>

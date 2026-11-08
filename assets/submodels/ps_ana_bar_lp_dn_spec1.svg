@@ -1,0 +1,103 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 25 100" width="25" height="100" id="ps_ana_bar_lp_dn_spec1" stroke="black">
+  <desc>Барограф кусочно-логарифмический с заливкой вниз</desc>
+  <rt:model comment="Пользовательская подмодель ПОРТАЛа" revision="4.0">
+    <rt:param name="PointID" datatype="string" comment="Идентификатор сигнала заливки"/> 
+    <rt:param name="Value_PZ" datatype="double" value="-9999" comment="Значение верхней предупредительной уставки"/> 
+    <rt:param name="Value_AZ" datatype="double" value="-9999" comment="Значение верхней аварийной уставки"/> 
+    <rt:var name="pv" datatype="PlsPVAna" value="" comment="DB PV"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="object in group"/> 
+    <rt:var name="FBar" datatype="float" value="1" comment="fill level"/> 
+    <rt:var name="FColor" datatype="uint" comment="цвет индикации"/> 
+    <rt:var name="ErrAa" datatype="boolean" value="true" comment="ошибка"/> 
+    <rt:sub>Sub ValCalc()
+If pv != nothing Then
+	ErrAa = False
+	If (Value_AZ == -9999) || (Value_AZ &gt;= pv.RangeHigh) || (Value_AZ &lt;= pv.RangeLow) Then
+		ErrAa = True
+	End If
+	FBar = Lt()
+	If (pv.Quality == 0) &amp;&amp; !ErrAa Then
+		FColor = Color_Inval
+	ElseIf (Value_AZ != -9999) &amp;&amp; (pv.Value &lt;= Value_AZ) Then
+		FColor = Color_ANA_HI_A
+	ElseIf (Value_PZ != -9999)  &amp;&amp; (pv.Value &lt;= Value_PZ) Then
+		FColor = Color_ANA_HI_P
+	Else
+		FColor = Color_ANA_GOOD
+	End If
+End If
+End Sub</rt:sub>
+    <rt:sub>Function Lt() As Float
+&apos;Вычисление уровней по формулам
+If pv == Nothing Then
+	Lt = 1
+	Exit Function
+End If
+
+Dim Am As Double
+Dim At As Double
+Dim A0 As Double
+Dim Aa As Double
+Am = pv.RangeHigh
+At = pv.Value
+A0 = pv.RangeLow
+If (Value_AZ == -9999) Then
+	Aa = A0
+Else
+	Aa = Value_AZ
+End If
+
+If (At &gt;= Aa) Then
+	Lt = 0.9 - Log10(1 + 500*(At - Aa)/(Am - Aa)) / 3.0
+Else
+	Lt = 0.9 + Log10(1 + 500*(Aa - At)/(Aa - A0)) / 27.0
+End If
+End Function</rt:sub>
+    <rt:event type="OnResize">InGr.y = -2.5
+InGr.height = _This.height + 5</rt:event>
+    <rt:event type="OnInitialize">Set pv = ANA(PointID)
+If pv == Nothing Then
+	FColor = Color_ANA_ER_LINK
+End If</rt:event>
+    <rt:changeTrigger name="GRP">
+      <rt:condition>pv != Nothing</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(pv.PVId) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc">
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:chgItem>Value_PZ</rt:chgItem>
+      <rt:chgItem>Value_AZ</rt:chgItem>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="Backgr_rect" fill="Col_BGmain" stroke="none"/> 
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" rt:filly="0.3" id="body" fill="Col_Green" stroke="none">
+    <rt:dyn type="fill" mode="onchange" value="FColor"/> 
+    <rt:dyn type="rt:filly" mode="onchange" value="FBar"/> 
+  </rect>
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="Backgr_frame" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <rect x="2.5" y="-2.5" width="20" height="105" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="1.5">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="0" y="-2.5" width="25" height="105" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If pv == nothing Then
+	NoLink(PointID)
+ElseIf ErrAa Then
+	ShowWarning(&quot;Значение аварийной уставки\nвыходит за границы сигнала!&quot;, 10)
+Else
+	Call_Win (&quot;ws_ANA_NB&quot;, pv.PVId + &quot;|-1&quot;)
+End If</rt:event>
+    <rt:event type="OnRightClick">If pv == nothing Then
+	NoLink(PointID)
+ElseIf ErrAa Then
+	ShowWarning(&quot;Значение аварийной уставки\nвыходит за границы сигнала!&quot;, 10)
+Else
+	LoadPopUpMenu(pv.PVId + &quot;|ANAi|ws_ANA_NB &quot; + pv.PVId + &quot;|-1&quot;)
+End If</rt:event>
+  </rect>
+</svg>

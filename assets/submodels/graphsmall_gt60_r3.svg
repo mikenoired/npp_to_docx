@@ -1,0 +1,126 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 500 280" width="500" height="280" id="graphsmall_gt60_r3">
+  <rt:model modelversion="7.2.0.23" comment="Создано User-PC-VAIO\User-PC 16.12.2012 12:01:15">
+    <rt:param name="PointID1" datatype="double" comment=""/> 
+    <rt:param name="PointID2" datatype="double" comment=""/> 
+    <rt:param name="PointID3" datatype="boolean" comment=""/> 
+    <rt:var name="x_coordinate" datatype="double" comment=""/> 
+    <rt:var name="y_coordinate" datatype="double" comment=""/> 
+    <rt:var name="x_coord_T" datatype="double" comment=""/> 
+    <rt:var name="y_coord_T" datatype="double" comment=""/> 
+    <rt:var name="x_coord_P" datatype="double" comment=""/> 
+    <rt:var name="y_coord_P" datatype="double" comment=""/> 
+    <rt:sub>Sub graph()
+	if (PointID1 &gt;= 20) &amp;&amp; (PointID1 &lt;= 168) then
+		x_coordinate = 3.3*(PointID1 - 20)
+		y_coordinate = 250 - (PointID2 - 50)
+	elseif (PointID1 &gt; 168) then
+		x_coordinate = 3.3*148
+		y_coordinate = 250 - (PointID2 - 50)
+	else	
+		x_coordinate = -1000000
+		y_coordinate = 250 - (PointID2 - 50)
+	end if
+	if (PointID2 &gt; 300) then	
+		y_coordinate = 0
+	end if	
+	if (PointID2 &lt; 50) then	
+		y_coordinate = 250
+	end if		
+	
+	x_coord_T = x_coordinate + 10
+	y_coord_T = y_coordinate + 25
+	x_coord_P = x_coordinate + 10
+	y_coord_P = y_coordinate - 15	
+	if (x_coordinate&gt;410) then 
+		x_coord_T = 410 
+		x_coord_P = 410		
+	end if
+	if (y_coordinate&gt;225) then 
+		y_coord_T = y_coordinate - 15 
+		y_coord_P = y_coordinate - 40  		
+	end if	
+	
+End Sub</rt:sub>
+    <rt:changeTrigger name="graph">
+      <rt:chgItem>PointID1</rt:chgItem>
+      <rt:chgItem>PointID2</rt:chgItem>
+      <rt:chgItem>PointID3</rt:chgItem>
+      <rt:code>graph()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="-1" y="0" width="504" height="279" rx="0" ry="0" fill="white" fill-opacity="0.00999512">
+    <title>Увеличить</title>
+    <rt:event type="OnClick">LoadNew(&quot;SPPB5_GRAPH&quot;)</rt:event>
+  </rect>
+  <g>
+    <rt:dyn type="visibility" mode="unknown" value="PointID3" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <text x="-30" y="12" font-size="15">,</text>
+    <line x1="-2" y1="250" x2="492" y2="250" stroke="black" stroke-width="5"/> 
+    <polygon points="0,250 0,0 490,0 490,250" fill="Col_Red" stroke="black"/> 
+    <polygon points="0,250 0,211.488 3.3,204.424 6.6,197.277 9.9,190.049 13.2,182.745 16.501,175.368 19.801,167.92 23.101,160.405 26.401,152.825 29.701,145.182 33.001,137.479 36.301,129.716 39.601,121.898 42.901,114.024 46.202,106.097 49.502,98.118 52.802,90.089 56.102,82.012 59.402,73.886 62.702,65.715 66.002,57.498 66.085,57.292 396.013,57.292 490,57.292 490,250" fill="Col_Orange" stroke="black"/> 
+    <text x="514" y="255.75" font-size="20">Т</text>
+    <text x="-42" y="11" font-size="20">P</text>
+    <polygon points="398.25,10.5 388.25,30 408.25,30" transform="rotate(90 334.5 186)"/> 
+    <text x="-12" y="274" font-size="15">20</text>
+    <text x="55.667" y="274" font-size="15">40</text>
+    <text x="121.667" y="274.333" font-size="15">60</text>
+    <text x="188.333" y="274" font-size="15">80</text>
+    <text x="248.333" y="274" font-size="15">100</text>
+    <text x="315.333" y="274" font-size="15">120</text>
+    <text x="-46" y="205.667" font-size="15">100</text>
+    <text x="-46" y="154.667" font-size="15">150</text>
+    <text x="-44" y="105" font-size="15">200</text>
+    <text x="-44" y="55" font-size="15">250</text>
+    <text x="379.333" y="274" font-size="15">140</text>
+    <polygon points="0,250 0,240.825 3.3,240.741 6.6,238.407 9.9,234.486 13.2,229.473 16.501,223.735 19.801,217.547 23.101,211.113 26.401,204.584 29.701,198.072 33.001,191.659 36.301,185.402 39.601,179.341 42.901,173.503 46.202,167.904 49.502,162.551 52.802,157.447 56.102,152.59 59.402,147.972 62.702,143.585 66.002,139.418 69.302,135.459 72.602,131.696 75.902,128.113 79.203,124.697 82.503,121.434 85.803,118.309 89.103,115.308 92.403,112.417 95.703,109.623 99.003,106.911 102.303,104.268 105.603,101.683 108.904,99.141 112.204,96.632 115.504,94.143 117.055,92.977 490,92.977 490,250" fill="Col_Yellow" stroke="black"/> 
+    <line x1="66" y1="0" x2="66" y2="262" stroke="black" stroke-dasharray="5,5"/> 
+    <line x1="198" y1="0" x2="198" y2="262" stroke="black" stroke-dasharray="5,5"/> 
+    <line x1="264" y1="0" x2="264" y2="262" stroke="black" stroke-dasharray="5,5"/> 
+    <line x1="330" y1="0" x2="330" y2="262" stroke="black" stroke-dasharray="5,5"/> 
+    <line x1="396" y1="0" x2="396" y2="262" stroke="black" stroke-dasharray="5,5"/> 
+    <line x1="462" y1="0" x2="462" y2="262" stroke="black" stroke-dasharray="5,5"/> 
+    <line x1="-14" y1="50" x2="490" y2="50" stroke="black" stroke-dasharray="5,5"/> 
+    <line x1="-14" y1="100" x2="490" y2="100" stroke="black" stroke-dasharray="5,5"/> 
+    <line x1="-14" y1="150" x2="490" y2="150" stroke="black" stroke-dasharray="5,5"/> 
+    <line x1="-14" y1="200" x2="490" y2="200" stroke="black" stroke-dasharray="5,5"/> 
+    <rect x="138" y="72.75" width="85" height="17" rx="0" ry="0" fill="Col_Grey2" fill-opacity="0.899988">
+      <rt:dyn type="x" mode="unknown" value="x_coord_T - 4"/> 
+      <rt:dyn type="y" mode="unknown" value="y_coord_T - 15"/> 
+    </rect>
+    <rect x="138" y="91.75" width="85" height="17" rx="0" ry="0" fill="Col_Grey2" fill-opacity="0.899988">
+      <rt:dyn type="x" mode="unknown" value="x_coord_P - 4"/> 
+      <rt:dyn type="y" mode="unknown" value="y_coord_P - 15"/> 
+    </rect>
+    <text x="135.5" y="142.5" fill="black" font-size="15">
+      <rt:dyn type="text" mode="unknown" value="&apos;T= &apos; + CStr(Round(PointID1, 2))"/> 
+      <rt:dyn type="x" mode="onchange" value="x_coord_T"/> 
+      <rt:dyn type="y" mode="onchange" value="y_coord_T"/> 
+ttext</text>
+    <text x="135.75" y="126" fill="black" font-size="15">
+      <rt:dyn type="text" mode="onchange" value="&apos;P= &apos; + CStr(Round(PointID2, 2))"/> 
+      <rt:dyn type="x" mode="onchange" value="x_coord_P"/> 
+      <rt:dyn type="y" mode="onchange" value="y_coord_P"/> 
+ptext</text>
+    <line x1="132" y1="0" x2="132" y2="262" stroke="black" stroke-dasharray="5,5"/> 
+    <line x1="0" y1="250" x2="0" y2="0" stroke="black" stroke-width="5"/> 
+    <polygon points="0,-18.75 -10,0.75 10,0.75"/> 
+    <text x="-34" y="256.667" font-size="15">50</text>
+    <text x="450.333" y="274" font-size="15">&gt;160</text>
+    <text x="525" y="256.75" font-size="15">,°С</text>
+    <text x="-68" y="29" font-size="15">кгс/см2</text>
+    <text x="496" y="62" fill="black" font-size="15">242,7 кгс/см2</text>
+    <text x="496" y="97" fill="black" font-size="15">207,0 кгс/см2</text>
+    <circle cx="128" cy="132.25" r="5" fill="Col_Cyan">
+      <rt:dyn type="cx" mode="onchange" value="x_coordinate"/> 
+      <rt:dyn type="cy" mode="onchange" value="y_coordinate"/> 
+    </circle>
+  </g>
+  <rect x="-8" y="-9" width="504" height="279" rx="0" ry="0" fill="white" fill-opacity="0.00999512">
+    <title>Увеличить</title>
+    <rt:event type="OnClick">LoadNew(&quot;SPPB5_GRAPH&quot;)</rt:event>
+  </rect>
+</svg>

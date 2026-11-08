@@ -1,0 +1,84 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="none meet" viewBox="0 0 225 35" width="225" height="35" id="TPTS_ZTT" font-family="AAP_Font1">
+  <desc>ZTT телеграммы (обобщенный индикатор) 2 поколения</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="4.1-6.0">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS телеграмм"/> 
+    <rt:param name="SafetySystem" datatype="boolean" value="false" comment="Это модуль СБ (будет обработка сигнала s14)"/> 
+    <rt:var name="Err" datatype="boolean" value="true" comment="ошибки"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="S0" datatype="PlsPVBin" comment="Указатель на переменную"/> 
+    <rt:var name="S1" datatype="PlsPVBin" comment="Указатель на переменную"/> 
+    <rt:var name="S3" datatype="PlsPVBin" comment="Указатель на переменную"/> 
+    <rt:sub>Sub ErrCount()
+Dim ErrS As uint
+ErrS = 0
+If (S0 == Nothing) || (S1 == Nothing) || (S3 == Nothing) Then
+	Err = True
+Else
+	If (S0 != nothing) Then
+		ErrS = S0.Value &amp; 0x1ff
+	End If
+	If (S1 != nothing) Then
+		ErrS = ErrS | (S1.Value &amp; 0x384)
+	End If
+	If (S3 != nothing) Then
+		ErrS = ErrS | (S3.Value &amp; 0xff)
+	End If
+	Err = (ErrS &gt; 0)
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (KKS != &quot;NULL&quot;) Then
+	S0 = BIN(KKS + &quot;_S0&quot;)
+	S1 = BIN(KKS + &quot;_S1&quot;)
+	S3 = BIN(KKS + &quot;_S3&quot;)
+End If</rt:event>
+    <rt:changeTrigger name="GetState">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>S0</rt:chgItem>
+      <rt:chgItem>S1</rt:chgItem>
+      <rt:chgItem>S3</rt:chgItem>
+      <rt:code>ErrCount()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="225" height="35" rx="0" ry="0" id="backgr" fill="Col_Grey2" stroke="Col_Grey5" stroke-linejoin="miter" stroke-width="2"/> 
+  <polyline points="0,35 0,0 225,0" id="LT_border" fill="none" stroke="Col_Grey1" stroke-width="2"/> 
+  <image x="10" y="10" width="32.5" height="15" xlink:href="bool_indicator.svg" id="Stat_indicator">
+    <rt:dyn type="Stat" mode="onchange" value="Err"/> 
+  </image>
+  <rect x="5" y="5" width="215" height="25" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <text x="45.125" y="21.625" fill="black" font-family="AAP_Font1" font-size="13" font-weight="bold" text-anchor="start">Др. неисправности по ZTT</text>
+  <rect x="0" y="0" width="225" height="35" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If S0 != nothing Then
+	If VIS.ModelExists(False, &quot;wd_TPTS_ZTT_6&quot;) Then
+		Open_ws_wf_wi(&quot;wd_TPTS_ZTT_6&quot;, KKS + &quot;|&quot; + CStr(SafetySystem), False)
+	ElseIf VIS.ModelExists(False, &quot;wd_TPTS_ZTT_g2&quot;) Then
+		Open_ws_wf_wi(&quot;wd_TPTS_ZTT_g2&quot;, KKS + &quot;|&quot; + CStr(SafetySystem), False)
+	Else
+		Open_ws_wf_wi(&quot;wd_TPTS_ZTT&quot;, KKS + &quot;|&quot; + CStr(SafetySystem), False)
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnRightClick">If S0 != nothing Then
+	If VIS.ModelExists(False, &quot;wd_TPTS_ZTT_6&quot;) Then
+		LoadPopUpMenu(KKS + &quot;|ZTTd|wd_TPTS_ZTT_6 &quot; + KKS + &quot;|&quot; + CStr(SafetySystem))
+	ElseIf VIS.ModelExists(False, &quot;wd_TPTS_ZTT_g2&quot;) Then
+		LoadPopUpMenu(KKS + &quot;|ZTTd|wd_TPTS_ZTT_g2 &quot; + KKS + &quot;|&quot; + CStr(SafetySystem))
+	Else
+		LoadPopUpMenu(KKS + &quot;|ZTTd|wd_TPTS_ZTT &quot; + KKS)
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+  </rect>
+</svg>

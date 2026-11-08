@@ -1,0 +1,193 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 75 25" width="75" height="25" id="bin_tablo_AND3">
+  <desc>Табло 3И</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.0">
+    <rt:param name="PointID_1" datatype="string" value="NULL" comment="идентификатор сигнала 1 обязательный"/> 
+    <rt:param name="PointID_2" datatype="string" value="NULL" comment="идентификатор сигнала 2"/> 
+    <rt:param name="PointID_3" datatype="string" value="NULL" comment="идентификатор сигнала 3"/> 
+    <rt:param name="Col_ON" datatype="string" value="Col_Yellow" comment="цвет для индикации состояния True"/> 
+    <rt:param name="Col_OFF" datatype="string" value="Col_Green" comment="цвет для индикации состояния False"/> 
+    <rt:param name="T_String" datatype="string" value="" comment="Текст на индикаторе"/> 
+    <rt:param name="T_Color" datatype="string" value="black" comment="Цвет текста"/> 
+    <rt:param name="T_Font" datatype="string" value="inherit" comment="Шрифт"/> 
+    <rt:param name="T_Size" datatype="float" value="15" comment="Размер шрифта"/> 
+    <rt:param name="T_Style" datatype="string" value="normal" comment="Стиль"/> 
+    <rt:param name="T_Weight" datatype="string" value="normal" comment="Толщина букв шрифта"/> 
+    <rt:param name="Grad_Style" datatype="boolean" value="false" comment="Индикатор имеет градиентную заливку - объёмный фон"/> 
+    <rt:var name="pv_1" datatype="PlsPVBin" comment="указатель на сигнал 1"/> 
+    <rt:var name="pv_2" datatype="PlsPVBin" comment="указатель на сигнал 2"/> 
+    <rt:var name="pv_3" datatype="PlsPVBin" comment="указатель на сигнал 3"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="NoGrad" datatype="boolean" value="false" comment="отображение градиента запрещено"/> 
+    <rt:sub>Sub BGColor ()
+Dim BadQ As Boolean
+Dim res As Boolean
+res = False
+NoGrad = False
+
+BadQ = false
+
+If pv_1 != Nothing Then
+	If !PRJSPEC.GET_Susp(pv_1.PVId, False) Then
+		If pv_1.Quality == PLS_QUAL_BAD Then
+			BadQ = True
+		Else
+			res = (pv_1.Value != 0)
+		End If
+	End If
+Else
+	body.fill = Color_ErLink
+	NoGrad = True
+	Exit Sub
+End If
+If pv_2 != Nothing Then
+	If !PRJSPEC.GET_Susp(pv_2.PVId, False) Then
+		If pv_2.Quality == PLS_QUAL_BAD Then
+			BadQ = true
+		Else
+			res = res &amp;&amp; (pv_2.Value != 0)
+		End If
+	End If
+ElseIf PointID_2 != &quot;NULL&quot; Then
+	BadQ = true
+End If
+If pv_3 != Nothing Then
+	If !PRJSPEC.GET_Susp(pv_3.PVId, False) Then
+		If pv_3.Quality == PLS_QUAL_BAD Then
+			BadQ = true
+		Else
+			res = res &amp;&amp; (pv_3.Value != 0)
+		End If
+	End If
+ElseIf PointID_3 != &quot;NULL&quot; Then
+	BadQ = true
+End If
+
+If BadQ Then
+	body.fill = Color_Inval
+	NoGrad = True
+ElseIf res Then
+	body.fill = Col_ON
+Else
+	body.fill = Col_OFF
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub CheckLocalGroup ()
+In_Group = (PRJSPEC.GRP_In(PointID_1) &gt; 0)
+If pv_2 != Nothing Then
+	In_Group = In_Group || (PRJSPEC.GRP_In(PointID_2) &gt; 0)
+End If
+If pv_3 != Nothing Then
+	In_Group = In_Group || (PRJSPEC.GRP_In(PointID_3) &gt; 0)
+End If
+End Sub</rt:sub>
+    <rt:event type="OnResize">InGr.x = -2.5
+InGr.y = -2.5
+InGr.width = _This.width + 5
+InGr.height = _This.height + 5</rt:event>
+    <rt:event type="OnInitialize">If (PointID_1 != &quot;NULL&quot;) then
+	pv_1 = BIN(PointID_1)
+Else
+	body.fill = Color_ErLink
+End If
+If (PointID_2 != &quot;NULL&quot;) then
+	pv_2 = BIN(PointID_2)
+End If
+If (PointID_3 != &quot;NULL&quot;) then
+	pv_3 = BIN(PointID_3)
+End If</rt:event>
+    <rt:event type="OnClick">Dim MsgStr As String
+If PointID_1 == &quot;NULL&quot; Then
+	ShowWarning (&quot;Объект не привязан.&quot;, 5)
+ElseIf (pv_1 == nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nВход 1 = \&quot;&quot; + PointID_1 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf ((PointID_2 != &quot;NULL&quot;) &amp;&amp; (pv_2 == nothing)) Then
+	MsgStr = &quot;Ошибка привязки.\nВход 2 = \&quot;&quot; + PointID_2 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf ((PointID_3 != &quot;NULL&quot;) &amp;&amp; (pv_3 == nothing)) Then
+	MsgStr = &quot;Ошибка привязки.\nВход 3 = \&quot;&quot; + PointID_3 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf ((PointID_2 == &quot;NULL&quot;) &amp;&amp; (PointID_3 == &quot;NULL&quot;)) Then
+	Call_Win(&quot;wi_BIN&quot;, PointID_1)
+Else
+	Dim s As String
+	s = PointID_1
+	If (PointID_2 != &quot;NULL&quot;) Then
+		s = s + &quot;|&quot; + PointID_2
+	End If
+	If (PointID_3 != &quot;NULL&quot;) Then
+		s = s + &quot;|&quot; + PointID_3
+	End If
+	Open_Win_Uni(False, &quot;multyKKS&quot;, &quot;Составной объект&quot;, &quot;wi_MultyPV&quot;, s)
+End If</rt:event>
+    <rt:event type="OnRightClick">Dim MsgStr As String
+If PointID_1 == &quot;NULL&quot; Then
+	ShowWarning (&quot;Объект не привязан.&quot;, 5)
+ElseIf (pv_1 == nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nВход 1 = \&quot;&quot; + PointID_1 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf ((PointID_2 != &quot;NULL&quot;) &amp;&amp; (pv_2 == nothing)) Then
+	MsgStr = &quot;Ошибка привязки.\nВход 2 = \&quot;&quot; + PointID_2 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf ((PointID_3 != &quot;NULL&quot;) &amp;&amp; (pv_3 == nothing)) Then
+	MsgStr = &quot;Ошибка привязки.\nВход 3 = \&quot;&quot; + PointID_3 + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf ((PointID_2 == &quot;NULL&quot;) &amp;&amp; (PointID_3 == &quot;NULL&quot;)) Then
+	LoadPopUpMenu(PointID_1 + &quot;|BINi|wi_BIN &quot; + PointID_1)
+Else
+	TmpBuffer(0) = PointID_1
+	If (PointID_2 != &quot;NULL&quot;) Then
+		TmpBuffer(1) = PointID_2
+	End If
+	If (PointID_3 != &quot;NULL&quot;) Then
+		TmpBuffer(2) = PointID_3
+	End If
+	LoadPopUpMenu(PointID_1 + &quot;|NONi|&quot;)
+
+End If</rt:event>
+    <rt:changeTrigger name="CheckPV_1">
+      <rt:condition>PointID_1 != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>pv_1</rt:chgItem>
+      <rt:code>BGColor()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="CheckPV_2">
+      <rt:condition>PointID_2 != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>pv_2</rt:chgItem>
+      <rt:code>BGColor()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="CheckPV_3">
+      <rt:condition>PointID_3 != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>pv_3</rt:chgItem>
+      <rt:code>BGColor()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>PointID_1 != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>CheckLocalGroup ()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="75" height="25" rx="0" ry="0" id="Grad_BG" fill="url(#Cylinder_horizontal2)" stroke="none"/> 
+  <rect x="0" y="0" width="75" height="25" rx="0" ry="0" id="body" fill="Col_Yellow" fill-opacity="0.599997" stroke="none">
+    <rt:dyn type="fill-opacity" mode="onchange" value="Grad_Style &amp;&amp; !NoGrad" trans="bd">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0.6"/> 
+    </rt:dyn>
+  </rect>
+  <polyline points="0,25 75,25 75,0" id="RB_border" fill="none" stroke="Col_Grey1" stroke-linecap="round" stroke-linejoin="miter" stroke-width="1"/> 
+  <polyline points="0,25 0,0 75,0" id="LU_border" fill="none" stroke="Col_Grey5" stroke-linecap="round" stroke-linejoin="miter" stroke-width="1"/> 
+  <text x="37.5" y="11" id="I_Text" fill="black" font-size="15" font-style="normal" font-weight="normal" text-anchor="middle" rt:text-vertanchor="middle">
+    <rt:dyn type="font-size" mode="onchange" value="T_Size"/> 
+    <rt:dyn type="font-family" mode="onchange" value="T_Font"/> 
+    <rt:dyn type="font-style" mode="onchange" value="T_Style"/> 
+    <rt:dyn type="font-weight" mode="onchange" value="T_Weight"/> 
+    <rt:dyn type="text" mode="onchange" value="T_String"/> 
+    <rt:dyn type="fill" mode="onchange" value="T_Color"/> 
+AND 3</text>
+  <rect x="-2.5" y="-2.5" width="80" height="30" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-linecap="round" stroke-linejoin="miter" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+</svg>

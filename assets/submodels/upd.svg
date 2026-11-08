@@ -1,0 +1,382 @@
+<?xml  version="1.0" encoding="windows-1251"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="none meet" viewBox="0 0 108 180" width="108" height="180" id="upd" fill="none" stroke="black" stroke-width="2">
+  <desc>PC класса 3Н (1 монитор)</desc>
+  <title>АРМ PC-1K4</title>
+  <rt:model comment="Подмодель ПОРТАЛа" revision="1.0" modelversion="0.0.0.0">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="идентификатор сигнала"/> 
+    <rt:param name="title_base" datatype="string" value="NULL" comment="имя станции"/> 
+    <rt:param name="NdID" datatype="RtaNode" comment="интерфейс узла"/> 
+    <rt:param name="Active" datatype="boolean" comment="выделение подсветкой" value="false"/> 
+    <rt:param name="LocalNetMask" datatype="ushort" value="3" comment="реальная маска локальной сети"/> 
+    <rt:var name="IBP_XQ01" datatype="PlsPVAna" comment="Заряд батареи ИБП"/> 
+    <rt:var name="IBP_XQ02" datatype="PlsPVAna" comment="Основное напряжение питания ИБП"/> 
+    <rt:var name="IBP_XQ03" datatype="PlsPVAna" comment="Уровень нагрузки ИБП"/> 
+    <rt:var name="IBP_XQ04" datatype="PlsPVAna" comment="Напряжение ИБП"/> 
+    <rt:var name="IBP_XQ05" datatype="PlsPVAna" comment="Напряжение на выходе ИБП"/> 
+    <rt:var name="IBP_XQ06" datatype="PlsPVAna" comment="Время работы на ИБП"/> 
+    <rt:var name="IBP_XQ07" datatype="PlsPVAna" comment="Частота на входе ИБП"/> 
+    <rt:var name="IBP_XQ08" datatype="PlsPVAna" comment="Частота на выходе ИБП"/> 
+    <rt:var name="IBP_XQ09" datatype="PlsPVAna" comment="Внутренняя температура ИБП"/> 
+    <rt:var name="IBP_ZV02" datatype="PlsPVBin" comment="Источник выходной мощности ИБП"/> 
+    <rt:var name="IBP_ZV03" datatype="PlsPVBin" comment="Состояние перегрузки выходов ИБП"/> 
+    <rt:var name="IBP_ZV04" datatype="PlsPVBin" comment="Состояние ИБП"/> 
+    <rt:var name="IBP_ZV05" datatype="PlsPVBin" comment="Наличие основного напряжения ИБП"/> 
+    <rt:var name="IBP_ZV06" datatype="PlsPVBin" comment="Наличие резервного напряжения ИБП"/> 
+    <rt:var name="MKB_ZV02" datatype="PlsPVBin" comment="Состояние процессорного модуля МКБ"/> 
+    <rt:var name="MKB_ZV03" datatype="PlsPVBin" comment="Состояние модуля I/O №1 МКБ"/> 
+    <rt:var name="MKB_ZV04" datatype="PlsPVBin" comment="Состояние модуля I/O №2 МКБ"/> 
+    <rt:var name="MKB_ZV05" datatype="PlsPVBin" comment="Состояние сенсора №1 модуля I/O №1 МКБ"/> 
+    <rt:var name="MKB_ZV06" datatype="PlsPVBin" comment="Состояние сенсора №2 модуля I/O №1 МКБ"/> 
+    <rt:var name="MKB_ZV07" datatype="PlsPVBin" comment="Состояние сенсора №3 модуля I/O №1 МКБ"/> 
+    <rt:var name="MKB_ZV08" datatype="PlsPVBin" comment="Состояние сенсора №1 модуля I/O №2 МКБ"/> 
+    <rt:var name="MKB_ZV09" datatype="PlsPVBin" comment="Состояние сенсора №2 модуля I/O №2 МКБ"/> 
+    <rt:var name="MKB_ZV12" datatype="PlsPVBin" comment="Состояние открытия передней двери"/> 
+    <rt:var name="MKB_ZV14" datatype="PlsPVBin" comment="Состояние открытия задней двери"/> 
+    <rt:var name="MKB_ZV16" datatype="PlsPVBin" comment="Состояние напряжения питания основной линии"/> 
+    <rt:var name="MKB_ZV17" datatype="PlsPVBin" comment="Состояние напряжения питания резервной линии"/> 
+    <rt:var name="TIME_ZV01" datatype="PlsPVBin" comment="Обобщенное состояние устройства времени"/> 
+    <rt:var name="TIME_XQ01" datatype="PlsPVAna" comment="Разность времен c тайм-сервером"/> 
+    <rt:var name="MKB_XQ01" datatype="PlsPVAna" comment="Температура в стойке"/> 
+    <rt:sub>Sub GetNodeStatus()
+Dim WS_ID As String
+Dim NStatus As UShort
+Dim NDStatus As UShort
+Dim NodeNet As UShort
+Dim IP1 As String
+Dim IP2 As String
+Dim CPU_load As UShort
+Dim t_ID As String
+Dim t_Status As String
+Dim t_Net_1 As String
+Dim t_Net_2 As String
+Dim t_CPU As String
+Dim rect_ID As String
+Dim rect_Status As String
+Dim rect_Net_1 As String
+Dim rect_Net_2 As String
+Dim rect_CPU As String
+Dim rect_DataOK As String
+Dim rect_Repl_S As String
+Dim rect_Repl_R As String
+Dim rect_Vis As String
+Dim R As String
+Dim W As String
+Dim G As String
+
+W = Col_Ar(7)
+R = Col_Ar(1)
+G = Col_Ar(2)
+
+If NdID == Nothing Then
+	t_ID = &quot;&quot;
+	rect_ID = Col_Ar(7)
+	t_Status = &quot;&quot;
+	rect_Status = Col_Ar(7)
+	t_Net_1 = &quot;&quot;
+	t_Net_2 = &quot;&quot;
+	rect_Net_1 = Col_Ar(7)
+	rect_Net_2 = Col_Ar(7)
+	rect_CPU = Col_Ar(7)
+	rect_DataOK = Col_Ar(7)
+	rect_Repl_S = Col_Ar(7)
+	rect_Repl_R = Col_Ar(7)
+	rect_Vis = Col_Ar(7)
+
+Else
+	NdID.Refresh()
+	WS_ID = PLStrCut(NdID.NodeName, 20)
+	NStatus = NdID.NodeStatus
+	IP1 = NdID.IPAddress
+	IP2 = NdID.IPAddress_2
+	If NdID.NodeId != RTA.LocalNode.NodeId Then
+		NodeNet = NdID.NetMask
+	Else
+		NodeNet = LocalNetMask
+	End If
+	CPU_load = NdID.CPULoad
+
+	t_ID = NdID.NodeName
+	If Active Then
+		rect_ID = Col_Ar(14)
+	Else
+		rect_ID = Col_Ar(8)
+	End If
+	t_Status = ENodeState(NStatus, False)
+	rect_Status = NodStatColor(NStatus)
+	t_Net_1 = IP1
+	t_Net_2 = IP2
+	If NStatus &lt; 4 Then
+		rect_Net_1 = Col_Ar(8)
+		rect_Net_2 = Col_Ar(8)
+		rect_CPU = Col_Ar(8)
+		rect_DataOK = Col_Ar(8)
+		rect_Repl_S = Col_Ar(8)
+		rect_Repl_R = Col_Ar(8)
+		rect_Vis = Col_Ar(8)
+	Else
+	&apos;	If (IP1 == &quot;&quot;) || ((LocalNetMask &amp; 1) == 0) Then
+	&apos;		rect_Net_1 = Col_Ar(8)
+	&apos;	Else
+	&apos;		rect_Net_1 = Col_Ar((NodeNet &amp; 1) + 1)
+	&apos;	End If	
+	&apos;	If (IP2 == &quot;&quot;) || ((LocalNetMask &amp; 2) == 0) Then
+	&apos;		rect_Net_2 = Col_Ar(8)
+	&apos;	Else
+	&apos;		rect_Net_2 = Col_Ar((NodeNet &amp; 2) / 2 + 1)
+	&apos;	End If
+
+
+
+&apos; анализ сети
+		
+		If (NdID.NetMask &amp; 8) != 0 Then       &apos; сеть 2 есть
+			rect_Net_2  = Col_Ar(2)  &apos; зеленый
+		Else					    &apos; сети 1 нет
+			rect_Net_2 = Col_Ar(1)  &apos; красный
+
+		End If
+
+
+		If (NdID.NetMask &amp; 4) != 0 Then      &apos; сеть 1 есть
+			rect_Net_1 = Col_Ar(2) &apos; зеленый
+		Else					    &apos; сети 2 нет
+			rect_Net_1 = Col_Ar(1)  &apos; красный
+
+		End If
+
+
+		t_CPU = CStr(CPU_load)
+		If CPU_load &gt; 90 Then
+			rect_CPU = Col_Ar(1)
+		ElseIf CPU_load &gt; 75 Then
+			rect_CPU = Col_Ar(3)
+		Else
+			rect_CPU = Col_Ar(2)	
+		End If
+		NDStatus = NdID.DataStatus
+		If (NDStatus &amp; RTDATA_STAT_OK) &gt; 0 Then
+			rect_DataOK = Col_Ar(2)
+		Else
+			rect_DataOK = Col_Ar(1) 
+		End If
+
+&apos;задачи сделаны через флаги
+		If (NDStatus &amp; RTDATA_STAT_FEATURE_7_OK) Then
+			rect_Repl_S = Col_Ar(2)
+		Else
+			rect_Repl_S = Col_Ar(1)
+		End If
+		If (NDStatus &amp; RTDATA_STAT_FEATURE_8_OK) Then
+			rect_Repl_R = Col_Ar(2)
+		Else
+			rect_Repl_R = Col_Ar(1)
+		End If
+		If (NDStatus &amp; RTDATA_STAT_FEATURE_4_OK) Then
+			rect_Vis = Col_Ar(2)
+		Else
+			rect_Vis = Col_Ar(1)
+		End If
+	End If
+End If
+
+If rect_Status == W Then
+	body.fill = Col_Ar(7)
+Else
+  If rect_Status == R Then
+	body.fill = Col_Ar(1)
+  Else
+     If ((rect_Net_1 == G) &amp; (rect_Net_2 == G) &amp; (rect_CPU == G) &amp; (rect_DataOK == G) &amp; (rect_Repl_S == G) &amp; (rect_Repl_R == G) &amp; (rect_Vis == G) ) Then
+		body.fill = Col_Ar(2)
+     Else
+		body.fill = Col_Ar(3)
+     End If
+  End If
+End If
+
+End Sub</rt:sub>
+    <rt:sub>Sub Alarm_IBP()
+
+If (IBP_XQ01 == Nothing) || (IBP_XQ02 == Nothing) || (IBP_XQ03 == Nothing) || (IBP_XQ04 == Nothing) || (IBP_XQ05 == Nothing) || (IBP_XQ06 == Nothing) || (IBP_XQ07 == Nothing) || (IBP_XQ08 == Nothing) || (IBP_XQ09 == Nothing) || (IBP_ZV02 == Nothing) || (IBP_ZV03 == Nothing) || (IBP_ZV04 == Nothing) Then
+	Diag_IBP.fill = &quot;Col_Grey1&quot;
+Else
+
+
+If (IBP_XQ01.Quality != 3) &amp;&amp; (IBP_XQ02.Quality != 3) &amp;&amp; (IBP_XQ03.Quality != 3) &amp;&amp; (IBP_XQ04.Quality != 3) &amp;&amp; (IBP_XQ05.Quality != 3) &amp;&amp; (IBP_XQ06.Quality != 3) &amp;&amp; (IBP_XQ07.Quality != 3) &amp;&amp; (IBP_XQ08.Quality != 3) &amp;&amp; (IBP_XQ09.Quality != 3) &amp;&amp; (IBP_ZV02.Quality != 3) &amp;&amp; (IBP_ZV03.Quality != 3) &amp;&amp; (IBP_ZV04.Quality != 3) Then
+	Diag_IBP.fill = &quot;Col_Grey1&quot;
+Else
+
+If (IBP_XQ01.AlarmLevel == 3) || (IBP_XQ02.AlarmLevel == 3) || (IBP_XQ03.AlarmLevel == 3) || (IBP_XQ04.AlarmLevel == 3) || (IBP_XQ05.AlarmLevel == 3) || (IBP_XQ06.AlarmLevel == 3) || (IBP_XQ07.AlarmLevel == 3) || (IBP_XQ08.AlarmLevel == 3) || (IBP_XQ09.AlarmLevel == 3) || (IBP_ZV02.Value == 1) || (IBP_ZV02.Value == 2) || (IBP_ZV02.Value == 4) || (IBP_ZV02.Value == 5) || (IBP_ZV02.Value == 6) || (IBP_ZV02.Value == 7) || (IBP_ZV03.Value == 1) || (IBP_ZV04.Value == 5) Then
+	Diag_IBP.fill = &quot;Col_Red&quot;
+ElseIf (IBP_XQ01.AlarmLevel == 2) || (IBP_XQ02.AlarmLevel == 2) || (IBP_XQ03.AlarmLevel == 2) || (IBP_XQ04.AlarmLevel == 2) || (IBP_XQ05.AlarmLevel == 2) || (IBP_XQ06.AlarmLevel == 2) || (IBP_XQ07.AlarmLevel == 2) || (IBP_XQ08.AlarmLevel == 2) || (IBP_XQ09.AlarmLevel == 2) Then
+	Diag_IBP.fill = &quot;Col_Yellow&quot;
+ElseIf ((IBP_XQ01.AlarmLevel == 0) &amp;&amp; (IBP_XQ01.Quality == 3)) &amp;&amp; ((IBP_XQ02.AlarmLevel == 0) &amp;&amp; (IBP_XQ02.Quality == 3)) &amp;&amp; ((IBP_XQ03.AlarmLevel == 0) &amp;&amp; (IBP_XQ03.Quality == 3)) &amp;&amp; ((IBP_XQ04.AlarmLevel == 0) &amp;&amp; (IBP_XQ04.Quality == 3)) &amp;&amp; ((IBP_XQ05.AlarmLevel == 0) &amp;&amp; (IBP_XQ05.Quality == 3)) &amp;&amp; ((IBP_XQ06.AlarmLevel == 0) &amp;&amp; (IBP_XQ06.Quality == 3)) &amp;&amp; ((IBP_XQ07.AlarmLevel == 0) &amp;&amp; (IBP_XQ07.Quality == 3)) &amp;&amp; ((IBP_XQ08.AlarmLevel == 0) &amp;&amp; (IBP_XQ08.Quality == 3)) &amp;&amp; ((IBP_XQ09.AlarmLevel == 0) &amp;&amp; (IBP_XQ09.Quality == 3)) &amp;&amp; (IBP_ZV02.Value == 3) &amp;&amp; ((IBP_ZV03.Value == 0) &amp;&amp; (IBP_ZV03.Quality == 3)) &amp;&amp; ((IBP_ZV04.Value == 1) || (IBP_ZV04.Value == 2) || (IBP_ZV04.Value == 3) || (IBP_ZV04.Value == 4)) Then
+	Diag_IBP.fill = &quot;Col_Green&quot;
+Else
+	Diag_IBP.fill = &quot;Col_Grey1&quot;
+End If
+
+End If
+
+End If
+
+End Sub</rt:sub>
+    <rt:sub>Sub Alarm_MKB()
+
+If (MKB_ZV02 == Nothing) || (MKB_ZV03 == Nothing) || (MKB_ZV04 == Nothing) || (MKB_ZV05 == Nothing) || (MKB_ZV06 == Nothing) || (MKB_ZV07 == Nothing) || (MKB_ZV08 == Nothing) || (MKB_ZV09 == Nothing) || (MKB_ZV12 == Nothing) || (MKB_ZV14 == Nothing) || (MKB_ZV16 == Nothing) || (MKB_ZV17 == Nothing) || (MKB_XQ01 == Nothing) Then
+	Diag_MKB.fill = &quot;Col_Grey1&quot;
+Else
+
+	If (MKB_ZV02.Quality != 3) &amp;&amp; (MKB_ZV03.Quality != 3) &amp;&amp; (MKB_ZV04.Quality != 3) &amp;&amp; (MKB_ZV05.Quality != 3) &amp;&amp; (MKB_ZV06.Quality != 3) &amp;&amp; (MKB_ZV07.Quality != 3) &amp;&amp; (MKB_ZV08.Quality != 3) &amp;&amp; (MKB_ZV09.Quality != 3) &amp;&amp; (MKB_ZV12.Quality != 3) &amp;&amp; (MKB_ZV14.Quality != 3) &amp;&amp; (MKB_ZV16.Quality != 3) &amp;&amp; (MKB_ZV17.Quality != 3) &amp;&amp; (MKB_XQ01.Quality != 3) Then
+		Diag_MKB.fill = &quot;Col_Grey1&quot;
+	Else
+	
+		If (MKB_ZV02.Value = 1) || ((MKB_ZV03.Value &gt;= 2) &amp;&amp; (MKB_ZV03.Value =&lt; 8)) || ((MKB_ZV04.Value &gt;= 2) &amp;&amp; (MKB_ZV04.Value =&lt; 8)) || ((MKB_ZV05.Value &gt;= 1) &amp;&amp; (MKB_ZV05.Value =&lt; 3)) || ((MKB_ZV06.Value &gt;= 1) &amp;&amp; (MKB_ZV06.Value =&lt; 3)) || ((MKB_ZV07.Value &gt;= 1) &amp;&amp; (MKB_ZV07.Value =&lt; 3)) || ((MKB_ZV08.Value &gt;= 1) &amp;&amp; (MKB_ZV08.Value =&lt; 3)) || ((MKB_ZV09.Value &gt;= 1) &amp;&amp; (MKB_ZV09.Value =&lt; 3)) || ((MKB_ZV16.Quality = 3) &amp;&amp; (MKB_ZV16.Value = 0)) &amp;&amp; ((MKB_ZV17.Quality = 3) &amp;&amp; (MKB_ZV17.Value = 0)) || (MKB_XQ01.AlarmLevel = 3) Then
+			Diag_MKB.fill = &quot;Col_Red&quot;
+		ElseIf ((MKB_ZV05.Value &gt;= 5) &amp;&amp; (MKB_ZV05.Value =&lt; 9)) || ((MKB_ZV06.Value &gt;= 5) &amp;&amp; (MKB_ZV06.Value =&lt; 9))  || ((MKB_ZV07.Value &gt;= 5) &amp;&amp; (MKB_ZV07.Value =&lt; 9)) || ((MKB_ZV08.Value &gt;= 5) &amp;&amp; (MKB_ZV08.Value =&lt; 9)) || ((MKB_ZV09.Value &gt;= 5) &amp;&amp; (MKB_ZV09.Value =&lt; 9)) || (MKB_ZV12.Value = 1) || (MKB_ZV14.Value = 1) || ((MKB_ZV16.Quality = 3) &amp;&amp; (MKB_ZV16.Value = 0)) || ((MKB_ZV17.Quality = 3) &amp;&amp; (MKB_ZV17.Value = 0)) || (MKB_XQ01.AlarmLevel = 2) Then
+			Diag_MKB.fill = &quot;Col_Yellow&quot;
+ElseIf (MKB_ZV02.Value = 2) &amp;&amp; (MKB_ZV03.Value = 1) &amp;&amp; (MKB_ZV04.Value = 1) &amp;&amp; (MKB_ZV05.Value = 4) &amp;&amp; (MKB_ZV06.Value = 4) &amp;&amp; (MKB_ZV07.Value = 4) &amp;&amp; (MKB_ZV08.Value = 4) &amp;&amp; (MKB_ZV09.Value = 4) &amp;&amp; ((MKB_ZV12.Value = 0) &amp;&amp; (MKB_ZV12.Quality = 3)) &amp;&amp; ((MKB_ZV14.Value = 0) &amp;&amp; (MKB_ZV14.Quality = 3)) &amp;&amp; (MKB_ZV16.Value = 1) &amp;&amp; (MKB_ZV17.Value = 1) &amp;&amp; ((MKB_XQ01.AlarmLevel = 0) &amp;&amp; (MKB_XQ01.Quality = 3)) Then
+			Diag_MKB.fill = &quot;Col_Green&quot;
+		Else
+			Diag_MKB.fill = &quot;Col_Grey1&quot;
+		End If
+
+	End If
+
+End If
+
+End Sub</rt:sub>
+    <rt:sub>Sub Alarm_TIME()
+
+If (TIME_ZV01 == Nothing)||(TIME_XQ01 == Nothing) Then
+	Diag_TIME.fill = &quot;Col_Grey1&quot;
+Else
+ If (TIME_ZV01.Quality != 3) &amp;&amp; (TIME_XQ01.Quality != 3) Then
+	 Diag_TIME.fill = &quot;Col_Grey1&quot;
+ Else
+
+	If (TIME_ZV01.Value = 1) || (TIME_XQ01.AlarmLevel = 3) Then
+		Diag_TIME.fill = &quot;Col_Red&quot;
+	ElseIf (TIME_ZV01.Value = 2) || (TIME_XQ01.AlarmLevel = 2) Then
+		Diag_TIME.fill = &quot;Col_Yellow&quot;
+	ElseIf ((TIME_ZV01.Value = 0) &amp;&amp; (TIME_ZV01.Quality = 3)) &amp;&amp; ((TIME_XQ01.AlarmLevel = 0) &amp;&amp; (TIME_XQ01.Quality = 3)) Then
+		Diag_TIME.fill = &quot;Col_Green&quot;
+	Else
+		Diag_TIME.fill = &quot;Col_Grey1&quot;
+	End If
+
+ End If
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">// Signals IBP
+Set IBP_XQ01 = ANA(KKS + &quot;E01_XQ01&quot;)
+Set IBP_XQ02 = ANA(KKS + &quot;E01_XQ02&quot;)
+Set IBP_XQ03 = ANA(KKS + &quot;E01_XQ03&quot;)
+Set IBP_XQ04 = ANA(KKS + &quot;E01_XQ04&quot;)
+Set IBP_XQ05 = ANA(KKS + &quot;E01_XQ05&quot;)
+Set IBP_XQ06 = ANA(KKS + &quot;E01_XQ06&quot;)
+Set IBP_XQ07 = ANA(KKS + &quot;E01_XQ07&quot;)
+Set IBP_XQ08 = ANA(KKS + &quot;E01_XQ08&quot;)
+Set IBP_XQ09 = ANA(KKS + &quot;E01_XQ09&quot;)
+Set IBP_ZV02 = BIN(KKS + &quot;E01_ZV02&quot;)
+Set IBP_ZV03 = BIN(KKS + &quot;E01_ZV03&quot;)
+Set IBP_ZV04 = BIN(KKS + &quot;E01_ZV04&quot;)
+Set IBP_ZV05 = BIN(KKS + &quot;E01_ZV05&quot;)
+Set IBP_ZV06 = BIN(KKS + &quot;E01_ZV06&quot;)
+
+// Signals MKB
+Set MKB_XQ01 = ANA(KKS + &quot;E02_XQ01&quot;)
+Set MKB_ZV02 = BIN(KKS + &quot;E02_ZV02&quot;)
+Set MKB_ZV03 = BIN(KKS + &quot;E02_ZV03&quot;)
+Set MKB_ZV04 = BIN(KKS + &quot;E02_ZV04&quot;)
+Set MKB_ZV05 = BIN(KKS + &quot;E02_ZV05&quot;)
+Set MKB_ZV06 = BIN(KKS + &quot;E02_ZV06&quot;)
+Set MKB_ZV07 = BIN(KKS + &quot;E02_ZV07&quot;)
+Set MKB_ZV08 = BIN(KKS + &quot;E02_ZV08&quot;)
+Set MKB_ZV09 = BIN(KKS + &quot;E02_ZV09&quot;)
+Set MKB_ZV12 = BIN(KKS + &quot;E02_ZV12&quot;)
+Set MKB_ZV14 = BIN(KKS + &quot;E02_ZV14&quot;)
+Set MKB_ZV16 = BIN(KKS + &quot;E02_ZV16&quot;)
+Set MKB_ZV17 = BIN(KKS + &quot;E02_ZV17&quot;)
+
+// Signals Time
+Set TIME_XQ01 = ANA(KKS + &quot;S01_XQ01&quot;)
+Set TIME_ZV01 = BIN(KKS + &quot;S01_ZV01&quot;)
+
+GetNodeStatus()</rt:event>
+    <rt:cycleTrigger name="ShowData" cycle="1" unit="second">
+      <rt:code>GetNodeStatus()</rt:code>
+    </rt:cycleTrigger>
+    <rt:changeTrigger name="Trg_Alarm_IBP">
+      <rt:chgItem>IBP_XQ01.AlarmLevel</rt:chgItem>
+      <rt:chgItem>IBP_XQ02.AlarmLevel</rt:chgItem>
+      <rt:chgItem>IBP_XQ03.AlarmLevel</rt:chgItem>
+      <rt:chgItem>IBP_XQ04.AlarmLevel</rt:chgItem>
+      <rt:chgItem>IBP_XQ05.AlarmLevel</rt:chgItem>
+      <rt:chgItem>IBP_XQ06.AlarmLevel</rt:chgItem>
+      <rt:chgItem>IBP_XQ07.AlarmLevel</rt:chgItem>
+      <rt:chgItem>IBP_XQ08.AlarmLevel</rt:chgItem>
+      <rt:chgItem>IBP_XQ09.AlarmLevel</rt:chgItem>
+      <rt:chgItem>IBP_ZV02.Value</rt:chgItem>
+      <rt:chgItem>IBP_ZV03.Value</rt:chgItem>
+      <rt:chgItem>IBP_ZV04.Value</rt:chgItem>
+      <rt:chgItem>IBP_ZV05.Value</rt:chgItem>
+      <rt:chgItem>IBP_ZV06.Value</rt:chgItem>
+      <rt:code>Alarm_IBP()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Trg_Alarm_MKB">
+      <rt:chgItem>MKB_ZV02.Value</rt:chgItem>
+      <rt:chgItem>MKB_ZV03.Value</rt:chgItem>
+      <rt:chgItem>MKB_ZV04.Value</rt:chgItem>
+      <rt:chgItem>MKB_ZV05.Value</rt:chgItem>
+      <rt:chgItem>MKB_ZV06.Value</rt:chgItem>
+      <rt:chgItem>MKB_ZV07.Value</rt:chgItem>
+      <rt:chgItem>MKB_ZV08.Value</rt:chgItem>
+      <rt:chgItem>MKB_ZV09.Value</rt:chgItem>
+      <rt:chgItem>MKB_ZV12.Value</rt:chgItem>
+      <rt:chgItem>MKB_ZV14.Value</rt:chgItem>
+      <rt:chgItem>MKB_ZV16.Value</rt:chgItem>
+      <rt:chgItem>MKB_ZV17.Value</rt:chgItem>
+      <rt:chgItem>MKB_XQ01.AlarmLevel</rt:chgItem>
+      <rt:code>Alarm_MKB()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Trg_Alarm_TIME">
+      <rt:chgItem>TIME_ZV01.Value</rt:chgItem>
+      <rt:chgItem>TIME_XQ01.AlarmLevel</rt:chgItem>
+      <rt:code>Alarm_TIME()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="107.5" height="180" rx="0" ry="0" fill="Col_Grey4"/> 
+  <rect x="3.5" y="4.5" width="100" height="165" rx="0" ry="0" fill="darkgrey"/> 
+  <g id="M">
+    <rect x="7" y="10" width="93" height="81" rx="0" ry="0" fill="Col_Grey2"/> 
+    <line x1="20" y1="19" x2="20" y2="82" stroke-width="8"/> 
+    <line x1="16" y1="23" x2="93" y2="23" stroke-width="8"/> 
+    <line x1="16" y1="75" x2="88" y2="75" stroke-width="5"/> 
+    <line x1="86" y1="19" x2="86" y2="77" stroke-width="5"/> 
+  </g>
+  <rect x="24" y="27" width="60" height="46" rx="0" ry="0" id="body_1" fill="url(#Circle_LeftFront)" stroke="none"/> 
+  <rect x="24" y="27" width="60" height="46" rx="0" ry="0" id="body" fill="black" fill-opacity="0.699994" stroke="none">
+    <rt:event type="OnClick">Open_Win_Uni(False, &quot;diag_WS&quot; + KKS, &quot;Состояние рабочей станции&quot;, &quot;wd_diag_WS&quot;, KKS + &quot;|&quot; + title_base + &quot;|0&quot;)</rt:event>
+  </rect>
+  <circle cx="91" cy="82.5" r="2"/> 
+  <rect x="11" y="98.5" width="4" height="23" rx="0" ry="0" fill="Col_Grey4"/> 
+  <circle cx="13" cy="117" r="0.333336" fill="black"/> 
+  <rect x="7" y="133" width="32" height="32" rx="0" ry="0" id="Diag_IBP" fill="Col_Red" stroke="none"/> 
+  <rect x="38" y="133" width="33" height="32" rx="0" ry="0" id="Diag_MKB" fill="Col_Red" stroke="none"/> 
+  <rect x="70" y="133" width="30" height="32" rx="0" ry="0" id="Diag_TIME" fill="Col_Red" stroke="none"/> 
+  <text x="22" y="158" id="Text_IBP" fill="black" font-family="Arial" font-size="25" font-weight="bold" text-anchor="middle">И</text>
+  <text x="53" y="158" id="Text_MKB" fill="black" font-family="Arial" font-size="25" font-weight="bold" text-anchor="middle">М</text>
+  <text x="86" y="158" id="Text_TIME" fill="black" font-family="Arial" font-size="25" font-weight="bold" text-anchor="middle">T</text>
+  <line x1="38" y1="134" x2="38" y2="164" stroke-width="4"/> 
+  <line x1="71" y1="134" x2="71" y2="164" stroke="black" stroke-width="4"/> 
+  <rect x="7" y="134" width="32" height="30" rx="0" ry="0" id="Sel_Area_IBP" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">Open_Win_Uni(False, &quot;UPS&quot; + KKS, &quot;Состояние ИБП&quot;, &quot;wd_UPS&quot;, KKS + &quot;|&quot; + title_base + &quot;|0&quot;)</rt:event>
+  </rect>
+  <rect x="40" y="134" width="31.75" height="30" rx="0" ry="0" id="Sel_Area_MKB" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">Open_Win_Uni(False, &quot;MKB&quot; + KKS, &quot;Состояние МКБ&quot;, &quot;wd_MKB&quot;, KKS + &quot;|&quot; + title_base + &quot;|0&quot;)</rt:event>
+  </rect>
+  <rect x="70.5" y="134" width="30" height="30" rx="0" ry="0" id="Sel_Area_TIME" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">Open_Win_Uni(False, &quot;TIME&quot; + KKS, &quot;Синхронизация времени&quot;, &quot;wd_TIME&quot;, KKS + &quot;|&quot; + title_base + &quot;|0&quot;)</rt:event>
+  </rect>
+  <rect x="8" y="134" width="91" height="30" rx="0" ry="0" fill="none" stroke="black" stroke-width="3"/> 
+</svg>

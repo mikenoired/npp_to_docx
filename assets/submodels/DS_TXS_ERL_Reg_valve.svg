@@ -1,0 +1,327 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="-35 -42.5 70 65" width="70" height="65" id="DS_TXS_ERL_Reg_valve">
+  <desc>регулирующий клапан для работы с ТПТС 1718 плюс TXS</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа (Dull Screen)" revision="6.0" modelversion="0.0.0.0">
+    <rt:param name="KKS_ERL" datatype="string" value="NULL" comment="KKS канального оператора ERL (модуль 1718)"/> 
+    <rt:param name="PID_Auto" datatype="string" value="NULL" comment="идентификатор сигнала «АВТОМАТ»"/> 
+    <rt:param name="PID_Dist" datatype="string" value="NULL" comment="идентификатор сигнала «ДИСТАНЦИЯ»"/> 
+    <rt:param name="PID_Fail" datatype="string" value="NULL" comment="идентификатор сигнала «Неисправность»"/> 
+    <rt:param name="PID_Position" datatype="string" value="NULL" comment="идентификатор ANA сигнала  «Степень открытия»"/> 
+    <rt:param name="PID_Deviation" datatype="string" value="NULL" comment="идентификатор ANA сигнала  «Рассогласование»"/> 
+    <rt:param name="PID_Setpoint" datatype="string" value="NULL" comment="идентификатор ANA сигнала  «Текущее задание регулятору»"/> 
+    <rt:param name="Operate" datatype="boolean" value="False" comment="Сделать объект управляемым"/> 
+    <rt:var name="pv_A" datatype="PlsPVBin" comment="указатель на переменную АВТОМАТ"/> 
+    <rt:var name="pv_H" datatype="PlsPVBin" comment="указатель на переменную ДИСТАНЦИЯ"/> 
+    <rt:var name="pv_Fail" datatype="PlsPVBin" comment="указатель на переменную Неисправность"/> 
+    <rt:var name="pv_Pos" datatype="PlsPVAna" comment="указатель на переменную Положение"/> 
+    <rt:var name="pv_Dev" datatype="PlsPVAna" comment="указатель на переменную Рассогласования"/> 
+    <rt:var name="pv_SP" datatype="PlsPVAna" comment="указатель на переменную Задания"/> 
+    <rt:var name="pv_F1" datatype="PlsPVBin" comment="указатель на переменную BST телеграммы"/> 
+    <rt:var name="pv_Z0" datatype="PlsPVBin" comment="указатель на переменную BST телеграммы"/> 
+    <rt:var name="pv_OU" datatype="PlsPVBin" comment="указатель на переменную управления, которая может встретиться для любого объекта"/> 
+    <rt:var name="STrig" datatype="boolean" value="false" comment="состояние ремонта"/> 
+    <rt:var name="MyStrokeWidth" datatype="float" value="2" comment="толщина рамки"/> 
+    <rt:var name="TE_mode" datatype="boolean" value="false" comment="тестовый режим"/> 
+    <rt:sub>Sub Show_A()
+If pv_A != Nothing Then
+	If pv_A.Quality != PLS_QUAL_BAD Then
+		If pv_A.Value != 0 Then
+			g_indic_A.fill = Color_A
+		Else
+			g_indic_A.fill = &quot;Col_Grey5&quot;
+		End If
+		g_indic_A.fill_opacity = 0.35
+	Else
+		g_indic_A.fill = Color_Inval
+		g_indic_A.fill_opacity = 1
+	End If
+Else
+	g_indic_A.fill = Color_ErLink
+	g_indic_A.fill_opacity = 1
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Show_H()
+If pv_H != Nothing Then
+	If pv_H.Quality != PLS_QUAL_BAD Then
+		If pv_H.Value != 0 Then
+			g_indic_H.fill = Color_H
+		Else
+			g_indic_H.fill = &quot;Col_Grey5&quot;
+		End If
+		g_indic_H.fill_opacity = 0.35
+	Else
+		g_indic_H.fill = Color_Inval
+		g_indic_H.fill_opacity = 1
+	End If
+Else
+	g_indic_H.fill = Color_ErLink
+	g_indic_H.fill_opacity = 1
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Show_F()
+If pv_Fail != Nothing Then
+	If pv_Fail.Quality != PLS_QUAL_BAD Then
+		If pv_Fail.Value != 0 Then
+			g_Al_frame.visibility = &quot;visible&quot;
+		Else
+			g_Al_frame.visibility = &quot;hidden&quot;
+		End If
+	Else
+		g_Al_frame.visibility = &quot;hidden&quot;
+	End If
+Else
+	g_Al_frame.visibility = &quot;hidden&quot;
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Get_Open_State()
+If STrig Then
+	g_body_l.fill = Color_Remont
+	g_body_r.fill = Color_Remont
+ElseIf (pv_Z0 != Nothing) Then
+	If (pv_Z0.Quality == PLS_QUAL_BAD) Then
+		g_body_l.fill = Color_Inval
+		g_body_r.fill = Color_Inval
+	ElseIf (pv_Z0.Value &amp; 3) == 2 Then
+		g_body_l.fill = Color_OPEN_M
+		g_body_r.fill = Color_OPEN_M
+	ElseIf (pv_Z0.Value &amp; 3) == 1 Then
+		g_body_l.fill = Color_CLOSE_M
+		g_body_r.fill = Color_CLOSE_M
+	ElseIf (pv_Z0.Value &amp; 3) == 0 Then
+		g_body_l.fill = Color_CLOSE_M
+		g_body_r.fill = Color_OPEN_M
+	Else
+		g_body_l.fill = Color_Inval
+		g_body_r.fill = Color_Inval
+	End If
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Show_Pos()
+If pv_Pos != Nothing Then
+	Dim Pos As Double
+	Pos = pv_Pos.Value
+	g_Position_bg.visibility = &quot;visible&quot;
+	g_Position_val.visibility = &quot;visible&quot;
+	If Pos &lt;= 1 Then
+		Pos = 1
+	ElseIf Pos &gt; 100 Then
+		Pos = 100
+	End If
+	g_Position_val.x2 = -25.0 + Pos / 2
+Else
+	g_Position_bg.visibility = &quot;hidden&quot;
+	g_Position_val.visibility = &quot;hidden&quot;
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">g.transform=&quot;&quot;
+g_InGr.visibility = &quot;hidden&quot;
+If (KKS_ERL == &quot;NULL&quot;) &amp;&amp; (PID_Auto == &quot;NULL&quot;) &amp;&amp; (PID_Dist == &quot;NULL&quot;) Then
+		g.transform = &quot;scale(0.75 0.75 0 0)&quot;
+		g_body_l.fill = Color_Static
+		g_body_r.fill = Color_Static
+		g_bg_1.visibility = &quot;hidden&quot;
+		g_bg_2.visibility = &quot;hidden&quot;
+		g_indic_H.visibility = &quot;hidden&quot;
+		g_indic_A.visibility = &quot;hidden&quot;
+		g_Position_bg.visibility = &quot;hidden&quot;
+		g_Position_val.visibility = &quot;hidden&quot;
+		g_Al_frame.visibility = &quot;hidden&quot;
+End If
+If (KKS_ERL != &quot;NULL&quot;) Then
+	If requests_allown Then
+		pv_Z0 = BIN(KKS_ERL + &quot;_Z0&quot;)
+	End If
+	pv_F1 = BIN(KKS_ERL + &quot;_F1&quot;)
+	pv_OU = BIN(KKS_ERL + &quot;_OU&quot;)
+End If
+If pv_Z0 == Nothing Then
+	g_body_l.fill = &quot;Col_Grey2&quot;
+	g_body_r.fill = &quot;Col_Grey2&quot;
+End If
+If (PID_Auto != &quot;NULL&quot;) Then
+	pv_A = BIN(PID_Auto)
+End If
+If (PID_Dist != &quot;NULL&quot;) Then
+	pv_H = BIN(PID_Dist)
+End If
+If (PID_Fail != &quot;NULL&quot;) Then
+	pv_Fail = BIN(PID_Fail)
+Else
+	g_Al_frame.visibility = &quot;hidden&quot;
+End If
+If (PID_Position != &quot;NULL&quot;) Then
+	pv_Pos = ANA(PID_Position)
+End If
+If (PID_Deviation != &quot;NULL&quot;) Then
+	pv_Dev = ANA(PID_Deviation)
+End If
+If (PID_Setpoint != &quot;NULL&quot;) Then
+	pv_SP = ANA(PID_Setpoint)
+End If</rt:event>
+    <rt:event type="OnInitializeEnd">Show_A()
+Show_H()
+Show_F()</rt:event>
+    <rt:changeTrigger name="sh_A">
+      <rt:chgItem>pv_A</rt:chgItem>
+      <rt:code>Show_A()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="sh_H">
+      <rt:chgItem>pv_H</rt:chgItem>
+      <rt:code>Show_H()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="sh_F">
+      <rt:chgItem>pv_Fail</rt:chgItem>
+      <rt:code>Show_F()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="chesk_SUS">
+      <rt:chgItem>pv_OU</rt:chgItem>
+      <rt:code>STrig = PRJSPEC.GET_Susp(KKS_ERL, True)</rt:code>
+      <rt:code>Get_Open_State()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="sh_Pos">
+      <rt:chgItem>pv_Pos</rt:chgItem>
+      <rt:code>Show_Pos()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChRights">
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>MyStrokeWidth = FrameStrokeWidth (Operate, pv_OU)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="check_TestMode">
+      <rt:condition>(pv_F1 != Nothing) &amp;&amp; (pv_OU != Nothing)</rt:condition>
+      <rt:chgItem>pv_OU</rt:chgItem>
+      <rt:chgItem>pv_F1</rt:chgItem>
+      <rt:code>TE_mode = ((pv_F1.Value &amp; 32) != 0) &amp;&amp; !PRJSPEC.GET_Susp(KKS_ERL, True)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <g id="g">
+    <polygon points="0,0 -25,-12.5 -25,0" id="body_l" fill="Col_LtGreen" stroke="none"/> 
+    <polygon points="0,0 25,-12.5 25,12.5" id="body_r" fill="Col_LtYellow" stroke="none"/> 
+    <polygon points="0,0 -25,12.5 -25,0" id="body_2" fill="Col_Grey5" stroke="none"/> 
+    <g id="contour" stroke="Col_Grey5" stroke-width="1">
+      <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWidth"/> 
+      <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS_ERL)" trans="bt">
+        <rt:xy value="false" value2="Col_Grey1"/> 
+        <rt:xy value2="Col_Grey5"/> 
+      </rt:dyn>
+      <polygon points="-25,-12.5 -25,12.5 25,-12.5 25,12.5" id="contour_1" fill="none"/> 
+    </g>
+    <g id="moto" stroke="Col_Grey5" stroke-width="1">
+      <rt:dyn type="stroke-dasharray" mode="onchange" value="TE_mode" trans="bt">
+        <rt:xy value="false" value2="inherit"/> 
+        <rt:xy value2="2,1"/> 
+      </rt:dyn>
+      <line x1="0" y1="-15" x2="0" y2="0" id="obj_moto_line">
+        <rt:dyn type="y1" mode="onchange" value="TE_mode" trans="bd">
+          <rt:xy value="false" value2="-20"/> 
+          <rt:xy value2="-15"/> 
+        </rt:dyn>
+      </line>
+      <circle cx="0" cy="-22.5" r="7.5" id="obj_moto_circle" fill="none">
+        <rt:dyn type="fill" mode="onchange" value="CUInt(_Blink3 || !TE_mode) * 0xffffffff | Color_Imitation"/> 
+        <rt:dyn type="visibility" mode="onchange" value="TE_mode" trans="bi">
+          <rt:xy value="false" value2="1"/> 
+          <rt:xy value2="0"/> 
+        </rt:dyn>
+      </circle>
+      <path d="M-5.625 -22.5 C-2.8125 -18.75 -2.8125 -18.75 0 -22.5 C2.8125 -26.25 2.8125 -26.25 5.625 -22.5 " id="obj_moto_path" fill="none">
+        <rt:dyn type="visibility" mode="onchange" value="TE_mode" trans="bi">
+          <rt:xy value="false" value2="1"/> 
+          <rt:xy value2="0"/> 
+        </rt:dyn>
+      </path>
+      <polyline points="-4,-10 0,0 4,-10" id="obj_moto_arrow" fill="Col_Grey5" stroke="none"/> 
+    </g>
+    <circle cx="-20.125" cy="-24.875" r="7.625" id="bg_1" fill="url(#DS_circle)" stroke="none"/> 
+    <circle cx="19.875" cy="-24.875" r="7.625" id="bg_2" fill="url(#DS_circle)" stroke="none"/> 
+    <circle cx="-20.125" cy="-24.875" r="7.625" id="indic_H" fill="Col_Green" fill-opacity="0.349997" stroke="Col_Grey5" stroke-width="1"/> 
+    <circle cx="20" cy="-24.5" r="7.625" id="indic_A" fill="Col_Yellow" fill-opacity="0.349997" stroke="Col_Grey5" stroke-width="1"/> 
+    <line x1="-25" y1="15" x2="25" y2="15" id="Position_bg" stroke="Col_Grey5" stroke-linecap="round" stroke-width="3"/> 
+    <line x1="-25" y1="15" x2="10" y2="15" id="Position_val" stroke="Col_LtYellow" stroke-width="2"/> 
+    <rect x="-30" y="-37.5" width="60" height="55" rx="0" ry="0" id="Al_frame" fill="gray" fill-opacity="0" stroke="Col_Red" stroke-width="2">
+      <rt:dyn type="stroke" mode="constant" value="Color_Alarm"/> 
+    </rect>
+    <rect x="-35" y="-42.5" width="70" height="65" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2"/> 
+    <rect x="-30" y="-37.5" width="60" height="55" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+      <rt:event type="OnMiddleClick">If KKS_ERL == &quot;NULL&quot; Then
+	ShowMessage (&quot;Это статический элемент.&quot;, 5)
+ElseIf pv_F1 == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nKKS_ERL = \&quot;&quot; + KKS_ERL + &quot;\&quot;&quot;, 0)
+ElseIf pv_A == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Auto = \&quot;&quot; + PID_Auto + &quot;\&quot;&quot;, 0)
+ElseIf pv_H == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Dist = \&quot;&quot; + PID_Dist + &quot;\&quot;&quot;, 0)
+ElseIf pv_Fail == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Fail = \&quot;&quot; + PID_Fail + &quot;\&quot;&quot;, 0)
+ElseIf pv_Pos == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Position = \&quot;&quot; + PID_Position + &quot;\&quot;&quot;, 0)
+ElseIf pv_Dev == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Deviation = \&quot;&quot; + PID_Deviation + &quot;\&quot;&quot;, 0)
+ElseIf pv_SP == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Setpoint = \&quot;&quot; + PID_Setpoint + &quot;\&quot;&quot;, 0)
+ElseIf (KKS_ERL != &quot;NULL&quot;) &amp;&amp; (pv_OU != nothing) Then
+	Open_Win_Uni(False, &quot;rights&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS_ERL + &quot;|&quot; + CStr(Operate))
+ElseIf (pv_OU == nothing) Then
+	ShowMessage (&quot;Нет переменной управления.&quot;, 5)
+Else
+	ShowMessage (&quot;Управление не предусмотрено.&quot;, 5)
+End If</rt:event>
+      <rt:event type="OnClick">If KKS_ERL == &quot;NULL&quot; Then
+	ShowMessage (&quot;Это статический элемент.&quot;, 5)
+ElseIf pv_F1 == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nKKS_ERL = \&quot;&quot; + KKS_ERL + &quot;\&quot;&quot;, 0)
+ElseIf pv_A == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Auto = \&quot;&quot; + PID_Auto + &quot;\&quot;&quot;, 0)
+ElseIf pv_H == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Dist = \&quot;&quot; + PID_Dist + &quot;\&quot;&quot;, 0)
+ElseIf pv_Fail == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Fail = \&quot;&quot; + PID_Fail + &quot;\&quot;&quot;, 0)
+ElseIf pv_Pos == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Position = \&quot;&quot; + PID_Position + &quot;\&quot;&quot;, 0)
+ElseIf pv_Dev == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Deviation = \&quot;&quot; + PID_Deviation + &quot;\&quot;&quot;, 0)
+ElseIf pv_SP == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Setpoint = \&quot;&quot; + PID_Setpoint + &quot;\&quot;&quot;, 0)
+ElseIf pv_OU != Nothing Then
+//KKS_ERL|PID_CV|PID_DV|PID_SP|PID_H|PID_A|PID_Fail
+	Open_ws_wf_wi(&quot;TXS_ERL_Reg_valve&quot;, KKS_ERL + &quot;|&quot; + PID_Position + &quot;|&quot; + PID_Deviation + &quot;|&quot; + PID_Setpoint + &quot;|&quot; + PID_Dist + &quot;|&quot; + PID_Auto + &quot;|&quot; + PID_Fail, Operate)
+Else
+	NoLink(KKS_ERL)
+End If</rt:event>
+      <rt:event type="OnRightClick">If KKS_ERL == &quot;NULL&quot; Then
+	ShowMessage (&quot;Это статический элемент.&quot;, 5)
+ElseIf pv_F1 == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nKKS_ERL = \&quot;&quot; + KKS_ERL + &quot;\&quot;&quot;, 0)
+ElseIf pv_A == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Auto = \&quot;&quot; + PID_Auto + &quot;\&quot;&quot;, 0)
+ElseIf pv_H == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Dist = \&quot;&quot; + PID_Dist + &quot;\&quot;&quot;, 0)
+ElseIf pv_Fail == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Fail = \&quot;&quot; + PID_Fail + &quot;\&quot;&quot;, 0)
+ElseIf pv_Pos == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Position = \&quot;&quot; + PID_Position + &quot;\&quot;&quot;, 0)
+ElseIf pv_Dev == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Deviation = \&quot;&quot; + PID_Deviation + &quot;\&quot;&quot;, 0)
+ElseIf pv_SP == Nothing Then
+	ShowWarning (&quot;Ошибка привязки.\nPID_Setpoint = \&quot;&quot; + PID_Setpoint + &quot;\&quot;&quot;, 0)
+ElseIf pv_OU != Nothing Then
+	Dim s As String
+	s = KKS_ERL + &quot;|&quot; + PID_Position + &quot;|&quot; + PID_Deviation + &quot;|&quot; + PID_Setpoint + &quot;|&quot; + PID_Dist + &quot;|&quot; + PID_Auto + &quot;|&quot; + PID_Fail
+	TmpBuffer(0) = PID_Position
+	TmpBuffer(1) = PID_Deviation
+	TmpBuffer(2) = PID_Setpoint
+	TmpBuffer(3) = PID_Dist
+	TmpBuffer(4) = PID_Auto
+	TmpBuffer(5) = PID_Fail
+	If Operate &amp;&amp; Check_Oper_Rights(pv_OU) Then
+		TmpMnuPar = KKS_ERL + &quot;|REGo|TXS_ERL_Reg_valve &quot; + s
+		LoadPopUpMenu(KKS_ERL + &quot;|REGo|TXS_ERL_Reg_valve &quot; + s)
+	Else
+		TmpMnuPar = KKS_ERL + &quot;|REGi|TXS_ERL_Reg_valve &quot; + s
+		LoadPopUpMenu(KKS_ERL + &quot;|REGi|TXS_ERL_Reg_valve &quot; + s)
+	End If
+Else
+	NoLink(KKS_ERL)
+End If</rt:event>
+    </rect>
+  </g>
+</svg>

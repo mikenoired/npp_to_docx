@@ -1,0 +1,200 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="-35 -42.5 70 65" width="70" height="65" id="DS_TPTS_Reg_valve">
+  <desc>ТПТС регулирующий клапан (Dull Screen)</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа (Dull Screen)" revision="6.0">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS оборудования"/> 
+    <rt:param name="Operate" datatype="boolean" value="False" comment="Сделать объект управляемым"/> 
+    <rt:param name="NoSP" datatype="boolean" value="False" comment="окна управления без области ввода задания"/> 
+    <rt:var name="Z0" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="OU" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="VB11" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="F2" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="pv_Open" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="pv_Close" datatype="PlsPVBin" comment="указатель на pv_Close или VB10"/> 
+    <rt:var name="pv_Close_is_VB10" datatype="boolean" comment="pv_Close - это указатель на VB10" value="false"/> 
+    <rt:var name="Status" datatype="int" comment="обобщенное сотояние"/> 
+    <rt:var name="ACol" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="HCol" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="AStat" datatype="ushort" value="0" comment="код сигнализации"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="MyStrokeWdth" datatype="float" value="2" comment="Толщина рамок в зависимости от управляемости"/> 
+    <rt:var name="TE_mode" datatype="boolean" value="false" comment="Тестовый режим"/> 
+    <rt:sub>Sub Get_Open_State()
+If Status == -1 Then
+	body_l.fill = Color_Remont
+	body_r.fill = Color_Remont
+ElseIf !pv_Close_is_VB10 &amp;&amp; (pv_Open != Nothing) &amp;&amp; (pv_Close != Nothing) Then
+	If (pv_Open.Quality == PLS_QUAL_BAD) || (pv_Open.Quality == PLS_QUAL_BAD) Then
+		body_l.fill = Color_Inval
+		body_r.fill = Color_Inval
+	ElseIf (pv_Open.Value &gt; 0) &amp;&amp; (pv_Close.Value == 0) Then
+		body_l.fill = Color_OPEN_M
+		body_r.fill = Color_OPEN_M
+	ElseIf (pv_Open.Value == 0) &amp;&amp; (pv_Close.Value &gt; 0) Then
+		body_l.fill = Color_CLOSE_M
+		body_r.fill = Color_CLOSE_M
+	ElseIf (pv_Open.Value == 0) &amp;&amp; (pv_Close.Value == 0) Then
+		body_l.fill = Color_CLOSE_M
+		body_r.fill = Color_OPEN_M
+	Else
+		body_l.fill = Color_Inval
+		body_r.fill = Color_Inval
+	End If
+ElseIf pv_Close_is_VB10 &amp;&amp; (pv_Close != Nothing) Then
+	If (pv_Close.Quality == PLS_QUAL_BAD) Then
+		body_l.fill = Color_Inval
+		body_r.fill = Color_Inval
+	ElseIf (pv_Close.Value &amp; 3) == 2 Then
+		body_l.fill = Color_OPEN_M
+		body_r.fill = Color_OPEN_M
+	ElseIf (pv_Close.Value &amp; 3) == 1 Then
+		body_l.fill = Color_CLOSE_M
+		body_r.fill = Color_CLOSE_M
+	ElseIf (pv_Close.Value &amp; 3) == 0 Then
+		body_l.fill = Color_CLOSE_M
+		body_r.fill = Color_OPEN_M
+	Else
+		body_l.fill = Color_Inval
+		body_r.fill = Color_Inval
+	End If
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (KKS != &quot;NULL&quot;) Then
+	Z0 = BIN(KKS + &quot;_Z0&quot;)
+	OU = BIN(KKS + &quot;_OU&quot;)
+	VB11 = BIN(KKS + &quot;_VB11&quot;)
+	F2 = BIN(KKS + &quot;_F2&quot;)
+	pv_Open = BIN(KKS + &quot;_&quot; + Signal_RegValve_Open)
+	pv_Close = BIN(KKS + &quot;_&quot; + Signal_RegValve_Close)
+	If (pv_Open == Nothing) || (pv_Close == Nothing) Then
+		pv_Close_is_VB10 = true
+		pv_Close = BIN(KKS + &quot;_VB10&quot;)
+	End If
+Else
+	_This.transform = &quot;scale(0.75 0.75 0 0)&quot;
+End If</rt:event>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChRights">
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>MyStrokeWdth = FrameStrokeWidth (Operate, OU)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChTE">
+      <rt:condition>F2 != Nothing</rt:condition>
+      <rt:chgItem>F2</rt:chgItem>
+      <rt:chgItem>OU</rt:chgItem>
+      <rt:code>TE_mode = ((F2.Value &amp; 1) != 0) &amp;&amp; !PRJSPEC.GET_Susp(KKS, True)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="DetectOpen">
+      <rt:chgItem>pv_Open</rt:chgItem>
+      <rt:chgItem>pv_Close</rt:chgItem>
+      <rt:code>Get_Open_State()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetStatus">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>Z0</rt:chgItem>
+      <rt:chgItem>OU</rt:chgItem>
+      <rt:chgItem>VB11</rt:chgItem>
+      <rt:code>Status = PRJSPEC.TPTS_SR(KKS, ACol, HCol, AStat)</rt:code>
+      <rt:code>Get_Open_State()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <polygon points="0,0 -25,-12.5 -25,0" id="body_l" fill="Col_BGmain" stroke="none"/> 
+  <polygon points="0,0 25,-12.5 25,12.5" id="body_r" fill="Col_BGmain" stroke="none"/> 
+  <polygon points="25,0 50,12.5 50,0" id="body_2" fill="Col_Grey5" stroke="none" transform="flipX(12.5)"/> 
+  <polygon points="-25,-12.5 -25,12.5 25,-12.5 25,12.5" id="sel_frame" fill="none" stroke="Col_Grey5" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey1"/> 
+      <rt:xy value2="Col_Grey5"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polygon>
+  <g id="moto" stroke="Col_Grey5" stroke-width="1">
+    <rt:dyn type="stroke-dasharray" mode="onchange" value="TE_mode" trans="bt">
+      <rt:xy value="false" value2="inherit"/> 
+      <rt:xy value2="2,1"/> 
+    </rt:dyn>
+    <line x1="0" y1="-12" x2="0" y2="0"/> 
+    <circle cx="0" cy="-22.5" r="10" fill="none">
+      <rt:dyn type="fill" mode="onchange" value="CUInt(_Blink3 || !TE_mode) * 0xffffffff | Color_Imitation"/> 
+    </circle>
+    <path d="M-7.5 -22.5 C-3.75 -17.5 -3.75 -17.5 0 -22.5 C3.75 -27.5 3.75 -27.5 7.5 -22.5 " fill="none"/> 
+  </g>
+  <circle cx="-20.125" cy="-24.875" r="7.625" id="bg_1" fill="url(#DS_circle)" stroke="none">
+    <rt:dyn type="visibility" mode="constant" value="KKS != &quot;NULL&quot;" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </circle>
+  <circle cx="19.875" cy="-24.875" r="7.625" id="bg_2" fill="url(#DS_circle)" stroke="none">
+    <rt:dyn type="visibility" mode="constant" value="KKS != &quot;NULL&quot;" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </circle>
+  <circle cx="-20.125" cy="-24.875" r="7.625" id="indic_H" fill="Col_Green" fill-opacity="0.349997" stroke="Col_Grey5" stroke-width="1">
+    <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, HCol, 11)"/> 
+    <rt:dyn type="visibility" mode="constant" value="KKS != &quot;NULL&quot;" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="fill-opacity" mode="onchange" value="(Status &lt; 0) || ((Status &amp; 4096)!= 0) || ((Status &amp; 0xC) == 0)" trans="bd">
+      <rt:xy value="false" value2="0.35"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </circle>
+  <circle cx="20" cy="-24.5" r="7.625" id="indic_A" fill="Col_Yellow" fill-opacity="0.349997" stroke="Col_Grey5" stroke-width="1">
+    <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, ACol, 11)"/> 
+    <rt:dyn type="visibility" mode="constant" value="KKS != &quot;NULL&quot;" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="fill-opacity" mode="onchange" value="(Status &lt; 0) || ((Status &amp; 4096)!= 0) || ((Status &amp; 0x30) == 0)" trans="bd">
+      <rt:xy value="false" value2="0.35"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </circle>
+  <rect x="-30" y="-37.5" width="60" height="55" rx="0" ry="0" id="Al_frame" fill="gray" fill-opacity="0" stroke="Col_Red" stroke-width="2">
+    <rt:dyn type="visibility" mode="cyclic" value="PRJSPEC.AlarmVis(AStat)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke" mode="constant" value="Color_Alarm"/> 
+  </rect>
+  <rect x="-35" y="-42.5" width="70" height="65" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="-30" y="-37.5" width="60" height="55" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Это статический элемент.&quot;, 5)
+ElseIf Z0 != nothing Then
+	Open_ws_wf_wi(&quot;TPTS_Reg_valve&quot;, KKS + &quot;|&quot; + CStr(NoSP), Operate)
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnRightClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Это статический элемент.&quot;, 5)
+ElseIf Z0 != nothing Then
+	If Operate &amp;&amp; Check_Oper_Rights(OU) Then
+		LoadPopUpMenu(KKS + &quot;|SR o|TPTS_Reg_valve &quot; + KKS + &quot;|&quot; + CStr(NoSP))
+	Else
+		LoadPopUpMenu(KKS + &quot;|SR i|TPTS_Reg_valve &quot; + KKS + &quot;|&quot; + CStr(NoSP))
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnMiddleClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Это статический элемент.&quot;, 5)
+ElseIf Z0 != nothing Then
+	Open_Win_Uni(False, &quot;rights&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS+&quot;|&quot;+CStr(Operate))
+Else
+	NoLink(KKS)
+End If</rt:event>
+  </rect>
+</svg>

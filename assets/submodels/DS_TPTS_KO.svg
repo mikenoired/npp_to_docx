@@ -1,0 +1,404 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 120 50" width="120" height="50" id="DS_TPTS_KO" stroke-width="0.898438" font-family="AAP_Font1">
+  <desc>ТПТС KO (пошаговое управление) для Dull Screen</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа (Dull Screen)" revision="6.2">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS оборудования"/> 
+    <rt:param name="Operate" datatype="boolean" value="False" comment="Сделать объект управляемым"/> 
+    <rt:param name="StopStart" datatype="boolean" value="True" comment="Называть программы «ПУСК» и «ОСТАНОВ»"/> 
+    <rt:var name="Z0" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="OU" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="VB17" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="VB28" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="ANA_CurStep" datatype="PlsPVAna" comment="указатель"/> 
+    <rt:var name="AStat" datatype="ushort" value="0" comment="код сигнализации"/> 
+    <rt:var name="Status" datatype="int" comment="обобщенное сотояние"/> 
+    <rt:var name="BGColor" datatype="ushort" value="13" comment="код цвета фона"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="ProgrColor" datatype="ushort" value="0" comment="Код цвета для значка текущей программы"/> 
+    <rt:var name="MyStrokeWdth" datatype="float" value="2" comment="Толщина рамок в зависимости от управляемости"/> 
+    <rt:var name="Branch_mode" datatype="boolean" value="false" comment="Текущий режим - ветвление"/> 
+    <rt:var name="StepStr" datatype="string" value="--" comment="Строка с номером текущего шага"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub AckMe()
+If Check_Oper_Rights(OU) &amp;&amp; ((OU.PVSuspendedFlags &amp; PLS_SUSP_CMD) == 0) &amp;&amp; ((AStat &amp; 1) != 0) Then
+	Dim F1 As PlsPVBin
+	Dim F2 As PlsPVBin
+	F1 = BIN(KKS + &quot;_F1&quot;)
+	If F1 != Nothing Then
+		F2 = BIN(KKS + &quot;_F2&quot;)
+		If F2 != Nothing Then
+			&apos;классическое квитирование
+			&apos;Квитирование для состояний ОСТАНОВ
+			If ((F1.Value &amp; 128) &gt; 0) || ((F2.Value &amp; 1) &gt; 0) Then
+				PRJSPEC.Operate(KKS, KO_BHB)
+			&apos;Квитирование для состояний ПУСК
+			ElseIf  ((F1.Value &amp; 256) &gt; 0) || ((F2.Value &amp; 2) &gt; 0) Then
+				PRJSPEC.Operate(KKS, KO_BHS)
+			&apos;Проталкивание для состояний ПУСК
+			ElseIf  ((F1.Value &amp; 1024) &gt; 0) Then
+				PRJSPEC.Operate(KKS, KO_BHB_FTI)
+			&apos;Проталкивание для состояний ОСТВНОВ
+			ElseIf  ((F1.Value &amp; 512) &gt; 0) Then
+				PRJSPEC.Operate(KKS, KO_BHS_FTI)
+			End If
+		End If
+	End If
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub StatusCount ()
+Dim StepN As String
+Dim Use_Z0 As Boolean
+Use_Z0 = False
+ProgrColor = 0
+body.fill_opacity = 0.35
+If (Z0 == Nothing) Then	//без Z0 считается ошибка привязки
+	BGColor = 14
+	AStat = 0
+	body.fill_opacity = 1
+	Exit Sub
+Else	
+	&apos;Если можно обрабатывать запрашиваемые сигналы
+	If requests_allown &amp;&amp; (VB17 != Nothing) Then
+		If (VB17.Quality != PLS_QUAL_BAD) &amp;&amp; ((VB17.Value &amp; 14) != 0) Then
+			If (VB17.Value &amp; 14) == 2 Then
+				BGColor = 4	&apos;CFG_COLOR_T
+			ElseIf (VB17.Value &amp; 14) == 4 Then
+				BGColor = 2	&apos;CFG_COLOR_H
+			ElseIf (VB17.Value &amp; 14) == 8 Then
+				BGColor = 3	&apos;CFG_COLOR_A
+			Else
+				BGColor = 9	&apos;Col_Grey2
+			End If
+		Else
+			Use_Z0 = True
+		End If
+	Else
+		Use_Z0 = True
+	End If
+
+	If Use_Z0 Then
+		If (Z0.Quality != PLS_QUAL_BAD) &amp;&amp; ((Z0.Value &amp; 0x7c0) == 0) Then
+			If (Z0.Value &amp; 7) == 1Then
+				BGColor = 2	&apos;CFG_COLOR_H
+			ElseIf (Z0.Value &amp; 7) == 2 Then
+				BGColor = 3	&apos;CFG_COLOR_A
+			ElseIf (Z0.Value &amp; 7) == 4 Then
+				BGColor = 4	&apos;CFG_COLOR_T
+			Else
+				BGColor = 9	&apos;Col_Grey2
+			End If
+		Else
+			BGColor = 15	&apos;CFG_COLOR_INVALID
+			body.fill_opacity = 1
+		End If
+	End If
+	&apos;теперь определяем и ставим код мигания программы и рамки неисправности
+	If requests_allown Then
+	&apos;можно обрабатывать запрашиваемые сигналы
+		If (VB17 == Nothing) Then
+			AStat = 0
+			Branch_mode = False
+		ElseIf (VB17.Quality == PLS_QUAL_BAD) Then
+			AStat = 0
+			Branch_mode = False
+		Else
+			Branch_mode = ((VB17.Value &amp; 1) != 0)
+			AStat = ((VB17.Value &amp; 0xC00) / 0x400)
+			If (VB17.Value &amp; 0x240) &gt; 0 Then
+				ProgrColor = 16
+			ElseIf (VB17.Value &amp; 0x90) &gt; 0 Then
+				ProgrColor = 64
+			End If
+		End If
+	End If
+End If
+
+&apos;определяем номер шага
+If !requests_allown Then	&apos;нельзя обрабатывать запрашиваемые сигналы
+	If (ANA_CurStep == Nothing) Then
+		StepStr = &quot;??&quot;
+	Else
+		StepStr = CStr(CInt(ANA_CurStep.Value))
+		If (ANA_CurStep.Quality == PLS_QUAL_BAD) Then
+			Cur_step_bg.fill = Color_Inval
+		Else
+			Cur_step_bg.fill = &quot;url(#Circle_LeftFront)&quot;
+		End If
+	End If
+ElseIf (VB28 == Nothing) Then
+	If (ANA_CurStep == Nothing) Then
+		StepStr = &quot;--&quot;
+	Else
+		StepStr = CStr(CInt(ANA_CurStep.Value))
+		If (ANA_CurStep.Quality == PLS_QUAL_BAD) Then
+			Cur_step_bg.fill = Color_Inval
+		Else
+			Cur_step_bg.fill = &quot;url(#Circle_LeftFront)&quot;
+		End If
+	End If
+Else
+	StepStr = CStr( (VB28.Value &amp; 0xF) + 10 * CInt((VB28.Value &amp; 0xF0) / 16) )
+	If (VB28.Quality == PLS_QUAL_BAD) Then
+		Cur_step_bg.fill = Color_Inval
+	Else
+		Cur_step_bg.fill = &quot;url(#Circle_LeftFront)&quot;
+	End If
+End If
+
+&apos;определяем специальные состояния
+If PRJSPEC.GET_Susp(KKS, True) Then	&apos;ремонт
+	AStat = 0
+	BGColor = 6	&apos;CFG_COLOR_REMONT
+	body.fill_opacity = 1
+	ProgrColor = 0
+	Progr_start.visibility = &quot;hidden&quot;
+	Progr_stop.visibility = &quot;hidden&quot;
+	Progr_bg.visibility = &quot;hidden&quot;
+	Prog_num.visibility = &quot;hidden&quot;
+	Repair_mode.visibility = &quot;visible&quot;
+	Exit Sub
+Else
+	Repair_mode.visibility = &quot;hidden&quot;
+End If
+Dim DetectByZ0 As Boolean
+DetectByZ0 = False
+If ((Z0.Value &amp; 0x7C0) != 0) Then	&apos;недостоверность
+	AStat = 0
+	BGColor = 15	&apos;CFG_COLOR_INVALID
+	body.fill_opacity = 1
+	ProgrColor = 0
+	Progr_start.visibility = &quot;hidden&quot;
+	Progr_stop.visibility = &quot;hidden&quot;
+	Progr_bg.visibility = &quot;hidden&quot;
+	Prog_num.visibility = &quot;visible&quot;
+	Prog_num.text = &quot;X&quot;
+ElseIf (VB17 == Nothing) &amp;&amp; (Z0.Quality == PLS_QUAL_BAD) Then	&apos;нельзя определить программу
+	Progr_bg.visibility = &quot;visible&quot;
+	Progr_start.visibility = &quot;hidden&quot;
+	Progr_stop.visibility = &quot;hidden&quot;
+	Prog_num.visibility = &quot;hidden&quot;
+ElseIf (VB17 != Nothing) Then
+	If (VB17.Quality != PLS_QUAL_BAD) Then
+		If ((VB17.Value &amp; 0x380) != 0) &amp;&amp; ((VB17.Value &amp; 0x70) == 0) Then	&apos;программа ПУСК
+			If StopStart Then
+				Progr_bg.visibility = &quot;hidden&quot;
+				Prog_num.visibility = &quot;hidden&quot;
+				Progr_start.visibility = &quot;visible&quot;
+				Progr_stop.visibility = &quot;hidden&quot;
+			Else
+				Progr_bg.visibility = &quot;visible&quot;
+				Prog_num.visibility = &quot;visible&quot;
+				Prog_num.text = &quot;1&quot;
+				Progr_start.visibility = &quot;hidden&quot;
+				Progr_stop.visibility = &quot;hidden&quot;
+			End If
+		ElseIf ((VB17.Value &amp; 0x70) != 0) &amp;&amp; ((VB17.Value &amp; 0x380) == 0) Then	&apos;программа ОСТАНОВ
+			If StopStart Then
+				Progr_bg.visibility = &quot;hidden&quot;
+				Prog_num.visibility = &quot;hidden&quot;
+				Progr_start.visibility = &quot;hidden&quot;
+				Progr_stop.visibility = &quot;visible&quot;
+			Else
+				Progr_bg.visibility = &quot;visible&quot;
+				Prog_num.visibility = &quot;visible&quot;
+				Prog_num.text = &quot;2&quot;
+				Progr_start.visibility = &quot;hidden&quot;
+				Progr_stop.visibility = &quot;hidden&quot;
+			End If
+		Else
+			Progr_bg.visibility = &quot;visible&quot;
+			Progr_start.visibility = &quot;hidden&quot;
+			Progr_stop.visibility = &quot;hidden&quot;
+			Prog_num.visibility = &quot;hidden&quot;
+		End If
+	Else
+		DetectByZ0 = True
+	End If
+ElseIf (Z0.Quality != PLS_QUAL_BAD) Then
+	DetectByZ0 = True
+Else	&apos;нельзя определить программу
+	Progr_bg.visibility = &quot;visible&quot;
+	Progr_start.visibility = &quot;hidden&quot;
+	Progr_stop.visibility = &quot;hidden&quot;
+	Prog_num.visibility = &quot;hidden&quot;
+End If
+If DetectByZ0 Then
+	If ((Z0.Value &amp; 0x18) == 0x10) Then	&apos;программа ПУСК
+		If StopStart Then
+			Progr_bg.visibility = &quot;hidden&quot;
+			Prog_num.visibility = &quot;hidden&quot;
+			Progr_start.visibility = &quot;visible&quot;
+			Progr_stop.visibility = &quot;hidden&quot;
+		Else
+			Progr_bg.visibility = &quot;visible&quot;
+			Prog_num.visibility = &quot;visible&quot;
+			Prog_num.text = &quot;1&quot;
+			Progr_start.visibility = &quot;hidden&quot;
+			Progr_stop.visibility = &quot;hidden&quot;
+		End If
+	ElseIf ((Z0.Value &amp; 0x18) == 8) Then	&apos;программа ОСТАНОВ
+		If StopStart Then
+			Progr_bg.visibility = &quot;hidden&quot;
+			Prog_num.visibility = &quot;hidden&quot;
+			Progr_start.visibility = &quot;hidden&quot;
+			Progr_stop.visibility = &quot;visible&quot;
+		Else
+			Progr_bg.visibility = &quot;visible&quot;
+			Prog_num.visibility = &quot;visible&quot;
+			Prog_num.text = &quot;2&quot;
+			Progr_start.visibility = &quot;hidden&quot;
+			Progr_stop.visibility = &quot;hidden&quot;
+		End If
+	Else
+		Progr_bg.visibility = &quot;visible&quot;
+		Progr_start.visibility = &quot;hidden&quot;
+		Progr_stop.visibility = &quot;hidden&quot;
+		Prog_num.visibility = &quot;hidden&quot;
+	End If
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (KKS != &quot;NULL&quot;) Then
+	Z0 = BIN(KKS + &quot;_Z0&quot;)
+	OU = BIN(KKS + &quot;_OU&quot;)
+	If requests_allown Then
+		VB17 = BIN(KKS + &quot;_VB17&quot;)
+		VB28 = BIN(KKS + &quot;_VB28&quot;)
+	End If
+	If !requests_allown || (VB28 == Nothing) Then
+		ANA_CurStep = ANA(KKS + &quot;_&quot; + Signal_KO_Cur_Step)
+	End If
+Else
+	BGColor = 14
+	AStat = 0
+	body.fill_opacity = 1
+End If</rt:event>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetStatus">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>Z0</rt:chgItem>
+      <rt:chgItem>OU</rt:chgItem>
+      <rt:chgItem>VB17</rt:chgItem>
+      <rt:chgItem>VB28</rt:chgItem>
+      <rt:code>StatusCount ()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChRights">
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>MyStrokeWdth = FrameStrokeWidth (Operate, OU)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetCurStep">
+      <rt:condition>VB28 == Nothing</rt:condition>
+      <rt:chgItem>ANA_CurStep</rt:chgItem>
+      <rt:code>StatusCount()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="9.75" y="9.75" width="100" height="30" rx="0" ry="0" id="backgr" fill="url(#Cylinder_horizontal2)" stroke="none"/> 
+  <rect x="9.75" y="9.75" width="100" height="30" rx="0" ry="0" id="body" fill="Col_Grey2" fill-opacity="0.349997" stroke="none">
+    <rt:dyn type="fill" mode="onchange" value="PRJSPEC.ObjectColorEx(3, BGColor, 8)"/> 
+  </rect>
+  <g id="Progr_bg">
+    <rect x="17.5" y="15" width="30.25" height="20.25" rx="0" ry="0" fill="Col_Grey2" stroke="Col_Grey4"/> 
+    <polyline points="17.5,35 47.75,35.25 47.5,15" fill="none" stroke="Col_Grey5" stroke-width="1.5"/> 
+    <g stroke="Col_Grey4">
+      <line x1="20" y1="20" x2="41.75" y2="20"/> 
+      <line x1="20" y1="22.5" x2="30" y2="22.5"/> 
+      <line x1="20" y1="25" x2="35" y2="25" stroke="Col_Grey5" stroke-width="1.5"/> 
+      <line x1="20" y1="27.5" x2="45" y2="27.5"/> 
+      <line x1="20" y1="30" x2="27.5" y2="30"/> 
+    </g>
+  </g>
+  <text x="32" y="32.5" id="Prog_num" visibility="hidden" rt:detect="disabled" fill="black" font-family="AAP_Font1" font-size="20" font-weight="bold" text-anchor="middle">
+    <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, ProgrColor, 7)"/> 
+X</text>
+  <g id="Progr_start" visibility="hidden" rt:detect="disabled">
+    <polyline points="27.5,35 40,25 27.5,15" fill="black" stroke="Col_Grey4">
+      <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, ProgrColor, 7)"/> 
+    </polyline>
+    <line x1="27.5" y1="15" x2="27.5" y2="34.25" stroke="Col_Grey1" stroke-width="1"/> 
+  </g>
+  <g id="Progr_stop" visibility="hidden" rt:detect="disabled">
+    <rect x="24.75" y="17.75" width="15.5" height="15" rx="0" ry="0" fill="black" stroke="Col_Grey5">
+      <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, ProgrColor, 7)"/> 
+    </rect>
+    <polyline points="24.75,32.75 24.75,17.75 39.75,17.75" fill="none" stroke="Col_Grey1"/> 
+  </g>
+  <polygon points="20,35 20,30 22.5,27.5 27.5,27.5 35,20 35,15 37.5,12.5 42.5,12.5 37.5,17.5 40,20 45,15 45,19.5 42.5,22.5 37.5,22.5 30,30 30,35 27.5,37.5 22.5,37.5 27.5,32.5 25,30" id="Repair_mode" visibility="hidden" rt:detect="disabled" fill="black" stroke="none"/> 
+  <g id="Virtual_steps" fill="none" stroke="Col_Grey5">
+    <line x1="60" y1="20" x2="60" y2="30"/> 
+    <line x1="65" y1="25" x2="70" y2="25"/> 
+    <rect x="55" y="15" width="10" height="5" rx="2.5" ry="2.5"/> 
+    <polygon points="55,22.5 65,22.5 65,27.5 55,27.5" fill="url(#Circle_LeftFront)">
+      <rt:dyn type="points" mode="onchange" value="Branch_mode" trans="bt">
+        <rt:xy value="false" value2="55,22.5 65,22.5 65,27.5 55,27.5"/> 
+        <rt:xy value2="52.5,25 60,22 67.5,25 60,28"/> 
+      </rt:dyn>
+    </polygon>
+    <polygon points="60,30 55,32.5 60,35 65,32.5">
+      <rt:dyn type="points" mode="onchange" value="Branch_mode" trans="bt">
+        <rt:xy value="false" value2="60,30 55,32.5 60,35 65,32.5"/> 
+        <rt:xy value2="55,30 65,30 65,35 55,35"/> 
+      </rt:dyn>
+    </polygon>
+  </g>
+  <rect x="70" y="12.5" width="35" height="25" rx="12.5" ry="11" id="Cur_step_bg" fill="url(#Circle_LeftFront)" stroke="Col_Grey4"/> 
+  <text x="87.25" y="32.25" id="Cur_step" fill="black" font-family="AAP_Font1" font-size="20" font-weight="bold" text-anchor="middle">
+    <rt:dyn type="text" mode="onchange" value="StepStr"/> 
+88</text>
+  <polyline points="9.75,39.75 109.75,39.75 109.75,9.75" id="RB_edge" fill="none" stroke="Col_Grey5" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey1"/> 
+      <rt:xy value2="Col_Grey5"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <polyline points="9.75,39.75 9.75,9.75 109.75,9.75" id="LU_edge" fill="none" stroke="Col_Grey1" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey5"/> 
+      <rt:xy value2="Col_Grey1"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <rect x="5" y="5" width="110" height="40" rx="0" ry="0" id="Al_frame" fill="none" stroke="Col_Red" stroke-width="2">
+    <rt:dyn type="visibility" mode="cyclic" value="PRJSPEC.AlarmVis(AStat)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke" mode="constant" value="Color_Alarm"/> 
+  </rect>
+  <rect x="0" y="0" width="120" height="50" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="9.75" y="9.75" width="100" height="30" rx="0" ry="0" id="SelFrame" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Объект не привязан.&quot;, 5)
+ElseIf Z0 != nothing Then
+	Open_ws_wf_wi(&quot;TPTS_KO_6&quot;, KKS + &quot;|&quot; + CStr(StopStart), Operate)
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnRightClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Объект не привязан.&quot;, 5)
+ElseIf Z0 != nothing Then
+	If Operate &amp;&amp; Check_Oper_Rights(OU) Then
+		LoadPopUpMenu(KKS + &quot;|KO o|TPTS_KO_6 &quot; + KKS + &quot;|&quot; + CStr(StopStart))
+	Else
+		LoadPopUpMenu(KKS + &quot;|KO i|TPTS_KO_6 &quot; + KKS + &quot;|&quot; + CStr(StopStart))
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnMiddleClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Объект не привязан.&quot;, 5)
+ElseIf Z0 != nothing Then
+	Open_Win_Uni(False, &quot;rights&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS+&quot;|&quot;+CStr(Operate))
+Else
+	NoLink(KKS)
+End If</rt:event>
+  </rect>
+</svg>

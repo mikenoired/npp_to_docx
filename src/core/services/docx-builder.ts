@@ -86,7 +86,10 @@ export async function buildDocx(
   width: number,
   height: number,
   markers: RenderedMarker[],
-  passport: { frameName: string; missingResources: string[] } = { frameName: "", missingResources: [] },
+  passport: { frameName: string; missingResources: string[]; reconstructedResources?: string[] } = {
+    frameName: "",
+    missingResources: [],
+  },
 ): Promise<Buffer> {
   const maxWidth = 960;
   const imageWidth = Math.min(width, maxWidth, (400 * width) / height);
@@ -95,6 +98,13 @@ export async function buildDocx(
   const children: Array<Paragraph | Table> = [
     new Paragraph({ text: `Паспорт кадра ${passport.frameName}`, heading: HeadingLevel.TITLE }),
     new Paragraph({ text: `Элементов: ${markers.length}. Номера на схеме соответствуют строкам таблицы.` }),
+    ...(passport.reconstructedResources?.length
+      ? [
+          new Paragraph({
+            text: `Условно восстановлены подмодели: ${passport.reconstructedResources.join(", ")}. Изображения показывают назначение элемента без показаний и состояний. Геометрия исходной иллюстрации ЦВД, если она указана, не восстановлена.`,
+          }),
+        ]
+      : []),
     ...(passport.missingResources.length
       ? [
           new Paragraph({

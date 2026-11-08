@@ -1,0 +1,115 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 20 20" width="20" height="20" id="aux_Stat_Alarm_data" stroke="Col_Grey5" font-family="AAP_Font3" font-size="18" text-anchor="middle" rt:text-vertanchor="middle">
+  <desc>отображение одного из свойств статистики станции</desc>
+  <rt:model revision="6.0" modelversion="7.2.0.23" comment="вспомогательная подмодель ПОРТАЛа">
+    <rt:param name="Current_Station" datatype="PlsStation" comment="Интерфейс станции, статистика которой отображается"/> 
+    <rt:param name="Alarm_Level" datatype="byte" value="0" comment="Уровень сигнализации (0...7) или недостоверность (-1)"/> 
+    <rt:param name="Txt_char" datatype="string" comment="Текст индикации - одна буква или &lt;пустая строка&gt; = использовать первую букву названия из конфигурации"/> 
+    <rt:param name="CurrentStationDataOnly" datatype="boolean" value="false" comment="Отображать данные только по текущей станции, и не отображать данные дочерних подстанций"/> 
+    <rt:var name="Main_color_int" datatype="uint" comment="Основной цвет представления параметра"/> 
+    <rt:var name="Alt_color_int" datatype="uint" value="0x7d7d7d" comment="Альтернативный цвет для мигания"/> 
+    <rt:var name="Empty_color_int" datatype="uint" value="0xcdcdcd" comment="Цвет для отсутствия состояния"/> 
+    <rt:var name="Error_detected" datatype="boolean" value="false" comment="Обнаружена критическая ошибка, не позволяющая отображать"/> 
+    <rt:var name="InAlarm" datatype="ubyte" value="0" comment="Несквитированная сигнализация - надо мигать 0 = потухнуть; 1 = гореть; 2 = медленно; 3 = быстро"/> 
+    <rt:sub>Sub ShowCurStatus()
+	If Error_detected Then
+		Exit Sub
+	ElseIf InAlarm == 0 Then
+		BG.fill = Alt_color_int
+		Character.fill = Empty_color_int
+		Character.font_size = 14
+		Character.font_weight = &quot;normal&quot;
+	Else
+		Character.font_size = 18
+		If InAlarm == 2 Then
+			BG.fill = Alt_color_int
+			Character.fill = Main_color_int
+			If _Blink3 Then	&apos;мигать будем толщиной шрифта
+				Character.font_weight = &quot;bold&quot;
+			Else
+				Character.font_weight = &quot;normal&quot;
+			End If
+		Else	&apos;есть сигнализации
+			Character.fill = 0
+			Character.font_weight = &quot;bold&quot;
+			If InAlarm == 1 Then		&apos;гореть
+				BG.fill = Main_color_int
+			Else	&apos;мигать
+				If _Blink1 Then
+					BG.fill = Main_color_int
+				Else
+					BG.fill = Alt_color_int
+				End If
+			End If
+		End If
+	End If
+End Sub</rt:sub>
+    <rt:sub>Sub GetStationStatistics()
+	InAlarm = 0
+	If Error_detected Then
+		Exit Sub
+	ElseIf !CurrentStationDataOnly Then	//получить данные от дочерних подстанций
+		If Alarm_Level &lt; 0 Then
+			If Current_Station.SumStationCounter(PLS_STATCOUNTER_BAD) &gt; 0 Then
+				InAlarm = 1
+			End If
+		Else
+			If Current_Station.AlarmCounterSum(Alarm_Level) &gt; 0 Then
+				InAlarm = 1
+			End If
+			If Current_Station.NoAckCounterSum(Alarm_Level) &gt; 0 Then
+				InAlarm = InAlarm | 2
+			End If
+		End If
+	Else
+		If Alarm_Level &lt; 0 Then
+			If Current_Station.StationCounter(PLS_STATCOUNTER_BAD) &gt; 0 Then
+				InAlarm = 1
+			End If
+		Else
+			If Current_Station.AlarmCounter(Alarm_Level) &gt; 0 Then
+				InAlarm = 1
+			End If
+			If Current_Station.NoAckCounter(Alarm_Level) &gt; 0 Then
+				InAlarm = InAlarm | 2
+			End If
+		End If
+	End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If Current_Station != Nothing Then
+	If Alarm_Level &gt; 7 Then
+		Error_detected = True
+	ElseIf Alarm_Level &lt; 0 Then		&apos;если будет что-то кроме недостоверности - исправить
+		Main_color_int = Color_Inval
+	Else
+		Main_color_int = ColorAlarm(Alarm_Level)
+	End If
+Else
+	Error_detected = True
+End If
+If Error_detected Then
+	Character.fill = Color_ErLink
+	BG.fill = Alt_color_int
+	Character.text = &quot;?&quot;
+ElseIf Len(Txt_char) &gt; 0 Then	//буква задана
+	Character.text = Left(Txt_char, 1)
+Else	&apos;буква - по умолчанию
+	If Alarm_Level &lt; 0 Then
+		Character.text = &quot;Н&quot;
+	Else
+		Character.text = Left(CStr(RTAPLS.GetConfigurationParameter(True, &quot;PortalAlarms&quot;, &quot;ALARM_NAME_&quot; + CStr(Alarm_Level))), 1)
+	End If
+End If</rt:event>
+    <rt:cycleTrigger name="ShowState" cycle="100" unit="millisecond">
+      <rt:condition>!Error_detected</rt:condition>
+      <rt:code>ShowCurStatus()</rt:code>
+    </rt:cycleTrigger>
+    <rt:changeTrigger name="RefreshStatistics">
+      <rt:condition>!Error_detected</rt:condition>
+      <rt:chgItem>Current_Station</rt:chgItem>
+      <rt:code>GetStationStatistics()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="20" height="20" rx="0" ry="0" id="BG" fill="Col_Grey5" stroke="#303030" stroke-width="1"/> 
+  <text x="10" y="7" id="Character" fill="Col_Red" font-size="15">-</text>
+</svg>

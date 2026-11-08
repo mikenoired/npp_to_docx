@@ -107,7 +107,13 @@ export async function processBatch(
   let totalMarkers = 0;
   let totalMismatches = 0;
   const searchRecords: SearchMarkerRecord[] = [];
-  const frameReports: Array<{ frame: string; markers?: number; missingResources?: string[]; error?: string }> = [];
+  const frameReports: Array<{
+    frame: string;
+    markers?: number;
+    missingResources?: string[];
+    reconstructedResources?: string[];
+    error?: string;
+  }> = [];
 
   const emitProgress = (): void => {
     const line = renderProgressBar(completed, files.length, success, failed, startedAt);
@@ -132,7 +138,12 @@ export async function processBatch(
 
     try {
       const result = await convertSvgToDocx(svgPath, outputPath, descriptions);
-      frameReports.push({ frame: fileName, markers: result.markers, missingResources: result.missingResources });
+      frameReports.push({
+        frame: fileName,
+        markers: result.markers,
+        missingResources: result.missingResources,
+        reconstructedResources: result.reconstructedResources,
+      });
       if (result.missingResources.length)
         logger.log(`WARNING ${fileName}: missing submodels: ${result.missingResources.join(", ")}`);
       success += 1;

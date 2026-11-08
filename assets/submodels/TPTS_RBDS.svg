@@ -1,0 +1,71 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 50 80" width="50" height="80" id="TPTS_RBDS" font-family="AAP_Font1">
+  <desc>Модуль ТПТС RBDS</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="4.0-6.0">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS модуля"/> 
+    <rt:param name="MN" datatype="string" value="1718" comment="типовой номер модуля"/> 
+    <rt:var name="Err" datatype="boolean" value="true" comment="ошибки"/> 
+    <rt:var name="Fail" datatype="boolean" value="false" comment="отказы"/> 
+    <rt:var name="Sim" datatype="boolean" value="false" comment="имитация"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="F0" datatype="PlsPVBin" comment="Указатель на переменную"/> 
+    <rt:var name="F1" datatype="PlsPVBin" comment="Указатель на переменную"/> 
+    <rt:var name="F6" datatype="PlsPVBin" comment="Указатель на переменную"/> 
+    <rt:var name="F7" datatype="PlsPVBin" comment="Указатель на переменную"/> 
+    <rt:event type="OnInitialize">If (KKS != &quot;NULL&quot;) Then
+	F0 = BIN(KKS + &quot;_F0&quot;)
+	F1 = BIN(KKS + &quot;_F1&quot;)
+	F6 = BIN(KKS + &quot;_F6&quot;)
+	F7 = BIN(KKS + &quot;_F7&quot;)
+End If</rt:event>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetState">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>F0</rt:chgItem>
+      <rt:chgItem>F1</rt:chgItem>
+      <rt:chgItem>F6</rt:chgItem>
+      <rt:chgItem>F7</rt:chgItem>
+      <rt:code>Fail = PRJSPEC.TPTS_RB(KKS, Err, Sim)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="50" height="80" rx="0" ry="0" id="backgr" fill="Col_Grey2" stroke="Col_Grey5" stroke-linejoin="miter" stroke-width="2"/> 
+  <polyline points="0,80 0,0 50,0" id="LT_border" fill="none" stroke="Col_Grey1" stroke-linecap="butt" stroke-linejoin="miter" stroke-width="2"/> 
+  <image x="10" y="32.5" width="30" height="12.5" xlink:href="bool_indicator.svg" id="Ind_Fail">
+    <rt:dyn type="Stat" mode="onchange" value="Fail"/> 
+  </image>
+  <image x="10" y="47.5" width="30" height="12.5" xlink:href="bool_indicator.svg" id="Ind_Errors">
+    <rt:dyn type="Stat" mode="onchange" value="Err"/> 
+  </image>
+  <image x="10" y="62.5" width="30" height="12.5" xlink:href="bool_indicator.svg" id="Ind_imitation">
+    <rt:dyn type="Col_ON" mode="constant" value="Color_Imitation"/> 
+    <rt:dyn type="Stat" mode="onchange" value="Sim"/> 
+  </image>
+  <rect x="2.5" y="2.5" width="45" height="75" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="1.5">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <g fill="black">
+    <text x="25" y="17.5" id="Mod_name" font-size="15" font-weight="bold" text-anchor="middle">RBDS</text>
+    <text x="25" y="27.75" id="Mod_number" font-size="10" font-weight="normal" text-anchor="middle">
+      <rt:dyn type="text" mode="constant" value="MN"/> 
+1718</text>
+  </g>
+  <rect x="0" y="0" width="50" height="80" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If F0 != nothing Then
+	Open_ws_wf_wi(&quot;wd_TPTS_RBDS_6&quot;, KKS, False)	//есть только 6 поколение!
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnRightClick">If F0 != nothing Then
+	LoadPopUpMenu(KKS + &quot;|RBBd|wd_TPTS_RBDS_6 &quot; + KKS)	//есть только 6 поколение
+Else
+	NoLink(KKS)
+End If</rt:event>
+  </rect>
+</svg>

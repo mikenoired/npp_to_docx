@@ -1,0 +1,449 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="codedlayout meet" viewBox="0 0 75 20" width="75" height="20" id="bitwise_tablo_4bits">
+  <desc>Табло универсальное для 4 сигналов и их битов</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.2">
+    <rt:param name="PointID_1" datatype="string" value="NULL" comment="Идентификатор сигнала 1 (и для NARY номер его бита 0...15 через пробел)"/> 
+    <rt:param name="PointID_2" datatype="string" value="NULL" comment="Идентификатор сигнала 2 (и для NARY номер его бита 0...15 через пробел)"/> 
+    <rt:param name="PointID_3" datatype="string" value="NULL" comment="Идентификатор сигнала 3 (и для NARY номер его бита 0...15 через пробел)"/> 
+    <rt:param name="PointID_4" datatype="string" value="NULL" comment="Идентификатор сигнала 4 (и для NARY номер его бита 0...15 через пробел)"/> 
+    <rt:param name="Text_0000" datatype="string" value="0000" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Text_0001" datatype="string" value="0001" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Text_0010" datatype="string" value="0010" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Text_0011" datatype="string" value="0011" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Text_0100" datatype="string" value="0100" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Text_0101" datatype="string" value="0101" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Text_0110" datatype="string" value="0110" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Text_0111" datatype="string" value="0111" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Text_1000" datatype="string" value="1000" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Text_1001" datatype="string" value="1001" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Text_1010" datatype="string" value="1010" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Text_1011" datatype="string" value="1011" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Text_1100" datatype="string" value="1100" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Text_1101" datatype="string" value="1101" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Text_1110" datatype="string" value="1110" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Text_1111" datatype="string" value="1111" comment="Текст на индикаторе для определённого сочетания битов"/> 
+    <rt:param name="Color_0000" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Color_0001" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Color_0010" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Color_0011" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Color_0100" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Color_0101" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Color_0110" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Color_0111" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Color_1000" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Color_1001" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Color_1010" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Color_1011" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Color_1100" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Color_1101" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Color_1110" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Color_1111" datatype="string" value="none" comment="Цвет индикатора для определённого сочетания битов"/> 
+    <rt:param name="Ignore_BAD" datatype="boolean" value="false" comment="Игнорировать плохие качества сигналов"/> 
+    <rt:param name="Blink_on_0000" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Blink_on_0001" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Blink_on_0010" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Blink_on_0011" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Blink_on_0100" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Blink_on_0101" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Blink_on_0110" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Blink_on_0111" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Blink_on_1000" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Blink_on_1001" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Blink_on_1010" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Blink_on_1011" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Blink_on_1100" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Blink_on_1101" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Blink_on_1110" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Blink_on_1111" datatype="boolean" value="false" comment="Мигать для определённого сочетания битов"/> 
+    <rt:param name="Ack_Allowed" datatype="boolean" value="false" comment="Разрешить квитирование мигания"/> 
+    <rt:param name="T_Color" datatype="string" value="black" comment="Цвет текста"/> 
+    <rt:param name="T_Font" datatype="string" value="AAP_Font3" comment="Шрифт"/> 
+    <rt:param name="T_Size" datatype="float" value="15" comment="Размер шрифта"/> 
+    <rt:param name="T_Style" datatype="string" value="normal" comment="Стиль"/> 
+    <rt:param name="T_Weight" datatype="string" value="bold" comment="Толщина букв шрифта"/> 
+    <rt:param name="Grad_Style" datatype="boolean" value="true" comment="Индикатор имеет градиентную заливку - объёмный фон"/> 
+    <rt:var name="pv_1" datatype="PlsPVBin" comment="указатель на сигнал 1"/> 
+    <rt:var name="pv_2" datatype="PlsPVBin" comment="указатель на сигнал 2"/> 
+    <rt:var name="pv_3" datatype="PlsPVBin" comment="указатель на сигнал 3"/> 
+    <rt:var name="pv_4" datatype="PlsPVBin" comment="указатель на сигнал 4"/> 
+    <rt:var name="pv_1_bit" datatype="short" value="-1" comment="номер бита сигнала 1"/> 
+    <rt:var name="pv_2_bit" datatype="short" value="-1" comment="номер бита сигнала 2"/> 
+    <rt:var name="pv_3_bit" datatype="short" value="-1" comment="номер бита сигнала 3"/> 
+    <rt:var name="pv_4_bit" datatype="short" value="-1" comment="номер бита сигнала 4"/> 
+    <rt:var name="Blink_on" datatype="boolean" value="false" comment="мигание включено"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub AckMe()
+If Blink_on &amp;&amp; Ack_Allowed Then
+	Blink_on = False
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub BGColor ()
+If Grad_Style Then
+	body.fill_opacity = 0.6
+Else
+	body.fill_opacity = 1
+End If
+If pv_1 == Nothing Then
+	I_Text.text = &quot;Ош.&quot;
+	body.fill = Color_ErLink
+	body.fill_opacity = 1
+	Exit Sub
+End If
+Dim res As Byte
+If !Ignore_BAD Then
+	If pv_1.Quality == PLS_QUAL_BAD Then
+		I_Text.text = &quot;НДСТ&quot;
+		body.fill = Color_Inval
+		body.fill_opacity = 1
+		Exit Sub
+	End If
+	If pv_2 != Nothing Then
+		If pv_2.Quality == PLS_QUAL_BAD Then
+			I_Text.text = &quot;НДСТ&quot;
+			body.fill = Color_Inval
+			body.fill_opacity = 1
+			Exit Sub
+		End If
+	End If
+	If pv_3 != Nothing Then
+		If pv_3.Quality == PLS_QUAL_BAD Then
+			I_Text.text = &quot;НДСТ&quot;
+			body.fill = Color_Inval
+			body.fill_opacity = 1
+			Exit Sub
+		End If
+	End If
+	If pv_4 != Nothing Then
+		If pv_4.Quality == PLS_QUAL_BAD Then
+			I_Text.text = &quot;НДСТ&quot;
+			body.fill = Color_Inval
+			body.fill_opacity = 1
+			Exit Sub
+		End If
+	End If
+End If
+res = 0
+If pv_1_bit == -1 Then
+	res = pv_1.Value &amp; 1
+Else
+	If PRJSPEC.DetectBit(pv_1, (16 - pv_1_bit)) Then
+		res = 1
+	End If
+End If
+If pv_2 != Nothing Then
+	If pv_2_bit == -1 Then
+		res = res | ((pv_2.Value &amp; 1) * 2)
+	Else
+		If PRJSPEC.DetectBit(pv_2, (16 - pv_2_bit)) Then
+			res = res | 2
+		End If
+	End If
+End If
+If pv_3 != Nothing Then
+	If pv_3_bit == -1 Then
+		res = res | ((pv_3.Value &amp; 1) * 4)
+	Else
+		If PRJSPEC.DetectBit(pv_3, (16 - pv_3_bit)) Then
+			res = res | 4
+		End If
+	End If
+End If
+If pv_4 != Nothing Then
+	If pv_4_bit == -1 Then
+		res = res | ((pv_4.Value &amp; 1) * 8)
+	Else
+		If PRJSPEC.DetectBit(pv_4, (16 - pv_4_bit)) Then
+			res = res | 8
+		End If
+	End If
+End If
+
+If res == 0 Then
+	I_Text.text = Text_0000
+	body.fill = Color_0000
+	If Blink_on_0000 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+ElseIf res == 1 Then
+	I_Text.text = Text_0001
+	body.fill = Color_0001
+	If Blink_on_0001 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+ElseIf res == 2 Then
+	I_Text.text = Text_0010
+	body.fill = Color_0010
+	If Blink_on_0010 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+ElseIf res == 3 Then
+	I_Text.text = Text_0011
+	body.fill = Color_0011
+	If Blink_on_0011 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+ElseIf res == 4 Then
+	I_Text.text = Text_0100
+	body.fill = Color_0100
+	If Blink_on_0100 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+ElseIf res == 5 Then
+	I_Text.text = Text_0101
+	body.fill = Color_0101
+	If Blink_on_0101 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+ElseIf res == 6 Then
+	I_Text.text = Text_0110
+	body.fill = Color_0110
+	If Blink_on_0110 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+ElseIf res == 7 Then
+	I_Text.text = Text_0111
+	body.fill = Color_0111
+	If Blink_on_0111 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+ElseIf res == 8 Then
+	I_Text.text = Text_1000
+	body.fill = Color_1000
+	If Blink_on_1000 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+ElseIf res == 9 Then
+	I_Text.text = Text_1001
+	body.fill = Color_1001
+	If Blink_on_1001 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+ElseIf res == 10 Then
+	I_Text.text = Text_1010
+	body.fill = Color_1010
+	If Blink_on_1010 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+ElseIf res == 11 Then
+	I_Text.text = Text_1011
+	body.fill = Color_1011
+	If Blink_on_1011 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+ElseIf res == 12 Then
+	I_Text.text = Text_1100
+	body.fill = Color_1100
+	If Blink_on_1100 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+ElseIf res == 13 Then
+	I_Text.text = Text_1101
+	body.fill = Color_1101
+	If Blink_on_1101 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+ElseIf res == 14 Then
+	I_Text.text = Text_1110
+	body.fill = Color_1110
+	If Blink_on_1110 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+ElseIf res == 15 Then
+	I_Text.text = Text_1111
+	body.fill = Color_1111
+	If Blink_on_1111 Then
+		Blink_on = True
+	Else
+		Blink_on = False
+	End If
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">Dim Tmp_PID As String
+Dim bit_num As String
+If (PointID_1 != &quot;NULL&quot;) then
+	Tmp_PID = PRJSPEC.ComSplit(PointID_1, bit_num)
+	pv_1 = BIN(Tmp_PID)
+	If IsNumericString(bit_num) Then
+		pv_1_bit = CByte(bit_num)
+		If (pv_1_bit &lt; 0) || (pv_1_bit &gt; 16) Then
+			pv_1_bit = -1
+		End If
+	End If
+Else
+	body.fill = Color_ErLink
+End If
+If (PointID_2 != &quot;NULL&quot;) then
+	Tmp_PID = PRJSPEC.ComSplit(PointID_2, bit_num)
+	pv_2 = BIN(Tmp_PID)
+	If IsNumericString(bit_num) Then
+		pv_2_bit = CByte(bit_num)
+		If (pv_2_bit &lt; 0) || (pv_2_bit &gt; 16) Then
+			pv_2_bit = -1
+		End If
+	End If
+End If
+If (PointID_3 != &quot;NULL&quot;) then
+	Tmp_PID = PRJSPEC.ComSplit(PointID_3, bit_num)
+	pv_3 = BIN(Tmp_PID)
+	If IsNumericString(bit_num) Then
+		pv_3_bit = CByte(bit_num)
+		If (pv_3_bit &lt; 0) || (pv_3_bit &gt; 16) Then
+			pv_3_bit = -1
+		End If
+	End If
+End If
+If (PointID_4 != &quot;NULL&quot;) then
+	Tmp_PID = PRJSPEC.ComSplit(PointID_4, bit_num)
+	pv_4 = BIN(Tmp_PID)
+	If IsNumericString(bit_num) Then
+		pv_4_bit = CByte(bit_num)
+		If (pv_4_bit &lt; 0) || (pv_4_bit &gt; 16) Then
+			pv_4_bit = -1
+		End If
+	End If
+End If</rt:event>
+    <rt:event type="OnClick">If Blink_on &amp;&amp; Ack_Allowed Then
+	Blink_on = False
+	Exit Sub
+End If
+If PointID_1 == &quot;NULL&quot; Then
+	ShowWarning (&quot;Объект не привязан.&quot;, 5)
+ElseIf (pv_1 == Nothing) Then
+	NoLink (PointID_1)
+ElseIf (PointID_2 != &quot;NULL&quot;) &amp;&amp; (pv_2 == Nothing) Then
+	NoLink (PointID_2)
+ElseIf (PointID_3 != &quot;NULL&quot;) &amp;&amp; (pv_3 == Nothing) Then
+	NoLink (PointID_3)
+ElseIf (PointID_4 != &quot;NULL&quot;) &amp;&amp; (pv_4 == Nothing) Then
+	NoLink (PointID_4)
+ElseIf  (pv_2 == Nothing) &amp;&amp; (pv_3 == Nothing) &amp;&amp; (pv_4 == Nothing) Then
+	Call_Win(&quot;wi_BIN&quot;, pv_1.PVId)
+Else
+	Dim s As String
+	s = pv_1.PVId + &quot;|&quot; + pv_2.PVId
+	If (pv_3 != Nothing) Then
+		s = s +  &quot;|&quot; + pv_3.PVId
+	End If
+	If (pv_4 != Nothing) Then
+		s = s +  &quot;|&quot; + pv_4.PVId
+	End If
+	Open_Win_Uni(False, &quot;multyKKS&quot;, &quot;Составной объект&quot;, &quot;wi_MultyPV&quot;, s)
+End If</rt:event>
+    <rt:event type="OnRightClick">If PointID_1 == &quot;NULL&quot; Then
+	ShowWarning (&quot;Объект не привязан.&quot;, 5)
+ElseIf (pv_1 == Nothing) Then
+	NoLink (PointID_1)
+ElseIf (PointID_2 != &quot;NULL&quot;) &amp;&amp; (pv_2 == Nothing) Then
+	NoLink (PointID_2)
+ElseIf (PointID_3 != &quot;NULL&quot;) &amp;&amp; (pv_3 == Nothing) Then
+	NoLink (PointID_3)
+ElseIf (PointID_4 != &quot;NULL&quot;) &amp;&amp; (pv_4 == Nothing) Then
+	NoLink (PointID_4)
+ElseIf  (pv_2 == Nothing) &amp;&amp; (pv_3 == Nothing) &amp;&amp; (pv_4 == Nothing) Then
+	LoadPopUpMenu(pv_1.PVId + &quot;|BINi|wi_BIN &quot; + pv_1.PVId)
+Else
+	Dim s As String
+	s = pv_1.PVId + &quot;|&quot; + pv_2.PVId
+	TmpBuffer(0) = pv_1.PVId
+	TmpBuffer(1) = pv_2.PVId
+	If (pv_3 != Nothing) Then
+		TmpBuffer(2) = pv_3.PVId
+		s = s +  &quot;|&quot; + pv_3.PVId
+	End If
+	If (pv_4 != Nothing) Then
+		TmpBuffer(3) = pv_4.PVId
+		s = s +  &quot;|&quot; + pv_4.PVId
+	End If
+	LoadPopUpMenu(pv_1.PVId + &quot;|NONi|&quot;)
+End If</rt:event>
+    <rt:event type="OnResize">Dim Th_Ht As Float
+Dim Th_Wdth As Float
+Th_Ht = _This.height
+Th_Wdth = _This.width
+
+Grad_BG.width = Th_Wdth
+Grad_BG.height = Th_Ht
+body.width = Th_Wdth
+body.height = Th_Ht
+RB_border.points = &quot;0,&quot; + CStr(Th_Ht) + &quot; &quot; + CStr(Th_Wdth)+ &quot;,&quot; + CStr(Th_Ht) + &quot; &quot; + CStr(Th_Wdth) + &quot;,0&quot;
+LU_border.points =  &quot;0,&quot; + CStr(Th_Ht) + &quot; 0,0 &quot; + CStr(Th_Wdth) + &quot;,0&quot;
+blink_pannel.width = Th_Wdth
+blink_pannel.height = Th_Ht
+I_Text.x = Th_Wdth / 2
+I_Text.y = Th_Ht / 2 - T_Size  / 15.0 - 1.5
+I_Text.font_size = T_Size</rt:event>
+    <rt:changeTrigger name="CheckPV_1">
+      <rt:condition>PointID_1 != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>pv_1</rt:chgItem>
+      <rt:code>BGColor()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="CheckPV_2">
+      <rt:condition>PointID_2 != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>pv_2</rt:chgItem>
+      <rt:code>BGColor()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="CheckPV_3">
+      <rt:condition>PointID_3 != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>pv_3</rt:chgItem>
+      <rt:code>BGColor()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="CheckPV_4">
+      <rt:condition>PointID_4 != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>pv_4</rt:chgItem>
+      <rt:code>BGColor()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="75" height="20" rx="0" ry="0" id="Grad_BG" fill="url(#Cylinder_horizontal2)" stroke="none">
+    <rt:dyn type="visibility" mode="constant" value="Grad_Style" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="0" y="0" width="75" height="20" rx="0" ry="0" id="body" fill="none" stroke="none"/> 
+  <polyline points="0,20 75,20 75,0" id="RB_border" fill="none" stroke="Col_Grey1" stroke-width="1"/> 
+  <polyline points="0,20 0,0 75,0" id="LU_border" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <text x="37.5" y="7.5" id="I_Text" fill="black" font-family="AAP_Font3" font-size="15" font-style="normal" font-weight="bold" text-anchor="middle" rt:text-vertanchor="middle">
+    <rt:dyn type="font-size" mode="onchange" value="T_Size"/> 
+    <rt:dyn type="font-family" mode="onchange" value="T_Font"/> 
+    <rt:dyn type="font-style" mode="onchange" value="T_Style"/> 
+    <rt:dyn type="font-weight" mode="onchange" value="T_Weight"/> 
+    <rt:dyn type="fill" mode="onchange" value="T_Color"/> 
+    <rt:dyn type="y" mode="onchange" value="_This.height / 2 - T_Size  / 15.0 - 1.5"/> 
+Табло</text>
+  <rect x="0" y="0" width="75" height="20" rx="0" ry="0" id="blink_pannel" visibility="hidden" rt:detect="disabled" fill="black" fill-opacity="0.399988" stroke="none">
+    <rt:dyn type="visibility" mode="cyclic" value="_Blink2 &amp;&amp; Blink_on" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+</svg>

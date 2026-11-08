@@ -1,0 +1,116 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 65 25" width="65" height="25" id="DS_TPTS_Reg_degree">
+  <desc>ТПТС (SR,KR) индикатор положения регулятора для Dull Screen</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа Dull Screen" revision="6.0">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS оборудования"/> 
+    <rt:param name="SIGNAL" datatype="string" value="NULL" comment="Поле SIGNAL при нестандартной кодировке (не AA1 или XQ08)"/> 
+    <rt:param name="ShowFrame" datatype="boolean" value="false" comment="выводить рамку"/> 
+    <rt:param name="ShowGoodColor" datatype="boolean" value="false" comment="окрашивать подложку при хорошем качестве"/> 
+    <rt:param name="BG_StaticColor" datatype="string" value="none" comment="Имя цвета подложки, если объект не должен быть прозрачным"/> 
+    <rt:var name="pv" datatype="PlsPVAna" comment="указатель на переменую"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:sub>Sub StatusColor ()
+	If (pv == nothing) Then
+		Value_text.text = &quot;Ош.&quot;
+		Value_text.font_size = 20
+		Backgr.fill = Color_ANA_ER_LINK
+	ElseIf  (pv.Value &lt; -25) || (pv.Value &gt; 125) Then
+		Value_text.text = &quot;***&quot;
+		Backgr.fill = Color_Inval
+	Else
+		Value_text.text = RoundAscii(pv.Value, 0, True)
+		Dim ValColor As UInt
+		ValColor = PRJSPEC.ANA_Color_pv (pv)
+		Backgr.fill = ValColor
+		If ShowGoodColor Then
+			If ValColor == Color_ANA_GOOD Then
+				Backgr.fill_opacity = 0.5
+			Else
+				Backgr.fill_opacity = 1
+			End If
+		Else
+			If ValColor == Color_ANA_GOOD Then
+				Backgr.visibility = &quot;hidden&quot;
+			Else
+				Backgr.visibility = &quot;visible&quot;
+			End If
+		End If
+	End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If KKS != &quot;NULL&quot; Then
+	If SIGNAL == &quot;NULL&quot; Then
+		If (!requests_allown) Then
+			pv = ANA(KKS + &quot;_XQ08&quot;)
+		Else
+			pv = ANA(KKS + &quot;_AA1&quot;)
+			If pv == Nothing Then
+				pv = ANA(KKS + &quot;_XQ08&quot;)
+			End If
+		End If
+	Else
+		pv = ANA(KKS + &quot;_&quot; + SIGNAL)
+	End If
+Else
+	Value_text.text = &quot;Ош.&quot;
+	Value_text.font_size = 20
+	Backgr.fill = Color_ANA_ER_LINK
+End If</rt:event>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>pv != Nothing</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(pv.PVId) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetStatus">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:code>StatusColor()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="65" height="25" rx="0" ry="0" id="Static_BG" fill="none" stroke="none" stroke-width="1">
+    <rt:dyn type="fill" mode="constant" value="BG_StaticColor"/> 
+  </rect>
+  <rect x="0" y="0" width="65" height="25" rx="0" ry="0" id="Backgr" fill="none" stroke="none" stroke-width="0.5">
+    <rt:dyn type="stroke" mode="constant" value="ShowFrame" trans="bt">
+      <rt:xy value="false" value2="black"/> 
+      <rt:xy value2="none"/> 
+    </rt:dyn>
+  </rect>
+  <g id="Frame" stroke-width="1">
+    <rt:dyn type="visibility" mode="constant" value="ShowFrame" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <polyline points="65,0 65,25 0,25" id="RB_frame" fill="none" stroke="Col_Grey1" stroke-opacity="0.75"/> 
+    <polyline points="0,25 0,0 65,-0.625" id="LU_frame" fill="none" stroke="Col_Grey5" stroke-opacity="0.5"/> 
+  </g>
+  <text x="45" y="21.125" id="EU" fill="Col_Grey5" font-family="AAP_Font3" font-size="20" font-style="italic" text-anchor="start">%</text>
+  <text x="42.5" y="20.875" id="Value_text" fill="black" font-family="AAR_Font2" font-size="23" font-weight="bold" text-anchor="end">120</text>
+  <g id="InGrObj">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rect x="0" y="0" width="65" height="25" rx="0" ry="0" id="InGrFrame" fill="none" stroke="Col_InGR1" stroke-width="2"/> 
+    <polygon points="60,0 65,0 65,5.875" id="InGrCorner" fill="Col_InGR1" stroke="none"/> 
+  </g>
+  <rect x="0" y="0" width="65" height="25" rx="0" ry="0" id="SelFrame" fill="black" fill-opacity="0" stroke="none">
+    <rt:event type="OnRightClick">If pv == nothing Then
+	If SIGNAL == &quot;NULL&quot; Then
+		NoLink(KKS)
+	Else
+		ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIGNAL = \&quot;&quot; + SIGNAL + &quot;\&quot;&quot;, 0)
+	End If
+Else
+	LoadPopUpMenu(pv.PVId + &quot;|ANAi|ws_ANA_FN &quot; + pv.PVId + &quot;|-1&quot;)
+End If</rt:event>
+    <rt:event type="OnClick">If pv == nothing Then
+	If SIGNAL == &quot;NULL&quot; Then
+		NoLink(KKS)
+	Else
+		ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIGNAL = \&quot;&quot; + SIGNAL + &quot;\&quot;&quot;, 0)
+	End If
+Else
+	Call_Win (&quot;ws_ANA_FN&quot;, pv.PVId + &quot;|-1&quot;)
+End If</rt:event>
+  </rect>
+</svg>

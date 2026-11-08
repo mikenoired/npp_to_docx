@@ -55,6 +55,7 @@
       "build/core/**/*",
       "build/shared/**/*",
       "build/web-client/**/*",
+      "assets/submodels/**/*",
       "package.json"
     ],
     "asarUnpack": [

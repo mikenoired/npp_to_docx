@@ -1,0 +1,26 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 20 5" width="20" height="5" id="aux721_al_level_indicator">
+  <rt:model modelversion="7.2.0.24" comment="Создано VNIIAES-ASUTP\Abramov 27.09.2013 14:00:14" revision="6.1">
+    <rt:param name="Alarm_level" datatype="byte" value="0" comment="Уровень сигнализаци"/> 
+    <rt:param name="Is_NotAcked" datatype="boolean" value="false" comment="Сигнализация не сквитирована"/> 
+    <rt:param name="Is_Active" datatype="boolean" value="false" comment="сигнализация активная (есть)"/> 
+    <rt:param name="BoundType" datatype="byte" value="0" comment="Тип нарушения: &gt;0 - ANA-HI; &lt;0 - ANA-LO"/> 
+    <rt:sub>Sub Refill()
+If Is_Active Then
+	My_obj.fill = ShowInAlarmColor(3 * CByte(Is_NotAcked), ColorAlarm(Alarm_level), ColorAlarm(9))
+Else
+	My_obj.fill = 0xffffffff
+End If
+End Sub</rt:sub>
+    <rt:cycleTrigger name="redraw_me" cycle="100" unit="millisecond">
+      <rt:code>Refill()</rt:code>
+    </rt:cycleTrigger>
+  </rt:model>
+  <polygon points="0,0 20,0 20,5 0,5" id="My_obj" fill="Col_Grey3" stroke="Col_Grey5" stroke-width="1">
+    <rt:dyn type="points" mode="onchange" value="BoundType" trans="it">
+      <rt:xy value="0" value2="0,0 10,5 20,0"/> 
+      <rt:xy value="1" value2="0,0 20,0 20,5 0,5"/> 
+      <rt:xy value2="0,5 10,0 20,5"/> 
+    </rt:dyn>
+  </polygon>
+</svg>

@@ -1,0 +1,7 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="-12.5 -12.5 25 25" width="25" height="25" id="Indicator">
+  <rt:model modelversion="7.2.0.23" comment="Создано VNIIAES-ASUTP\gubkina 07.09.2012 10:49:42">
+    <rt:param name="KKS_pos" datatype="string" comment="KKS маркера"/> 
+  </rt:model>
+  <polygon points="0,-12.5 12.5,12.5 -12.5,12.5" fill="Col_Green"/> 
+</svg>

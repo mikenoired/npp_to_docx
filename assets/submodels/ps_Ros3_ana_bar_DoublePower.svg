@@ -1,0 +1,357 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="codedlayout meet" viewBox="0 0 40 100" width="40" height="100" id="ps_Ros3_ana_bar_DoublePower" stroke="black" font-size="13">
+  <desc>Барограф для отображения периода удвоения мощности</desc>
+  <rt:model comment="Пользовательская подмодель ПОРТАЛа" revision="6.0" modelversion="0.0.0.0">
+    <rt:param name="FKKS1" datatype="string" comment="Идентификатор сигнала заливки"/> 
+    <rt:param name="FKKS2" datatype="string" comment="Идентификатор уставки"/> 
+    <rt:param name="ShowDigits" datatype="boolean" value="true" comment="Показывать значения шкалы"/> 
+    <rt:param name="Show_SubZero" datatype="boolean" value="true" comment="Показывать отрицательные значения"/> 
+    <rt:var name="pv" datatype="PlsPVAna" value="" comment="DB PV"/> 
+    <rt:var name="pv_ana" datatype="PlsPVAna" comment="DB PV"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="object in group"/> 
+    <rt:var name="FBar" datatype="float" value="1" comment="fill level"/> 
+    <rt:var name="FColor" datatype="uint" comment="цвет индикации"/> 
+    <rt:var name="M_Color" datatype="uint" comment="Приглушенный цвет"/> 
+    <rt:var name="HasError" datatype="boolean" value="false" comment="Ошибка данных"/> 
+    <rt:var name="val_AB" datatype="double" comment="Значение аварийной уставки" value="-999"/> 
+    <rt:var name="val_HB" datatype="double" value="-999" comment="Значение предупредительной уставки"/> 
+    <rt:sub>Sub ValCalc()
+Dim thh as double
+thh = _This.height
+If pv == nothing Then
+	body.y = 0
+	body.height = thh
+	FColor = Color_ErLink
+	Exit Sub
+End If
+
+Dim val As double
+Dim f as float
+Dim delta as float
+Dim start as float
+Dim a as float
+
+	val = pv.Value
+	val_AB = pv_ana.Value
+	If val != 0 Then
+		f = 1 / val
+	End If
+
+	If (f &lt; (-1) / 160.0) Then 
+		f = -1 / 160.0
+	ElseIf (f &gt; 1 / 20.0 + 1 / 160.0) Then
+		f = 1 / 20.0 + 1 / 160.0
+	End If
+	If (pv.Quality == PLS_QUAL_BAD) || (pv_ana.Quality == PLS_QUAL_BAD) || (val == 0)Then
+		FColor = Color_Inval	
+	ElseIf (val &lt;= val_AB) &amp;&amp; (val &gt; 0) Then
+		FColor = Color_ANA_HI_A
+	Elseif (val &lt;= (val_AB * 2)) &amp;&amp; (val &gt; 0) Then
+		FColor = Color_ANA_HI_P
+	Else
+		FColor = M_Color
+	End If
+
+start = thh / 10.0 * 9.0
+delta = thh / (1 / 20.0 + 2 / 160.0)
+If val == 0 Then
+	body.y = 0
+	body.height = thh
+ElseIf val &gt; 0 Then
+	body.y = start - f * delta
+	body.height = f * delta
+ElseIf Show_SubZero Then
+	body.y = start
+	body.height = Abs(f * delta	)
+Else
+	body.height = 0
+End If
+
+End Sub</rt:sub>
+    <rt:sub>Sub ShowBoard(ByVal board as double, ByVal B_Border as RtSvgObj, ByVal B_Line as RtSvgObj)
+Dim f as float
+If board != 0 Then
+	f = 1 / board
+	Dim y as float
+	Dim delta as float
+	Dim start as float
+	Dim thh as float
+
+	thh = _This.height
+	start = thh / 10.0 * 9.0
+	delta = thh / (1 / 20.0 + 2 / 160.0)
+	If (f &gt; 0.05625) Then
+		y = 0
+	ElseIf (f &lt; (-1 / 160.0)) Then
+		y = thh 
+	Else
+		y = start - f * delta
+	End If
+		B_Border.y1 = y
+		B_Border.y2 = y
+		B_Line.y1 = y
+		B_Line.y2 = y
+End If
+
+End Sub</rt:sub>
+    <rt:event type="OnResize">Dim thh as double
+Dim thw as double
+Dim i as ubyte
+
+thh = _This.height
+
+InGr.y = -2.5
+If Show_SubZero Then
+	InGr.height = thh + 5
+	Backgr_frame.height = thh
+	Backgr_rect.height = thh
+	BotLineBorder.y1 = thh
+	BotLineBorder.y2 = thh
+	BotLine.y1 = thh
+	BotLine.y2 = thh
+	SelArea.height = thh
+Else
+	InGr.height = (thh / 10.0 * 9) + 5
+	Backgr_frame.height = thh / 10.0 * 9
+	Backgr_rect.height = thh / 10.0 * 9
+	BotLineBorder.y1 = thh / 10.0 * 9
+	BotLineBorder.y2 = thh / 10.0 * 9
+	BotLine.y1 = thh / 10.0 * 9
+	BotLine.y2 = thh / 10.0 * 9
+	SelArea.height = thh / 10.0 * 9
+End If
+Digits_Dig20.y = thh / 10.0 - 2.5
+Digits_Dig40.y = thh / 2.0 - 2.5
+Digits_Dig80.y = thh / 10.0 * 7 - 2.5
+Digits_Dig160.y = thh / 10.0 * 8 - 2.5
+//Digits_DigBesk.y = thh / 10.0 * 9
+DigMin160.y = thh - 2.5
+HB_Group_HB_Border.y1 = thh / 10.0 
+HB_Group_HB_Border.y2 = thh / 10.0
+HB_Group_HB_Line.y1  =  thh / 10.0
+HB_Group_HB_Line.y2  =  thh / 10.0
+LB_Group_LB_Border.y1 = thh / 2.0
+LB_Group_LB_Border.y2 = thh / 2.0
+LB_Group_LB_Line.y1 = thh / 2.0
+LB_Group_LB_Line.y2 = thh / 2.0 
+Lines_Line160.y1 = thh / 10.0 * 8
+Lines_Line160.y2 = thh / 10.0 * 8
+Lines_Line80.y1 = thh / 10.0 * 7
+Lines_Line80.y2 = thh / 10.0 * 7
+Lines_LineBesk.y1 = thh / 10.0 * 9
+Lines_LineBesk.y2 = thh / 10.0 * 9
+Lines_Line20.y1 = thh / 10.0
+Lines_Line20.y2 = thh / 10.0
+Lines_Line40.y1 = thh / 2.0 
+Lines_Line40.y2 = thh / 2.0
+
+thw = _This.width					// ширина
+If thw &lt;  30 Then 
+	thw = 30
+End If	
+
+Backgr_frame.width = thw - 25
+Backgr_rect.width = thw - 25
+InGr.width = thw - 20
+BotLineBorder.x2 = thw
+TopLineBorder.x2 = thw
+BotLine.x2 = thw
+TopLine.x2 = thw
+HB_Group_HB_Border.x2 = thw - 15
+HB_Group_HB_Line.x2  =  thw - 15
+LB_Group_LB_Border.x2 = thw - 15
+LB_Group_LB_Line.x2 = thw - 15
+/*
+AB_Group_AB_Border.x2 = thw - 15
+AB_Group_AB_Line.x2 = thw - 15
+*/
+Lines_Line20.x2 = thw
+Lines_Line40.x2 = thw
+Lines_Line160.x2 = thw
+Lines_Line80.x2 = thw
+Lines_LineBesk.x2 = thw
+body.width = thw - 25
+SelArea.width = thw
+Digits_Dig20.x = thw - 7.5
+Digits_Dig40.x = thw - 7.5
+Digits_Dig80.x = thw - 7.5
+Digits_Dig160.x = thw - 15
+//Digits_DigBesk.x = thw - 10
+DigMin160.x = thw - 17.5</rt:event>
+    <rt:event type="OnInitialize">Set pv = RTAPLS.AnaPV(FKKS1)
+Set pv_ana = RTAPLS.AnaPV(FKKS2)
+
+body.visibility = &quot;visible&quot;
+M_Color = Middle_Color_Wieghted(Color_ANA_GOOD, 0xcdcdcd, 0.5)
+If (pv == Nothing) || (pv_ana == Nothing) Then
+	HasError = true
+	FColor = Color_ANA_ER_LINK
+	Exit Sub
+End If
+
+val_AB = pv_ana.Value
+val_HB = pv_ana.Value * 2
+
+if val_AB != 0 Then
+	ShowBoard(val_AB, HB_Group_HB_Border, HB_Group_HB_Line)
+	ShowBoard(val_HB, LB_Group_LB_Border, LB_Group_LB_Line)
+End If</rt:event>
+    <rt:changeTrigger name="GRP">
+      <rt:condition>pv != Nothing</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(pv.PVId) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc">
+      <rt:condition>!HasError</rt:condition>
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="On_pvANA">
+      <rt:condition>!HasError &amp;&amp; (pv_ana != Nothing) &amp;&amp; (pv_ana.Value !=0)</rt:condition>
+      <rt:chgItem>pv_ana</rt:chgItem>
+      <rt:code>ShowBoard(pv_ana.Value, HB_Group_HB_Border, HB_Group_HB_Line)</rt:code>
+      <rt:code>ValCalc()</rt:code>
+      <rt:code>ShowBoard((2.0 * pv_ana.Value), LB_Group_LB_Border, LB_Group_LB_Line)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <g id="Lines">
+    <line x1="0" y1="10" x2="40" y2="10" id="Line20" stroke="black" stroke-width="2">
+      <rt:dyn type="y1" mode="constant" value="_This.height / 10.0"/> 
+      <rt:dyn type="y2" mode="constant" value="_This.height / 10.0"/> 
+      <rt:dyn type="x2" mode="constant" value="_This.width"/> 
+    </line>
+    <line x1="0" y1="50" x2="40" y2="50" id="Line40" stroke="black" stroke-width="2">
+      <rt:dyn type="y1" mode="constant" value="_This.height / 2.0"/> 
+      <rt:dyn type="y2" mode="constant" value="_This.height / 2.0"/> 
+      <rt:dyn type="x2" mode="constant" value="_This.width"/> 
+    </line>
+    <line x1="0" y1="70" x2="40" y2="70" id="Line80" stroke="black" stroke-width="2">
+      <rt:dyn type="y1" mode="constant" value="_This.height / 10.0 * 7"/> 
+      <rt:dyn type="y2" mode="constant" value="_This.height / 10.0 * 7"/> 
+      <rt:dyn type="x2" mode="constant" value="_This.width"/> 
+    </line>
+    <line x1="0" y1="80" x2="40" y2="80" id="Line160" stroke="black" stroke-width="2">
+      <rt:dyn type="y1" mode="constant" value="_This.height / 10.0 * 8"/> 
+      <rt:dyn type="y2" mode="constant" value="_This.height / 10.0 * 8"/> 
+      <rt:dyn type="x2" mode="constant" value="_This.width"/> 
+    </line>
+    <line x1="0" y1="90" x2="40" y2="90" id="LineBesk" stroke="black" stroke-width="2">
+      <rt:dyn type="y1" mode="constant" value="_This.height / 10.0 * 9"/> 
+      <rt:dyn type="y2" mode="constant" value="_This.height / 10.0 * 9"/> 
+      <rt:dyn type="x2" mode="constant" value="_This.width"/> 
+    </line>
+  </g>
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="Backgr_rect" fill="Col_BGmain" stroke="none">
+    <rt:dyn type="height" mode="constant" value="_This.height"/> 
+    <rt:dyn type="width" mode="constant" value="_This.width - 25"/> 
+  </rect>
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="Backgr_frame" fill="none" stroke="Col_Grey5" stroke-width="1">
+    <rt:dyn type="height" mode="constant" value="_This.height"/> 
+    <rt:dyn type="width" mode="constant" value="_This.width - 25"/> 
+  </rect>
+  <rect x="2.5" y="-2.5" width="20" height="105" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="1.5">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="body" visibility="hidden" rt:detect="disabled" fill="Col_Green" stroke="none">
+    <rt:dyn type="fill" mode="onchange" value="FColor"/> 
+    <rt:dyn type="width" mode="constant" value="_This.width - 25"/> 
+  </rect>
+  <line x1="0" y1="0" x2="40" y2="0" id="TopLineBorder" stroke="black" stroke-width="3">
+    <rt:dyn type="x2" mode="constant" value="_This.width"/> 
+  </line>
+  <line x1="0" y1="0" x2="40" y2="0" id="TopLine" stroke="black" stroke-width="2">
+    <rt:dyn type="stroke" mode="unknown" value="M_Color"/> 
+    <rt:dyn type="x2" mode="constant" value="_This.width"/> 
+  </line>
+  <line x1="0" y1="100" x2="40" y2="100" id="BotLineBorder" stroke="black" stroke-width="3">
+    <rt:dyn type="y1" mode="constant" value="_This.height"/> 
+    <rt:dyn type="y2" mode="constant" value="_This.height"/> 
+    <rt:dyn type="x2" mode="constant" value="_This.width"/> 
+  </line>
+  <line x1="0" y1="100" x2="40" y2="100" id="BotLine" stroke="black" stroke-width="2">
+    <rt:dyn type="stroke" mode="unknown" value="M_Color"/> 
+    <rt:dyn type="y1" mode="constant" value="_This.height"/> 
+    <rt:dyn type="y2" mode="constant" value="_This.height"/> 
+    <rt:dyn type="x2" mode="constant" value="_This.width"/> 
+  </line>
+  <g id="HB_Group">
+    <rt:dyn type="visibility" mode="constant" value="HasError || (pv_ana.Value == 0)" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+    <line x1="0" y1="10" x2="25" y2="10" id="HB_Border" stroke="black" stroke-width="3">
+      <rt:dyn type="y1" mode="constant" value="_This.height / 10.0"/> 
+      <rt:dyn type="y2" mode="constant" value="_This.height / 10.0"/> 
+      <rt:dyn type="x2" mode="constant" value="_This.width - 15"/> 
+    </line>
+    <line x1="0" y1="10" x2="25" y2="10" id="HB_Line" stroke="black" stroke-width="2">
+      <rt:dyn type="stroke" mode="constant" value="Color_ANA_HI_A"/> 
+      <rt:dyn type="y1" mode="constant" value="_This.height / 10.0"/> 
+      <rt:dyn type="y2" mode="constant" value="_This.height / 10.0"/> 
+      <rt:dyn type="x2" mode="constant" value="_This.width - 15"/> 
+    </line>
+  </g>
+  <g id="LB_Group" visibility="visible" rt:detect="enabled">
+    <rt:dyn type="visibility" mode="constant" value="HasError || (pv_ana.Value == 0)" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+    <line x1="0" y1="50" x2="25" y2="50" id="LB_Border" stroke="black" stroke-width="3">
+      <rt:dyn type="y1" mode="constant" value="_This.height / 2.0"/> 
+      <rt:dyn type="y2" mode="constant" value="_This.height / 2.0"/> 
+      <rt:dyn type="x2" mode="constant" value="_This.width - 15"/> 
+    </line>
+    <line x1="0" y1="50" x2="25" y2="50" id="LB_Line" stroke="black" stroke-width="2">
+      <rt:dyn type="stroke" mode="constant" value="Color_ANA_LO_P"/> 
+      <rt:dyn type="y1" mode="constant" value="_This.height / 2.0"/> 
+      <rt:dyn type="y2" mode="constant" value="_This.height / 2.0"/> 
+      <rt:dyn type="x2" mode="constant" value="_This.width - 15"/> 
+    </line>
+  </g>
+  <rect x="0" y="-2.5" width="25" height="105" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If  HasError Then
+	NoLink(FKKS1)
+Else
+	Open_Win_Uni(False, &quot;multyKKS&quot;, &quot;Составной объект&quot;, &quot;wi_MultyPV&quot;, FKKS1 + &quot;|&quot; + FKKS2)
+	//Call_Win (&quot;ws_ANA_FN&quot;, FKKS1 + &quot;|&quot; + CStr(-1))
+End If</rt:event>
+    <rt:event type="OnRightClick">If  HasError Then
+	NoLink(FKKS1)
+Else
+	LoadPopUpMenu(FKKS1 + &quot;|ANAi|ws_ANA_FN &quot; + FKKS1 + &quot;|&quot; + CStr(-1))
+End If</rt:event>
+  </rect>
+  <g id="Digits" visibility="hidden" rt:detect="disabled" font-family="Verdana">
+    <rt:dyn type="visibility" mode="constant" value="ShowDigits &amp;&amp; !HasError" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <text x="32.5" y="7.5" id="Dig20">
+      <rt:dyn type="y" mode="constant" value="_This.height / 10 - 2.5"/> 
+      <rt:dyn type="x" mode="constant" value="_This.width - 7.5"/> 
+20</text>
+    <text x="32.5" y="47.5" id="Dig40">
+      <rt:dyn type="y" mode="constant" value="_This.height / 2.0 - 2.5"/> 
+      <rt:dyn type="x" mode="constant" value="_This.width - 7.5"/> 
+40</text>
+    <text x="32.5" y="67.5" id="Dig80">
+      <rt:dyn type="y" mode="constant" value="_This.height / 10 * 7 - 2.5"/> 
+      <rt:dyn type="x" mode="constant" value="_This.width - 7.5"/> 
+80</text>
+    <text x="25" y="77.5" id="Dig160">
+      <rt:dyn type="y" mode="constant" value="_This.height / 10 * 8 - 2.5"/> 
+      <rt:dyn type="x" mode="constant" value="_This.width - 15"/> 
+160</text>
+  </g>
+  <text x="22.5" y="97.5" id="DigMin160" visibility="hidden" rt:detect="disabled" font-family="Verdana">
+    <rt:dyn type="y" mode="constant" value="_This.height - 2.5"/> 
+    <rt:dyn type="x" mode="constant" value="_This.width - 17.5"/> 
+    <rt:dyn type="visibility" mode="constant" value="ShowDigits &amp;&amp; !HasError &amp;&amp; Show_SubZero" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+-160</text>
+</svg>

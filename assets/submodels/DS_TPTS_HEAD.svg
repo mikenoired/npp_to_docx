@@ -1,0 +1,73 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 50 80" width="50" height="80" id="DS_TPTS_HEAD" font-family="AAP_Font1">
+  <desc>Модуль ТПТС универсальный для любого головного оператора</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.0" controlref="PortalControl_TPTS_HEAD">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS модуля"/> 
+    <rt:param name="MT" datatype="string" value="XXX" comment="Имя головного оператора"/> 
+    <rt:param name="MN" datatype="string" value="xxxx-xx" comment="Типовой номер модуля"/> 
+    <rt:var name="pv_F0" datatype="PlsPVBin" comment="указатель на F0"/> 
+    <rt:var name="ctrl" datatype="PortalControl_TPTS_HEAD" comment="Optional pointer to the PortalControlProto C++ class"/> 
+  </rt:model>
+  <rect x="0" y="0" width="50" height="80" rx="0" ry="0" id="backgr" fill="Col_BGmain" stroke="Col_Grey5" stroke-linejoin="miter" stroke-width="2"/> 
+  <polyline points="0,80 0,0 50,0" id="LT_border" fill="none" stroke="Col_Grey1" stroke-linecap="butt" stroke-linejoin="miter" stroke-width="2"/> 
+  <text x="25" y="17.5" id="Module_name" font-family="AAP_Font3" font-size="15" font-weight="bold" text-anchor="middle">ИМЯ</text>
+  <text x="25" y="27.75" id="Module_number" font-family="AAP_Font3" font-size="10" font-weight="normal" text-anchor="middle">
+    <rt:dyn type="text" mode="constant" value="MN"/> 
+nnnn-mm</text>
+  <g id="BG_gr" fill="url(#Circle_LeftFront)">
+    <rect x="12.5" y="35" width="25" height="7.5" rx="0" ry="0" id="bg1"/> 
+    <rect x="12.5" y="50" width="25" height="7.5" rx="0" ry="0" id="bg2"/> 
+    <rect x="12.5" y="65" width="25" height="7.5" rx="0" ry="0" id="bg3"/> 
+  </g>
+  <rect x="12.5" y="35" width="25" height="7.5" rx="0" ry="0" id="Ind_Fail" fill="Col_Red" fill-opacity="0.5" stroke="none"/> 
+  <rect x="12.5" y="50" width="25" height="7.5" rx="0" ry="0" id="Ind_Errors" fill="Col_Red" fill-opacity="0.5" stroke="none"/> 
+  <rect x="12.5" y="65" width="25" height="7.5" rx="0" ry="0" id="Ind_Imitation" fill="Col_LtBlue" fill-opacity="0.5" stroke="none"/> 
+  <g id="frames">
+    <g id="LU" fill="none" stroke="Col_Grey5" stroke-width="1">
+      <polyline points="12.5,42.5 12.5,35 37.5,35" id="lu1"/> 
+      <polyline points="12.5,57.5 12.5,50 37.5,50" id="lu2"/> 
+      <polyline points="12.5,72.5 12.5,65 37.5,65" id="lu3"/> 
+    </g>
+    <g id="RB" fill="none" stroke="Col_Grey1" stroke-width="1">
+      <polyline points="12.5,42.5 37.5,42.5 37.5,35" id="rb1"/> 
+      <polyline points="12.5,57.5 37.5,57.5 37.5,50" id="rb2"/> 
+      <polyline points="12.5,72.5 37.5,72.5 37.5,65" id="rb3"/> 
+    </g>
+  </g>
+  <rect x="2.5" y="2.5" width="45" height="75" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="1.5"/> 
+  <rect x="0" y="0" width="50" height="80" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If pv_F0 != nothing Then
+	Dim wd_FileName As String
+	wd_FileName = &quot;wd_TPTS_&quot;
+	If (MT != &quot;RBBS&quot;) &amp;&amp; (MT != &quot;RBDS&quot;) &amp;&amp; (Right(MT,1) == &quot;S&quot;) Then
+	//Для всех кроме RBDS и RBBS используется один файл без S на конце
+		wd_FileName = wd_FileName + Left(MT, (Len(MT) - 1))
+	Else
+		wd_FileName = wd_FileName + MT
+	End If
+	wd_FileName = wd_FileName + &quot;_6&quot;	//будет только для 6 поколения
+	Open_ws_wf_wi(wd_FileName, KKS, False)
+Else
+	ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS  + &quot;\&quot;\nMT = \&quot;&quot; + MT + &quot;\&quot;&quot;, 0)
+End If</rt:event>
+    <rt:event type="OnRightClick">If pv_F0 != nothing Then
+	Dim wd_FileName As String
+	wd_FileName = &quot;wd_TPTS_&quot;
+	If (MT != &quot;RBBS&quot;) &amp;&amp; (Right(MT,1) == &quot;S&quot;) Then
+		wd_FileName = wd_FileName + Left(MT, (Len(MT) - 1))
+	Else
+		wd_FileName = wd_FileName + MT
+	End If
+	wd_FileName = wd_FileName + &quot;_6&quot;	//будет только для 6 поколения
+	Dim menu_operator As String
+	If Len(MT) == 2 Then	//пока это только для RB
+		menu_operator = MT + &quot; &quot;
+	Else
+		menu_operator = Left(MT, 3)
+	End If
+	LoadPopUpMenu(KKS + &quot;|&quot; + menu_operator + &quot;d|&quot; + wd_FileName + &quot; &quot; + KKS)
+Else
+	ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS  + &quot;\&quot;\nMT = \&quot;&quot; + MT + &quot;\&quot;&quot;, 0)
+End If</rt:event>
+  </rect>
+</svg>

@@ -1,0 +1,230 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="-20 -20 40 40" width="40" height="40" id="ana_rad_leakage">
+  <desc>Индикатор утечки радиации по показаниям ANA сигналов</desc>
+  <rt:model modelversion="7.2.0.24" comment="Создано VNIIAES-ASUTP\abramov 01.04.2013 16:23:40" revision="6.0">
+    <rt:param name="PointID_1" datatype="string" value="NULL" comment="Идентификатор аналогового сигнала 1"/> 
+    <rt:param name="PointID_2" datatype="string" value="NULL" comment="Идентификатор аналогового сигнала 2"/> 
+    <rt:param name="PointID_3" datatype="string" value="NULL" comment="Идентификатор аналогового сигнала 3"/> 
+    <rt:param name="PointID_4" datatype="string" value="NULL" comment="Идентификатор аналогового сигнала 4"/> 
+    <rt:var name="pv1" datatype="PlsPVAna" comment="Ссылка на переменную в БД"/> 
+    <rt:var name="pv2" datatype="PlsPVAna" comment="Ссылка на переменную в БД"/> 
+    <rt:var name="pv3" datatype="PlsPVAna" comment="Ссылка на переменную в БД"/> 
+    <rt:var name="pv4" datatype="PlsPVAna" comment="Ссылка на переменную в БД"/> 
+    <rt:var name="Bound_Violation_max" datatype="short" value="0" comment="Максимальная степень нарушения границы"/> 
+    <rt:var name="BodyColor" datatype="uint" value="0" comment="Значение цвета заливки"/> 
+    <rt:var name="AuxColor" datatype="uint" value="0" comment="Значение цвета состояния"/> 
+    <rt:var name="Color_for_OK" datatype="uint" comment="Цвет для хороших показаний (нет утечки радиации)"/> 
+    <rt:var name="In_Alarm" datatype="ubyte" value="0" comment="Наличие сигнализации и как мигать"/> 
+    <rt:sub>Sub Detect_Leackage()
+Dim Worst_Quality As UByte
+Dim MyAlarm As Boolean
+Worst_Quality = PLS_QUALSUB_GOOD
+Bound_Violation_max = -1
+In_Alarm = 0
+MyAlarm = true
+If pv1 != Nothing Then
+	If pv1.BoundViolType == PLS_BOUNDVIOL_HI Then
+		Bound_Violation_max = pv1.BoundViolIndex
+	End If
+	If pv1.QualitySubstatus == PLS_QUALSUB_LOCALOVERRIDE Then
+		Worst_Quality = PLS_QUALSUB_LOCALOVERRIDE
+	ElseIf pv1.Quality == PLS_QUAL_BAD Then
+		Worst_Quality = PLS_QUALSUB_BAD
+	End If
+	If Blink_on_NACK &amp;&amp; Alarms_ForUser Then	//проверяем только если надо мигать и сигнализации для пользователей
+		MyAlarm = PRJSPEC.Grant_for_CSGAD_Mask(pv1.PVNr, true, 5)		//true = ANA; 5 = отобр. и квитир. сигнализаций
+	End If
+	If Blink_on_NACK &amp;&amp; MyAlarm &amp;&amp; pv1.NotAcknowledged Then	//проверяем только если надо мигать, наша сигнализация и она не квитированная
+		If pv1.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = 1	//снятая неквитированная сигнализация
+		Else
+			In_Alarm = 3	//нормальная неквитированная сигнализация
+		End If
+	End If
+End If
+If pv2 != Nothing Then
+	If pv2.BoundViolType == PLS_BOUNDVIOL_HI Then
+		If Bound_Violation_max &lt; pv2.BoundViolIndex Then
+			Bound_Violation_max = pv2.BoundViolIndex
+		End If
+	End If
+	If Worst_Quality != PLS_QUALSUB_BAD Then
+		If pv2.QualitySubstatus == PLS_QUALSUB_LOCALOVERRIDE Then
+			Worst_Quality = PLS_QUALSUB_LOCALOVERRIDE
+		ElseIf pv2.Quality == PLS_QUAL_BAD Then
+			Worst_Quality = PLS_QUALSUB_BAD
+		End If
+	End If
+	If Blink_on_NACK &amp;&amp; (In_Alarm != 3) Then	//проверяем только если надо мигать и сигнализации нет
+		If Alarms_ForUser Then
+			MyAlarm = PRJSPEC.Grant_for_CSGAD_Mask(pv2.PVNr, true, 5)
+		End If
+		If MyAlarm &amp;&amp; pv2.NotAcknowledged Then
+			If pv2.AlarmType == PLS_ALARMTYP_NONE Then
+				In_Alarm = In_Alarm | 1
+			Else
+				In_Alarm = 3
+			End If
+		End If
+	End If
+End If
+If pv3 != Nothing Then
+	If pv3.BoundViolType == PLS_BOUNDVIOL_HI Then
+		If Bound_Violation_max &lt; pv3.BoundViolIndex Then
+			Bound_Violation_max = pv3.BoundViolIndex
+		End If
+	End If
+	If Worst_Quality != PLS_QUALSUB_BAD Then
+		If pv3.QualitySubstatus == PLS_QUALSUB_LOCALOVERRIDE Then
+			Worst_Quality = PLS_QUALSUB_LOCALOVERRIDE
+		ElseIf pv3.Quality == PLS_QUAL_BAD Then
+			Worst_Quality = PLS_QUALSUB_BAD
+		End If
+	End If
+	If Blink_on_NACK &amp;&amp; (In_Alarm != 3) Then
+		If Alarms_ForUser Then
+			MyAlarm = PRJSPEC.Grant_for_CSGAD_Mask(pv3.PVNr, true, 5)
+		End If
+		If MyAlarm &amp;&amp; pv3.NotAcknowledged Then
+			If pv3.AlarmType == PLS_ALARMTYP_NONE Then
+				In_Alarm = In_Alarm | 1
+			Else
+				In_Alarm = 3
+			End If
+		End If
+	End If
+End If
+If pv4 != Nothing Then
+	If pv4.BoundViolType == PLS_BOUNDVIOL_HI Then
+		If Bound_Violation_max &lt; pv4.BoundViolIndex Then
+			Bound_Violation_max = pv4.BoundViolIndex
+		End If
+	End If
+	If Worst_Quality != PLS_QUALSUB_BAD Then
+		If pv4.QualitySubstatus == PLS_QUALSUB_LOCALOVERRIDE Then
+			Worst_Quality = PLS_QUALSUB_LOCALOVERRIDE
+		ElseIf pv4.Quality == PLS_QUAL_BAD Then
+			Worst_Quality = PLS_QUALSUB_BAD
+		End If
+	End If
+	If Blink_on_NACK &amp;&amp; (In_Alarm != 3) Then
+		If Alarms_ForUser Then
+			MyAlarm = PRJSPEC.Grant_for_CSGAD_Mask(pv4.PVNr, true, 5)
+		End If
+		If MyAlarm &amp;&amp; pv4.NotAcknowledged Then
+			If pv4.AlarmType == PLS_ALARMTYP_NONE Then
+				In_Alarm = In_Alarm | 1
+			Else
+				In_Alarm = 3
+			End If
+		End If
+	End If
+End If
+If Bound_Violation_max == -1 Then
+	BodyColor = Color_for_OK
+ElseIf Bound_Violation_max == 0 Then
+	BodyColor = Color_ANA_HI_T
+ElseIf Bound_Violation_max == 1 Then
+	BodyColor = Color_ANA_HI_P
+ElseIf Bound_Violation_max &gt;= 2 Then
+	BodyColor = Color_ANA_HI_A
+End If
+If Worst_Quality == PLS_QUALSUB_BAD Then
+	AuxColor = Color_Inval
+ElseIf Worst_Quality == PLS_QUALSUB_LOCALOVERRIDE Then
+	AuxColor = Color_Imitation
+Else
+	AuxColor = 0 	//black
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If PointID_1 != &quot;NULL&quot; Then
+	pv1 = ANA(PointID_1)
+End If
+If PointID_2 != &quot;NULL&quot; Then
+	pv2 = ANA(PointID_2)
+End If
+If PointID_3 != &quot;NULL&quot; Then
+	pv3 = ANA(PointID_3)
+End If
+If PointID_4 != &quot;NULL&quot; Then
+	pv4 = ANA(PointID_4)
+End If
+Color_for_OK = Middle_Color_Wieghted(Color_ANA_GOOD, Color_ALTERNATIVE, Degree_of_main_color)
+If (pv1 == Nothing) &amp;&amp; (pv2 == Nothing) &amp;&amp; (pv3 == Nothing) &amp;&amp; (pv1 == Nothing) Then
+	BodyColor = Color_ANA_ER_LINK
+Else
+	BodyColor = Color_for_OK
+End If</rt:event>
+    <rt:changeTrigger name="Ch_pv1">
+      <rt:chgItem>pv1</rt:chgItem>
+      <rt:code>Detect_Leackage()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Ch_pv2">
+      <rt:chgItem>pv2</rt:chgItem>
+      <rt:code>Detect_Leackage()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Ch_pv3">
+      <rt:chgItem>pv3</rt:chgItem>
+      <rt:code>Detect_Leackage()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Ch_pv4">
+      <rt:chgItem>pv4</rt:chgItem>
+      <rt:code>Detect_Leackage()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="IsItMyAlarm">
+      <rt:condition>Blink_on_NACK &amp;&amp; Alarms_ForUser</rt:condition>
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>Detect_Leackage()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <circle cx="0" cy="0" r="20" id="bg" fill="Col_Green" stroke="black" stroke-width="1">
+    <rt:dyn type="fill" mode="cyclic" value="ShowInAlarmColor(In_Alarm, BodyColor, Col_Ar(11))"/> 
+  </circle>
+  <g id="black_triangle" fill="black" stroke="Col_Green">
+    <rt:dyn type="stroke" mode="onchange" value="BodyColor"/> 
+    <rt:dyn type="fill" mode="onchange" value="AuxColor"/> 
+    <path d="M7.78296e-005 -4.04275e-006 L-9.80537 14.4949 A17.4999 17.5 0 0 0 9.15983 14.9113 Z"/> 
+    <path d="M-6.74783 20.8064 L-15.8099 36.4485 A19.1902 17.7452 0 0 0 2.1488 36.5294 Z" transform="rotate(120 2.6703 12.4927)"/> 
+    <path d="M20.7345 18.0202 L11.7792 33.5312 A18.8614 17.6241 0 0 0 29.9624 33.391 Z" transform="rotate(240 5.1703 14.9927)"/> 
+    <circle cx="-0.25" cy="0" r="5.25" stroke-width="3"/> 
+  </g>
+  <rect x="-20" y="-20" width="40" height="40" rx="0" ry="0" id="SelFrame" fill="Col_Grey3" fill-opacity="0">
+    <rt:event type="OnClick">Dim ParStr As String
+Dim MainId As String
+MainId = &quot;&quot;
+If pv1 != Nothing Then
+	ParStr = pv1.PVId + &quot;|&quot;
+	MainId = pv1.PVId
+Else
+	ParStr = &quot;|&quot;
+End If
+If pv2 != Nothing Then
+	ParStr = ParStr + pv2.PVId + &quot;|&quot;
+	If MainId == &quot;&quot; Then
+		MainId = pv2.PVId
+	End If
+Else
+	ParStr = ParStr + &quot;|&quot;
+End If
+If pv3 != Nothing Then
+	ParStr = ParStr + pv3.PVId + &quot;|&quot;
+	If MainId == &quot;&quot; Then
+		MainId = pv3.PVId
+	End If
+Else
+	ParStr = ParStr + &quot;|&quot;
+End If
+If pv4 != Nothing Then
+	ParStr = ParStr + pv4.PVId
+	If MainId == &quot;&quot; Then
+		MainId = pv4.PVId
+	End If
+End If
+If ParStr == &quot;|||&quot; Then
+	ShowWarning(&quot;Объект не[правильно] привязан.&quot;,10)
+Else
+	Open_Win_Uni(False, MainId, PRJSPEC.RTM (MainId, False), &quot;wi_ana_rad_leackage&quot;, MainId + &quot;|&quot; + ParStr)
+//	Call_Win (&quot;wi_ana_rad_leackage&quot;, MainId + &quot;|&quot; + ParStr)
+End If</rt:event>
+  </rect>
+</svg>

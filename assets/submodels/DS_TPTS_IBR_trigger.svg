@@ -1,0 +1,133 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 60 30" width="60" height="30" id="DS_TPTS_IBR_trigger">
+  <desc>ТПТС (IBR) переключатель Автомат / Дистанция (Dull Screen)</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа (Dull Screen)" revision="6.2">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS оборудования"/> 
+    <rt:param name="Operate" datatype="boolean" value="False" comment="Сделать объект управляемым"/> 
+    <rt:var name="Z0" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="OU" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="VB13" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="AStat" datatype="ushort" value="0" comment="код сигнализации"/> 
+    <rt:var name="SColor" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="TString" datatype="string" value="Ош." comment="строка вывода"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="MyStrokeWdth" datatype="float" value="2" comment="Толщина рамок в зависимости от управляемости"/> 
+    <rt:var name="body_opacity" datatype="float" value="1" comment="непрозрачность подложки"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub AckMe()
+If Check_Oper_Rights(OU) &amp;&amp; ((OU.PVSuspendedFlags &amp; PLS_SUSP_CMD) == 0) &amp;&amp; ((AStat &amp; 1) != 0) Then
+	OU.Command(_Now, IBR_BHA)
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub StatusColor ()
+Dim Status As int
+Dim A As ushort
+Dim H As ushort
+Status = PRJSPEC.TPTS_IBR(KKS, A, H, AStat)
+If (Status == -1)Then
+	TString = &quot;РЕМ&quot;
+	SColor = 6
+	body_opacity = 1
+ElseIf ((Status &amp; 4096) &gt; 0) || (Status &lt; 0) || (((Status &amp; 48) &gt; 0) &amp;&amp; ((Status &amp; 12) &gt; 0)) Then
+	TString = &quot;НДСТ&quot;
+	SColor = 15
+	body_opacity = 1
+ElseIf ((Status &amp; 48) &gt; 0) Then
+	TString = &quot;ВКЛ&quot;
+	SColor = A
+	body_opacity = 0.35
+ElseIf ((Status &amp; 12) &gt; 0) Then
+	TString = &quot;ОТКЛ&quot;
+	SColor = H
+	body_opacity = 0.35
+Else
+	TString = &quot;НДСТ&quot;
+	SColor = 15
+	body_opacity = 1
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (KKS != &quot;NULL&quot;) Then
+	Z0 = BIN(KKS + &quot;_Z0&quot;)
+	OU = BIN(KKS + &quot;_OU&quot;)
+	If requests_allown Then
+		VB13 = BIN(KKS + &quot;_VB13&quot;)
+	End If
+End If</rt:event>
+    <rt:event type="OnClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Объект не привязан.&quot;, 5)
+ElseIf Z0 != nothing Then
+	Open_ws_wf_wi(&quot;TPTS_IBR_trigger&quot;, KKS, Operate)
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnRightClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Объект не привязан.&quot;, 5)
+ElseIf Z0 != nothing Then
+	If Operate &amp;&amp; Check_Oper_Rights(OU) Then
+		LoadPopUpMenu(KKS + &quot;|IBRo|TPTS_IBR_trigger &quot; + KKS)
+	Else
+		LoadPopUpMenu(KKS + &quot;|IBRi|TPTS_IBR_trigger &quot; + KKS)
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnMiddleClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Объект не привязан.&quot;, 5)
+ElseIf Z0 != nothing Then
+	Open_Win_Uni(False, &quot;rights&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS+&quot;|&quot;+CStr(Operate))
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChRights">
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>MyStrokeWdth = FrameStrokeWidth (Operate, OU)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetStatus">
+      <rt:condition>(KKS != &quot;NULL&quot;) &amp;&amp; (Z0 != Nothing)</rt:condition>
+      <rt:chgItem>Z0</rt:chgItem>
+      <rt:chgItem>OU</rt:chgItem>
+      <rt:chgItem>VB13</rt:chgItem>
+      <rt:code>StatusColor ()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="5" y="5" width="50" height="20" rx="0" ry="0" id="Backgr" fill="url(#Cylinder_horizontal2)" stroke="none"/> 
+  <rect x="5" y="5" width="50" height="20" rx="0" ry="0" id="body" fill="Col_Green" fill-opacity="0.399988" stroke="none">
+    <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, SColor, 11)"/> 
+    <rt:dyn type="fill-opacity" mode="onchange" value="body_opacity"/> 
+  </rect>
+  <polyline points="5,25 55,25 55,6" id="RB_edge" fill="none" stroke="Col_Grey5" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey1"/> 
+      <rt:xy value2="Col_Grey5"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <polyline points="5,25 5,5 55,5" id="LU_edge" fill="none" stroke="Col_Grey1" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey5"/> 
+      <rt:xy value2="Col_Grey1"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <rect x="2.5" y="2.5" width="55" height="25" rx="0" ry="0" id="Al_frame" fill="none" stroke="Col_Red" stroke-width="2">
+    <rt:dyn type="visibility" mode="cyclic" value="PRJSPEC.AlarmVis(AStat)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke" mode="constant" value="Color_Alarm"/> 
+  </rect>
+  <rect x="0" y="0" width="60" height="30" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <text x="30" y="20" id="Value_text" fill="black" font-family="AAP_Font3" font-size="15" font-weight="bold" text-anchor="middle">
+    <rt:dyn type="text" mode="onchange" value="TString"/> 
+ОТКЛ</text>
+</svg>

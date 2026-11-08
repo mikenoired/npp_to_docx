@@ -1,0 +1,1277 @@
+{
+  "source": "Портал 4.ova",
+  "files": [
+    {
+      "file": "ana_rad_leakage.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/ana_rad_leakage.svg",
+      "sha256": "b081d6eccdfd64899feeeba1c5753ac477a1a5816839193c871f4bc53b252f7c",
+      "bytes": 9210
+    },
+    {
+      "file": "ana_TVS.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/ana_TVS.svg",
+      "sha256": "9d951e3975029347a850218dfb58f7f9b3244d4632e9711b9ad138c443d28b6d",
+      "bytes": 6878
+    },
+    {
+      "file": "aux721_al_level_indicator.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux721_al_level_indicator.svg",
+      "sha256": "9c92d0bdbf5a83764c157cb4d4152d40c0c92617fdb336c1667bc6820f2cdaaa",
+      "bytes": 1624
+    },
+    {
+      "file": "aux_ana_bar_h.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_ana_bar_h.svg",
+      "sha256": "6c7aadb2a516a200c368ef6e9503f2ab1ca268344dfcec1922f37606aeb6de35",
+      "bytes": 2947
+    },
+    {
+      "file": "aux_KTSu1_BUZ_BUD_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_KTSu1_BUZ_BUD_diag.svg",
+      "sha256": "6d9ffabb3dee99cc164575b12ebbac4cea003999b349852fd189cc12db95e505",
+      "bytes": 19370
+    },
+    {
+      "file": "aux_PRJSPEC_AH_mode_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_PRJSPEC_AH_mode_diag.svg",
+      "sha256": "f3381ab0ae5af7fc1013526b953c4cb0372f9b8178ec86639f328e19c2ec2cc6",
+      "bytes": 16173
+    },
+    {
+      "file": "aux_PRJSPEC_breaker_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_PRJSPEC_breaker_diag.svg",
+      "sha256": "2b66c6752fa0adf85d37beddbbec821fd2f6b6dc87b48aaa528bcac010f4d5e3",
+      "bytes": 26822
+    },
+    {
+      "file": "aux_PRJSPEC_motor_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_PRJSPEC_motor_diag.svg",
+      "sha256": "cf19f87f21ebc6d44eee2dae90d0f9ccfbb6e1ae03b863da53a60a3889f703f2",
+      "bytes": 24177
+    },
+    {
+      "file": "aux_PRJSPEC_regulator_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_PRJSPEC_regulator_diag.svg",
+      "sha256": "b92ef4a65e238b77a6779fe6889d03278f5d609da8813c8f45a3939fbe249ce5",
+      "bytes": 46852
+    },
+    {
+      "file": "aux_PRJSPEC_reg_set_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_PRJSPEC_reg_set_diag.svg",
+      "sha256": "568a4176f14157be0bba41d417003b2e12b71f54179d7268c742f0edf113cc63",
+      "bytes": 17764
+    },
+    {
+      "file": "aux_PRJSPEC_setter_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_PRJSPEC_setter_diag.svg",
+      "sha256": "39bb1d819dd7b37639c1a2a54b7db1f9af866af5a2dd7d5df845170a0e06602f",
+      "bytes": 26691
+    },
+    {
+      "file": "aux_PRJSPEC_valve_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_PRJSPEC_valve_diag.svg",
+      "sha256": "8a5845269605dad793822c25f1b4f6a14bc0386cfc0d696b27f962c7b8d207ca",
+      "bytes": 28025
+    },
+    {
+      "file": "aux_Stat_Alarm_data.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_Stat_Alarm_data.svg",
+      "sha256": "5af3dd8291e9652aef42f304e42de00acf92025ede9d174206ef66127e4d21a2",
+      "bytes": 5079
+    },
+    {
+      "file": "aux_TPTS_EML_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_TPTS_EML_diag.svg",
+      "sha256": "1bfacd19615ce195bbf04595085a6fecf1f817984ed1a989910bfad120669572",
+      "bytes": 18943
+    },
+    {
+      "file": "aux_TPTS_EMS_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_TPTS_EMS_diag.svg",
+      "sha256": "afe343387eac53da368146fe8b8260ac0558c93417d7556db0e381a9ec96a138",
+      "bytes": 17866
+    },
+    {
+      "file": "aux_TPTS_EM_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_TPTS_EM_diag.svg",
+      "sha256": "2e38230d473745ff4d3aced2367e9ec0eb0699713865919de47ccde14eba3640",
+      "bytes": 15351
+    },
+    {
+      "file": "aux_TPTS_ERL_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_TPTS_ERL_diag.svg",
+      "sha256": "1230e5b86889b2d7397415262647b1f8cc08db7194adef6486bac60105b47afe",
+      "bytes": 16979
+    },
+    {
+      "file": "aux_TPTS_ESL_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_TPTS_ESL_diag.svg",
+      "sha256": "614cb622cf27b650004827cde69e53702a868f1ae2734ce40670e86adc7bd852",
+      "bytes": 20289
+    },
+    {
+      "file": "aux_TPTS_ESL_wi.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_TPTS_ESL_wi.svg",
+      "sha256": "44bfecd3daf4e2f2119347b0f058d533c6129d59f424259b1bc6ad371813f07f",
+      "bytes": 9939
+    },
+    {
+      "file": "aux_TPTS_ESS_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_TPTS_ESS_diag.svg",
+      "sha256": "e9fba3c838cc8f1323570e587a1f44f6a9091791f435ae500995fef408ce8267",
+      "bytes": 19742
+    },
+    {
+      "file": "aux_TPTS_ESS_wi.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_TPTS_ESS_wi.svg",
+      "sha256": "2a83b76e3978f699fa778a642a90ca47b46a7c03180ebb996f575439d51254c8",
+      "bytes": 9953
+    },
+    {
+      "file": "aux_TPTS_ES_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_TPTS_ES_diag.svg",
+      "sha256": "2d414701be3bc66309449a44ab1c5445b23136b7c27b0a79d7c98f0247f8d859",
+      "bytes": 16509
+    },
+    {
+      "file": "aux_TPTS_ES_wi.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_TPTS_ES_wi.svg",
+      "sha256": "7af95e4c1e2259b70eb8a10fbd5f7ce398cbd03b72c418facd61b210ca6d6012",
+      "bytes": 9804
+    },
+    {
+      "file": "aux_TPTS_SR_diag.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/aux_TPTS_SR_diag.svg",
+      "sha256": "898cc519e3f9ee58e845365100d8a6c2f29bac7a68e150e5406052cd151b7490",
+      "bytes": 19799
+    },
+    {
+      "file": "bin_checkbox.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bin_checkbox.svg",
+      "sha256": "b41c85de3292f4408add06739617caa4fdef70846e952b6df841ff9e6d3e069f",
+      "bytes": 6901
+    },
+    {
+      "file": "bin_indicator.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bin_indicator.svg",
+      "sha256": "b7d9b4558c1a865045594fcc8e4da585fc112e7a3caca6db693feb97debe8d49",
+      "bytes": 6399
+    },
+    {
+      "file": "bin_indicator_txt.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bin_indicator_txt.svg",
+      "sha256": "e067a13f46ca93459006f2d95378f23500b6131ec859eeafab6dbc633583d6d8",
+      "bytes": 7340
+    },
+    {
+      "file": "bin_indicator_txt_a.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bin_indicator_txt_a.svg",
+      "sha256": "cfb14a447e7187a505ec189faefbc20a8e1e8336f6dd8427c55778253d470295",
+      "bytes": 7772
+    },
+    {
+      "file": "bin_mode_1o6.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bin_mode_1o6.svg",
+      "sha256": "936fa3f62f1531025093a8b3320f778c249247caca48c8b09481d2b4b22d691f",
+      "bytes": 10748
+    },
+    {
+      "file": "bin_mode_1o6_a.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bin_mode_1o6_a.svg",
+      "sha256": "b4e96501ed8c5d74cf523aefbf3a561bd14ae5f378c69929f4cb62f3664486b8",
+      "bytes": 11551
+    },
+    {
+      "file": "bin_msg_txt.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bin_msg_txt.svg",
+      "sha256": "c0bb95c3edec5b2e4e8ddcce7527e0a5819bee3f7c602f120484adbc92366048",
+      "bytes": 2005
+    },
+    {
+      "file": "bin_tablo.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bin_tablo.svg",
+      "sha256": "1df84addf4160d56cbc068007c19b2e8497c3aa84eb07b902108044d6b1092d0",
+      "bytes": 9745
+    },
+    {
+      "file": "bin_tablo_a.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bin_tablo_a.svg",
+      "sha256": "62f76f5a0dcc161079715c07b6f9a0667efa4d3bd4b694dba786712188c5816a",
+      "bytes": 10368
+    },
+    {
+      "file": "bin_tablo_AND3.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bin_tablo_AND3.svg",
+      "sha256": "97c3f293c274a74c4a36da507b4a75f49e18f768eab060b05b960006d981d452",
+      "bytes": 8660
+    },
+    {
+      "file": "bin_tablo_AND3_a.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bin_tablo_AND3_a.svg",
+      "sha256": "61a11a9c18bb4c49fc44b72347cef87580dbe57cb1b21fc57dda5701402358b1",
+      "bytes": 9953
+    },
+    {
+      "file": "bin_tablo_flogic.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bin_tablo_flogic.svg",
+      "sha256": "2737574359fc109d0bd21329af9d87090e370e8f0d513e2775a99fdde0df2839",
+      "bytes": 12957
+    },
+    {
+      "file": "bin_tablo_flogic_a.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bin_tablo_flogic_a.svg",
+      "sha256": "5bb4d78038b73b9fe8b62281522e978a8f0752c93467e5428d2b86eb17046ad6",
+      "bytes": 16588
+    },
+    {
+      "file": "bin_tablo_OR3.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bin_tablo_OR3.svg",
+      "sha256": "4c829fdcbe9be5f811f73efabf4c45a22c3f5593ad1199b887b511b4f153c0e9",
+      "bytes": 8530
+    },
+    {
+      "file": "bin_tablo_OR3_a.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bin_tablo_OR3_a.svg",
+      "sha256": "2ce677748174754537e1f3a3e542934a21294da1c26d2441e00f0ba8fc5a3a92",
+      "bytes": 9695
+    },
+    {
+      "file": "bitwise_tablo_4bits.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bitwise_tablo_4bits.svg",
+      "sha256": "efacbbff4bb473395d0cb2aada80a894d9c3a3ed253931c043e67e44fa503758",
+      "bytes": 19531
+    },
+    {
+      "file": "bitwise_tablo_4bits_a.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bitwise_tablo_4bits_a.svg",
+      "sha256": "bea82f8dea3a0cdf932e07d1efc76501b3b5347b377f03a222510113abbbdcba",
+      "bytes": 20375
+    },
+    {
+      "file": "BLO_txt.png",
+      "source": "PORTAL/Vis/PORTAL_subviews/BLO_txt.png",
+      "sha256": "1f38302aadb8c58569af19e9e7fd3a2f95f3d3ebc00b2ec7d6a6c74954927529",
+      "bytes": 2083
+    },
+    {
+      "file": "bool_checkbox.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bool_checkbox.svg",
+      "sha256": "b427924ddbe419c461f767dd6072cc19d195a2b71e31e30e01377b8981fa20ff",
+      "bytes": 3820
+    },
+    {
+      "file": "bool_hexagon.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bool_hexagon.svg",
+      "sha256": "0c3734fcd50819d549c8b6f1d0a7820e4edeea02910a4b5ce4a18f385210389a",
+      "bytes": 3543
+    },
+    {
+      "file": "bool_hexagon_a.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bool_hexagon_a.svg",
+      "sha256": "03d1ce94715a313a459fd25f7e0ae86e5b67513f9e93397ee5104c48a6cb1993",
+      "bytes": 3921
+    },
+    {
+      "file": "bool_indicator.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bool_indicator.svg",
+      "sha256": "fbd9f7d108fcd3faf8baedbaf6dc602a73d76521eec16cbe8811c871c47a6c1d",
+      "bytes": 3332
+    },
+    {
+      "file": "bool_indicator_txt.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bool_indicator_txt.svg",
+      "sha256": "81a49fbdbb4192fd57664d3c22ab917524f1a4bd39af078efc97e49fbec43fed",
+      "bytes": 4115
+    },
+    {
+      "file": "bool_indicator_txt_a.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/bool_indicator_txt_a.svg",
+      "sha256": "5caf8f62fea6d217b8ec8d6a994303e961ddfb59bd3cff1cfe922d8438a6f6c3",
+      "bytes": 4484
+    },
+    {
+      "file": "Confirm.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/Confirm.bmp",
+      "sha256": "49625b2441888497d8e2e2c836e84bcc7fb407cf1f0224ba684506b0aa35410a",
+      "bytes": 5430
+    },
+    {
+      "file": "Confirm_all.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/Confirm_all.bmp",
+      "sha256": "34563bca8d16c80cd26f5c06377e4b136036e1eb26e10cbd57f041b53c1c1606",
+      "bytes": 5432
+    },
+    {
+      "file": "Confirm_plus.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/Confirm_plus.bmp",
+      "sha256": "969311660bfe2f890271661b33c42542e117a9e2bfc495dc0600fc2ed9236f7c",
+      "bytes": 5432
+    },
+    {
+      "file": "DS_AH_mode_icon.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_AH_mode_icon.svg",
+      "sha256": "e4ee3baf70c22fd0d48b177c8b1708798c75a49e3038c522a0fbfa813dbc5a94",
+      "bytes": 14094
+    },
+    {
+      "file": "DS_ana.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_ana.svg",
+      "sha256": "138b920159fd69012d9bb68b0a418ff6d8389de07139770bb26b3b3c9ccddfe3",
+      "bytes": 36777
+    },
+    {
+      "file": "DS_ana_ASRK.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_ana_ASRK.svg",
+      "sha256": "703cf335f03778251ef8b11a7ebb162e60f12ae68836bee7d560d64f5f66f57f",
+      "bytes": 47507
+    },
+    {
+      "file": "DS_ana_bar.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_ana_bar.svg",
+      "sha256": "e291cecc21531fb12be1baee4f5edd90e65346248777084def2c8ed635586050",
+      "bytes": 26900
+    },
+    {
+      "file": "DS_ana_bar_h.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_ana_bar_h.svg",
+      "sha256": "a43e2912d23d473d438c398ce9579a5dd66174f6866cb3c25c8c8f3b18f6c0f0",
+      "bytes": 26877
+    },
+    {
+      "file": "DS_ana_bar_reactivity_zoomed.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_ana_bar_reactivity_zoomed.svg",
+      "sha256": "3343b2c075e48c9f79664fab2b28005d52273a08a626927d647557ad4bf438fa",
+      "bytes": 7771
+    },
+    {
+      "file": "DS_ana_bar_usr.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_ana_bar_usr.svg",
+      "sha256": "cf05e599efe1d5a8e9b0062c62d3b714aa89f09c6bf62207bdb168e1d4269e4c",
+      "bytes": 20564
+    },
+    {
+      "file": "DS_ana_bar_usr1.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_ana_bar_usr1.svg",
+      "sha256": "9c962d24e3b0e1cab618d05967b2b62028e001d523500acfe2df5931a0256bf1",
+      "bytes": 20493
+    },
+    {
+      "file": "DS_ana_bar_usr2.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_ana_bar_usr2.svg",
+      "sha256": "609c7ef0ca2cf711008d2098203fd578ef642d8b96c0fa2921419aee735d9474",
+      "bytes": 20424
+    },
+    {
+      "file": "DS_ana_circle.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_ana_circle.svg",
+      "sha256": "a71585c8ff88827006bd6d58472dbd61dc0c3bfc33c978412f4d194afdb76775",
+      "bytes": 32824
+    },
+    {
+      "file": "DS_ana_ext_bounds.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_ana_ext_bounds.svg",
+      "sha256": "cc020e47fa2274b9dea7e147e61087cfe34b86f7822831ef243b69e05dc1d356",
+      "bytes": 29537
+    },
+    {
+      "file": "DS_ana_GetLocation.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_ana_GetLocation.svg",
+      "sha256": "64d27518221add42a51b78b30549db1ea52ef4c784394ec665ffa722d4a9579f",
+      "bytes": 37635
+    },
+    {
+      "file": "DS_ana_real_color_frame.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_ana_real_color_frame.svg",
+      "sha256": "fb0f3330f4f3f7a6ef79c7f885767c68bd4dde082ea3afae0f6fd04c7ed475a4",
+      "bytes": 12846
+    },
+    {
+      "file": "DS_AVR.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_AVR.svg",
+      "sha256": "22e8f55a3e6bf182f6f1f8bee9c87a0d33b364151be5353a225f066196d5551c",
+      "bytes": 13558
+    },
+    {
+      "file": "DS_breaker.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_breaker.svg",
+      "sha256": "928899277199938673c0b6b627ffe12cb8a054182ec6d99299453e876af37986",
+      "bytes": 19444
+    },
+    {
+      "file": "DS_CO_valve.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_CO_valve.svg",
+      "sha256": "bf66489f65b5e20dbceee5365fcf4db119e95fb7c9d60223c41353e2e544c524",
+      "bytes": 21138
+    },
+    {
+      "file": "DS_CO_valve_rect.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_CO_valve_rect.svg",
+      "sha256": "bcc1e792f0e98f7aab9be91590dcff50df679b9b96bac895aae13ab0be7ab622",
+      "bytes": 20930
+    },
+    {
+      "file": "DS_lockout.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_lockout.svg",
+      "sha256": "93b0511bdf954902052c0173c0a10de121e639f30103f65e3d79b0e928085b0e",
+      "bytes": 10559
+    },
+    {
+      "file": "DS_louver_valve.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_louver_valve.svg",
+      "sha256": "6df3c4252124fa7e4121a7cdd2b022316c0c1021f497c6b1b229219e1bf36596",
+      "bytes": 20709
+    },
+    {
+      "file": "DS_motor.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_motor.svg",
+      "sha256": "5146a98fec2336722a5e4bc34a1b82c24a658822897109ff40d34a6b99d1b58b",
+      "bytes": 18890
+    },
+    {
+      "file": "DS_pivot_valve.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_pivot_valve.svg",
+      "sha256": "cb717e1f41a5e6f702386a1b575494a918b6e2310bc5b11f873187f4ab97d691",
+      "bytes": 20342
+    },
+    {
+      "file": "DS_pulse3_valve.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_pulse3_valve.svg",
+      "sha256": "ca7823c073f4f5e4ac98c3466e8c6328e30efe429fc66581b14f929e9008f717",
+      "bytes": 20047
+    },
+    {
+      "file": "DS_pulse_valve.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_pulse_valve.svg",
+      "sha256": "f6404722dc83939cb13bce5e57ac5d414e9c9eb26ff6c1e09da9d2948f1b4cae",
+      "bytes": 19953
+    },
+    {
+      "file": "DS_reflux_valve.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_reflux_valve.svg",
+      "sha256": "b21c52cc5e39de3ded6fe3498445a2443fced9bd0c2d8077b6df3cc90cb70feb",
+      "bytes": 18225
+    },
+    {
+      "file": "DS_Reg_degree.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_Reg_degree.svg",
+      "sha256": "d03b733cfaa6478dc934747b846b02eb83c07945f0eafa92e166d31cb442a12d",
+      "bytes": 6351
+    },
+    {
+      "file": "DS_Reg_set.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_Reg_set.svg",
+      "sha256": "8606f9e16b03ead98e0ab826da2cd8a1146a5be3afc8c8165f5aa17f66d5bd25",
+      "bytes": 21130
+    },
+    {
+      "file": "DS_Reg_valve.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_Reg_valve.svg",
+      "sha256": "c2c3c41d8a207ae03a583d25f51cf5fd67d91f195df84a415aeb0ba1f55b6c1f",
+      "bytes": 24576
+    },
+    {
+      "file": "DS_RSD_stat.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_RSD_stat.svg",
+      "sha256": "87bc539310207432044916d3a101b60a87897c27e6283efa1b95328a28625108",
+      "bytes": 8319
+    },
+    {
+      "file": "DS_setter.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_setter.svg",
+      "sha256": "40b3881eeeabc39f8f3c4e814aa4cdd8c55e95582d455d7f734f4d8a039720ba",
+      "bytes": 22541
+    },
+    {
+      "file": "DS_switch.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_switch.svg",
+      "sha256": "84bc5b36936a450fd430cafb972b7120482d64e88bb7b40fe2bd54ff6d6bacc9",
+      "bytes": 15727
+    },
+    {
+      "file": "DS_TC_clutch.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TC_clutch.svg",
+      "sha256": "2c4e9cfc46afc404ae292f1f6332af01f542e29b6c57a8c1774e61fdb651f720",
+      "bytes": 25423
+    },
+    {
+      "file": "DS_TPTS_AVR.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_AVR.svg",
+      "sha256": "4c18daeccb38ed6af936b8c37287b923e43090b7f1cec4b933e049d468ee6e7c",
+      "bytes": 5975
+    },
+    {
+      "file": "DS_TPTS_AVR_sel.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_AVR_sel.svg",
+      "sha256": "da12167a0b765ae38151e9d788c5842c87cc70cac609247407f32fdcd338c218",
+      "bytes": 12525
+    },
+    {
+      "file": "DS_TPTS_GS.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_GS.svg",
+      "sha256": "4b526ae4b03f29a232716dd52e3baa3110c87914481e5033b57a094f526709bc",
+      "bytes": 22461
+    },
+    {
+      "file": "DS_TPTS_HEAD.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_HEAD.svg",
+      "sha256": "669626388fc2f35f63c65729f3ffb379592b286fce4080cbe71d4fa1f250c31f",
+      "bytes": 4684
+    },
+    {
+      "file": "DS_TPTS_IBR_set.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_IBR_set.svg",
+      "sha256": "9eadd8aacd64025dffb9d723886e459156d62e5dbe6776b4d5af418891570778",
+      "bytes": 10017
+    },
+    {
+      "file": "DS_TPTS_IBR_trigger.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_IBR_trigger.svg",
+      "sha256": "74816d034512fb99399fdc129a98f1b12cb473c0610df3c8d600d7ad9411f982",
+      "bytes": 6579
+    },
+    {
+      "file": "DS_TPTS_KO.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_KO.svg",
+      "sha256": "bf0a1acf811bfbd7690da1f6d28051841fff53dd726946f83b5673e71877a0b4",
+      "bytes": 17543
+    },
+    {
+      "file": "DS_TPTS_nakladka.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_nakladka.svg",
+      "sha256": "87b9c1b552e67a2c920acab80fe488fe128e6bb99fbe64c28448334c4cf771ab",
+      "bytes": 9983
+    },
+    {
+      "file": "DS_TPTS_Reg_degree.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_Reg_degree.svg",
+      "sha256": "9c7d0af0119dad42dd12df2f7a383b7554c10bd80d57d90cd64ab2028d07e2ac",
+      "bytes": 5466
+    },
+    {
+      "file": "DS_TPTS_Reg_set.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_Reg_set.svg",
+      "sha256": "e5e5e24d3209259c91b47b7c357191d86e7d9ebcb011be888b883a81aa2edc13",
+      "bytes": 9120
+    },
+    {
+      "file": "DS_TPTS_Reg_valve.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_Reg_valve.svg",
+      "sha256": "5c297dd0d607e20b16ca91f6cdf176002fa017a4b08777ef7b70d14b136ce30f",
+      "bytes": 10161
+    },
+    {
+      "file": "DS_TPTS_SR_ERL_Reg_valve.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_SR_ERL_Reg_valve.svg",
+      "sha256": "7cda6789b74c281e8024cb453f1155ee5995e6f3b45f59fd73b2d17dea1f391b",
+      "bytes": 16419
+    },
+    {
+      "file": "DS_TPTS_TE_spec.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_TE_spec.svg",
+      "sha256": "4e7edb0b098e50f90ff663d7670569b9e4d5984e6043e31510c083c149284101",
+      "bytes": 8165
+    },
+    {
+      "file": "DS_TPTS_TZB_universal.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_TZB_universal.svg",
+      "sha256": "9f6305f6ecd425cc4dbe2a6612d431363fccd448f16965174620448c6769c3cb",
+      "bytes": 10774
+    },
+    {
+      "file": "DS_TPTS_VL_num.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_VL_num.svg",
+      "sha256": "c881e970498438e7ec6f63c7b95ecb9752239a43c177197d9476f565ba755a5f",
+      "bytes": 13505
+    },
+    {
+      "file": "DS_TPTS_VL_spec.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TPTS_VL_spec.svg",
+      "sha256": "3207804df9facc2ffff7b6dd563e77e8389984f41f62fade2b6cb54fd04178ad",
+      "bytes": 15676
+    },
+    {
+      "file": "DS_TurbValve_control.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TurbValve_control.svg",
+      "sha256": "5805b440c8a6cc7bb8294af643c728ffb90187247b68a65d6c980dbeffc60462",
+      "bytes": 11529
+    },
+    {
+      "file": "DS_TurbValve_cutout.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TurbValve_cutout.svg",
+      "sha256": "84a9ed12e6fca7e8625d1c7cffbd43f98428f2c4327fc70a25ff99b2a3f4efdc",
+      "bytes": 12162
+    },
+    {
+      "file": "DS_TXS_ERL_Reg_valve.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_TXS_ERL_Reg_valve.svg",
+      "sha256": "4acb63ce4fab03b5cf0e5613fad6d344875f608b7753fbb06e784fa0aceec4e9",
+      "bytes": 15844
+    },
+    {
+      "file": "DS_T_valve.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/DS_T_valve.svg",
+      "sha256": "f0814f910866a658270a5947e65e44da95c4838c673a421c7984d6dcd1689696",
+      "bytes": 20655
+    },
+    {
+      "file": "dull_Arch_Logs.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/dull_Arch_Logs.bmp",
+      "sha256": "0ba8afab0d83eb2fa36bd81ad3d42543876288b712453b5ded34e2fedaa7c90c",
+      "bytes": 2016
+    },
+    {
+      "file": "dull_Camera.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/dull_Camera.bmp",
+      "sha256": "55223dae9b6282ea7f766d71fe95e8c5f8cc97eb50ea4f3dd0f67eee88c56080",
+      "bytes": 1552
+    },
+    {
+      "file": "dull_Exit.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/dull_Exit.bmp",
+      "sha256": "fec0e42791be8f412a26a69f6e3d0090808955ff29e1fdacb337905577710ca3",
+      "bytes": 12152
+    },
+    {
+      "file": "dull_Help.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/dull_Help.bmp",
+      "sha256": "2edb61f7a1515dd78566cd65d2eb858db8d0fbd3daf701b09febd21c4c9ced8e",
+      "bytes": 5432
+    },
+    {
+      "file": "dull_Logs.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/dull_Logs.bmp",
+      "sha256": "a6aed6152ee2d02d04ce9764637d7900516a30e29432d8371b6072996afabd2c",
+      "bytes": 5432
+    },
+    {
+      "file": "dull_Notes.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/dull_Notes.bmp",
+      "sha256": "298f1d59d9bcdd555d3065b41989139976f0d3473772b25897b28f8764396ea0",
+      "bytes": 3728
+    },
+    {
+      "file": "dull_Print.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/dull_Print.bmp",
+      "sha256": "72f50fbcfb3173f002996d7d38e65b3b030ec0cf8ff32f1193a93d7f417dd05d",
+      "bytes": 5432
+    },
+    {
+      "file": "dull_Restore_2.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/dull_Restore_2.bmp",
+      "sha256": "4a1194450e91f746431c5d5fc6414838da2766f3244a4c6a83bd10355c692dbd",
+      "bytes": 7736
+    },
+    {
+      "file": "dull_SPDS.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/dull_SPDS.bmp",
+      "sha256": "867cefb629b125270127312ab62e0f89fbd892785c46a20a37598b7283637e15",
+      "bytes": 2928
+    },
+    {
+      "file": "dull_Systems.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/dull_Systems.bmp",
+      "sha256": "24bb5da5132740dfe4baeab9dc93f881186d04f66dd712bca2838e4a2d8c6da8",
+      "bytes": 5432
+    },
+    {
+      "file": "dull_Trend.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/dull_Trend.bmp",
+      "sha256": "522cd2ec57fe6498e47a63ab5a14af19da1cb442b2f8a362f42a08b25613886a",
+      "bytes": 12152
+    },
+    {
+      "file": "dull_TZB.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/dull_TZB.bmp",
+      "sha256": "46b4f7b885f79b2532bb94b0cbc42aea9002d50d23289dcbd7d0c3ca45912a37",
+      "bytes": 5432
+    },
+    {
+      "file": "dull_Users.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/dull_Users.bmp",
+      "sha256": "7c95e694a227d2c8b05ec9d3b57552927cadb300c35ae65069c33ed26852a160",
+      "bytes": 2928
+    },
+    {
+      "file": "icon_PortExplorer.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/icon_PortExplorer.svg",
+      "sha256": "1a02a87e26065cb00e37690f3ec5796169611360046542ed1152f1f6d01860d7",
+      "bytes": 3359
+    },
+    {
+      "file": "Indicator.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/Indicator.svg",
+      "sha256": "d3a654b7d57716a82948fa35c66a32bd744ea375817ba7848ed3b43fa96b1b49",
+      "bytes": 638
+    },
+    {
+      "file": "KTPS_HEAD.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/KTPS_HEAD.svg",
+      "sha256": "359b78e7f6af8480fa935691911765cbedd90e18baf143c200579bbd677e9574",
+      "bytes": 5690
+    },
+    {
+      "file": "KTPS_HEAD_PK.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/KTPS_HEAD_PK.svg",
+      "sha256": "9064980ef9eb470ea74d59f3c593e67230e68d507a420985a98936a477b75b84",
+      "bytes": 4902
+    },
+    {
+      "file": "KTPS_modul.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/KTPS_modul.svg",
+      "sha256": "d3e440586ad1dc3a40543b5f7962323a99eb28d8eb7e4414481d8d78b196ff00",
+      "bytes": 1067
+    },
+    {
+      "file": "KTPS_PK.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/KTPS_PK.svg",
+      "sha256": "83c1d78964380c7b8cf4993d6bb9954093e0b4e1888694c42d785dd198317f61",
+      "bytes": 5334
+    },
+    {
+      "file": "obj721_station_alarms.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj721_station_alarms.svg",
+      "sha256": "175da2e402161f94ad27c19b04ae3ecb3a8d712f635a8a93a914dff0cf8ef354",
+      "bytes": 7493
+    },
+    {
+      "file": "obj_address.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj_address.svg",
+      "sha256": "a641a70a01773cc2720f57eddabbe64076dce85e60a2c8407489c50d5bfeadd2",
+      "bytes": 1478
+    },
+    {
+      "file": "obj_alarm_line.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj_alarm_line.svg",
+      "sha256": "a619530643122c0f8d8abea4a6aef597500b13ca75faa933550953d2d6f68c10",
+      "bytes": 9256
+    },
+    {
+      "file": "obj_Button.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj_Button.svg",
+      "sha256": "c74763352ef8f9e95039bb337e1331e7d37a0e569becd24c0ce7c7d618e9b5b6",
+      "bytes": 5154
+    },
+    {
+      "file": "obj_ButtonH.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj_ButtonH.svg",
+      "sha256": "c884468df5f3ce34de6cd5afdfa376c8cb0871af8b7f6e1596a2436ca3926a49",
+      "bytes": 5613
+    },
+    {
+      "file": "obj_ButtonH_icon.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj_ButtonH_icon.svg",
+      "sha256": "1a14e651caf5fc1797f45dbe6aeaa67640926e7603599463089e3d2038022525",
+      "bytes": 3150
+    },
+    {
+      "file": "obj_Button_icon.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj_Button_icon.svg",
+      "sha256": "c11856dbda0f1a9fd5acc7fc9a1732e2e6e1e3c10b07598d83678ab37aee7404",
+      "bytes": 2597
+    },
+    {
+      "file": "obj_circles.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj_circles.svg",
+      "sha256": "7ce84a4e06c39f0dd92cb057ae3ef6249ac43c4ab272ae19f6bfb4bc511179a0",
+      "bytes": 1560
+    },
+    {
+      "file": "obj_EnterPwd.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj_EnterPwd.svg",
+      "sha256": "6816b02edcecdae63a09b910c206977689026734945a4c64086fa021b9f7a3df",
+      "bytes": 5551
+    },
+    {
+      "file": "obj_EnterText.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj_EnterText.svg",
+      "sha256": "a07de71fb2e15be5d9e03a0442bf4e519104384e9d4c5dc402d20298ca0cc31c",
+      "bytes": 5844
+    },
+    {
+      "file": "obj_link.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj_link.svg",
+      "sha256": "e1769000c9856cc85adb778f2d03481a0a409baba4ccf52d5b7933d8b36ed9c5",
+      "bytes": 5110
+    },
+    {
+      "file": "obj_Monitors.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj_Monitors.svg",
+      "sha256": "c0cd0747b516af11340bcb422167533a6a74d5838b68a24ad7e6072c68980ef9",
+      "bytes": 4997
+    },
+    {
+      "file": "obj_NodeSRV.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj_NodeSRV.svg",
+      "sha256": "8b2afe72d23c6cc523f7c9d0d7d9f61691fece735ec5b8d823028d01ac7e9715",
+      "bytes": 4853
+    },
+    {
+      "file": "obj_NodeWS.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj_NodeWS.svg",
+      "sha256": "174e81a88f692e40d188f38f2f7d8cd2114bc1cc91e0652067ebaa7742be0c6d",
+      "bytes": 6631
+    },
+    {
+      "file": "obj_sinus.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj_sinus.svg",
+      "sha256": "aab6d7d5e4f6745c63e460576bf3b547797e2ce6bb945ebfa8ab4cb914b7ebff",
+      "bytes": 4893
+    },
+    {
+      "file": "obj_Station_stat.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/obj_Station_stat.svg",
+      "sha256": "14bbd9aed3d4b19457d67fcc0094da3eb478fab9c1bdf0e582f5f8e52613b5fd",
+      "bytes": 9958
+    },
+    {
+      "file": "ps_Ros3_ana_bar_DoublePower.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/ps_Ros3_ana_bar_DoublePower.svg",
+      "sha256": "ea1d93e0a2bc7de4fa50e30df38b5f46ed01c5fbe7112d7ee527996709e456d0",
+      "bytes": 14446
+    },
+    {
+      "file": "ps_Ros3_ana_bar_DoublePower_h.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/ps_Ros3_ana_bar_DoublePower_h.svg",
+      "sha256": "3a73d3265f2239cf034f05ac1f764b98cbed5daadfb1d6b4370bfb013f38e3a9",
+      "bytes": 14107
+    },
+    {
+      "file": "ps_Ros3_ana_bar_NP.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/ps_Ros3_ana_bar_NP.svg",
+      "sha256": "e85ebf0eedb266629ac90c55748cfeabf30e84a3ef7de254529c2ab26f1747d6",
+      "bytes": 19667
+    },
+    {
+      "file": "ps_Ros3_ana_bar_NP_h.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/ps_Ros3_ana_bar_NP_h.svg",
+      "sha256": "561222aedda71990ede51cecaecedf04af5a1aa19af762e23472084cc9b5b04d",
+      "bytes": 19215
+    },
+    {
+      "file": "ps_Ros3_ana_bar_reactivnost.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/ps_Ros3_ana_bar_reactivnost.svg",
+      "sha256": "420133fd3d1be7dc7d5a21a290489734e4d405f790a3c08543f62f6cff6601a5",
+      "bytes": 6480
+    },
+    {
+      "file": "ps_Ros3_ana_bar_reactivnost_h.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/ps_Ros3_ana_bar_reactivnost_h.svg",
+      "sha256": "a490b31f3fe253a6805d6c61fc5c2c39c2403d22caa7feffed030b9fa5855611",
+      "bytes": 7172
+    },
+    {
+      "file": "scroll_bar_v.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/scroll_bar_v.svg",
+      "sha256": "2c46c47cb877a5bf9861c428fdf52f0187fb915d1eeb21476b02ad49f2c2861a",
+      "bytes": 11590
+    },
+    {
+      "file": "scroll_line.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/scroll_line.svg",
+      "sha256": "0f72fe9a285fd94469014925d820cdee7a71e0a64cb5f45e639a94a7e5291ee8",
+      "bytes": 1670
+    },
+    {
+      "file": "scroll_list_10.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/scroll_list_10.svg",
+      "sha256": "0207422e4c576ec159530158709aa4dfa424948209623af830dd6551a73d205d",
+      "bytes": 9764
+    },
+    {
+      "file": "scroll_list_15.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/scroll_list_15.svg",
+      "sha256": "485e9a45ac5e64dcb558c44f24e5e124532ff47248d1c77800efec4cfcabe012",
+      "bytes": 11970
+    },
+    {
+      "file": "scroll_list_3.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/scroll_list_3.svg",
+      "sha256": "308778fddffece4837d730d8ce8f7ab259c036b15af596af93f69122f28daee6",
+      "bytes": 5667
+    },
+    {
+      "file": "scroll_list_40.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/scroll_list_40.svg",
+      "sha256": "3a4751a4165c1d707e1085d1843c527b8f8b8a1c52a838cc3510cfd72319d566",
+      "bytes": 22558
+    },
+    {
+      "file": "Server.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/Server.bmp",
+      "sha256": "a8bbf7ac6c5236c2c26095c5805863b2f1c3988b21119a4974ed36be187547e7",
+      "bytes": 1790
+    },
+    {
+      "file": "SPDS_usr.bmp",
+      "source": "PORTAL/Vis/PORTAL_subviews/SPDS_usr.bmp",
+      "sha256": "ce6574e5dcbb846f75e80174452e0f606022a9d548d789afda4e0a3673fda20a",
+      "bytes": 5430
+    },
+    {
+      "file": "spec_PTK.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/spec_PTK.svg",
+      "sha256": "1e88096d5f1f3b8b01bc3f1a3242ba9e742aa7e4da6fc3fb268b983cc75b00a0",
+      "bytes": 3164
+    },
+    {
+      "file": "TextAutoScale.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TextAutoScale.svg",
+      "sha256": "a4652923e1936069117d001fcc11cd3b1153ac8492b8b59d373f802a6077cbf0",
+      "bytes": 3669
+    },
+    {
+      "file": "TPTS_AET.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_AET.svg",
+      "sha256": "49dbdbc5e409719380ec177be7927a69753280b0a8c04a7d2387b0755fe2c495",
+      "bytes": 6078
+    },
+    {
+      "file": "TPTS_AETE.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_AETE.svg",
+      "sha256": "fb0ad2fdb19e9f217c1d6349cc8be5954c23880acbcdf74e1c83185b5da85f0c",
+      "bytes": 3778
+    },
+    {
+      "file": "TPTS_AETS.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_AETS.svg",
+      "sha256": "c53852e23e88cd3f89628cac16c58ae29a5bb1bd325793984867c93a212fd289",
+      "bytes": 6081
+    },
+    {
+      "file": "TPTS_ASR.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_ASR.svg",
+      "sha256": "01826ec03761eca7c0d91729b8e56224efe990a46252ba8c82f5ca276209690a",
+      "bytes": 6177
+    },
+    {
+      "file": "TPTS_ASRS.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_ASRS.svg",
+      "sha256": "957a0751fdb34068bfd4e4dc1de3c517de44bc55f6768f4e2a0e006cd4c92fc6",
+      "bytes": 6180
+    },
+    {
+      "file": "TPTS_BSR.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_BSR.svg",
+      "sha256": "0018f65ecc18677214bec9164c2e6e797d0257aa3956d2be050bf4c8c5f68875",
+      "bytes": 6753
+    },
+    {
+      "file": "TPTS_BSRS.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_BSRS.svg",
+      "sha256": "543f810f29f42a49f03d90292af7d5cd19ca0239471cbf53cd37d94d8398e84f",
+      "bytes": 6756
+    },
+    {
+      "file": "TPTS_FGS.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_FGS.svg",
+      "sha256": "9d86dbd3fa457cd192320f742f9e756584ea2e10481b9f46235d6e77ae9d62a2",
+      "bytes": 3880
+    },
+    {
+      "file": "TPTS_FGSS.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_FGSS.svg",
+      "sha256": "2fed3210c7e3d61e91ef8208489d9324acc0d9e7149f9566fee94621bcedbc92",
+      "bytes": 3883
+    },
+    {
+      "file": "TPTS_FKM.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_FKM.svg",
+      "sha256": "73fe0926e61fef0b6ac36681a05db3c2e08e925ad5d09856d431cea48f4a4912",
+      "bytes": 3886
+    },
+    {
+      "file": "TPTS_FKME_details.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_FKME_details.svg",
+      "sha256": "f49b7c1fbd9df89ef12495e2ed6913c5406454fda6fc79e46fd1663387af9077",
+      "bytes": 24323
+    },
+    {
+      "file": "TPTS_FRE.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_FRE.svg",
+      "sha256": "802bb2c2c0712259adf80c99f4ebdab47f3ed773373f5c0cce05e332005d145f",
+      "bytes": 4029
+    },
+    {
+      "file": "TPTS_KRZ.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_KRZ.svg",
+      "sha256": "842e860c5b0acd0d9be7ed520df485d5c97e112fee9d443f39d00792cf9ff263",
+      "bytes": 4178
+    },
+    {
+      "file": "TPTS_KRZS.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_KRZS.svg",
+      "sha256": "98ce4f69f5fde096b5d50d4db2fddd4ace8c3c5421e0116ee63e2b3399bcbb1b",
+      "bytes": 4181
+    },
+    {
+      "file": "TPTS_modul.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_modul.svg",
+      "sha256": "ad34ca7a9bfdec10195d007fdb3c9815b53bc177bb376d1f60803d1777b6b476",
+      "bytes": 1125
+    },
+    {
+      "file": "TPTS_MPA.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_MPA.svg",
+      "sha256": "f43480c575de72fc97f0a67f07fb601217e3d12eef7b9822bfa2677687ab60a1",
+      "bytes": 4178
+    },
+    {
+      "file": "TPTS_RB.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_RB.svg",
+      "sha256": "3228c9997c2236d20443448afe2fac2937eab88550f94453e4d54945e38fdd4d",
+      "bytes": 4913
+    },
+    {
+      "file": "TPTS_RBBS.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_RBBS.svg",
+      "sha256": "506d1cb58b45faaa0dd2fef89bd0e26736c58c2a16a680f2851deffc6d4325d4",
+      "bytes": 4484
+    },
+    {
+      "file": "TPTS_RBDS.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_RBDS.svg",
+      "sha256": "e72771accfad6abdf7d31bc8d54d023e225014163babbac7c2fb3677d572a7f8",
+      "bytes": 4115
+    },
+    {
+      "file": "TPTS_RBS.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_RBS.svg",
+      "sha256": "38a272a68510056a92e3d6d174282a478a187a73a7482673d74eb314466305fa",
+      "bytes": 4916
+    },
+    {
+      "file": "TPTS_SRZ.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_SRZ.svg",
+      "sha256": "3f9c3cc84bb2daae0e6c4e8ac9b7ae07c2c4bf087b707a111b019ff78557e89a",
+      "bytes": 4178
+    },
+    {
+      "file": "TPTS_SRZS.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_SRZS.svg",
+      "sha256": "c55ff0a20c1304d3f35f44096c7178c5386f7c184ee0ab4da5327a0430d8b2d8",
+      "bytes": 4181
+    },
+    {
+      "file": "TPTS_XXX_dubl.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_XXX_dubl.svg",
+      "sha256": "4b631efe116dea639a7769cbc6ffa13d6c88f905e5f776d4e4a91051525cc648",
+      "bytes": 1466
+    },
+    {
+      "file": "TPTS_XXX_ext.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_XXX_ext.svg",
+      "sha256": "e6b720f32ce86a7eb29b3cf1b21d3a1b4fbf3dd1474e08be6b60ba8cd6931060",
+      "bytes": 1464
+    },
+    {
+      "file": "TPTS_ZTT.svg",
+      "source": "PORTAL/Vis/PORTAL_subviews/TPTS_ZTT.svg",
+      "sha256": "0d7f055a5ee63a3697f44d0129395d6cda82e3357f557f8a9d4ec062ac30a634",
+      "bytes": 4329
+    },
+    {
+      "file": "Arm_3H_1.svg",
+      "source": "PORTAL/Vis/NPP_subviews/Arm_3H_1.svg",
+      "sha256": "ac7fe82593dfde1eb446dd06c7bc222b97d1fde66f3175b232e04d5beb6a6519",
+      "bytes": 20436
+    },
+    {
+      "file": "Arm_3H_2.svg",
+      "source": "PORTAL/Vis/NPP_subviews/Arm_3H_2.svg",
+      "sha256": "d14c8e039241bad74397f141ad4f062a47b685d5950830128775651349b10638",
+      "bytes": 22459
+    },
+    {
+      "file": "Arm_4_2.svg",
+      "source": "PORTAL/Vis/NPP_subviews/Arm_4_2.svg",
+      "sha256": "37366fe726e2a8a9cd3a3bca713317b536d4f683f0d1a2ed8ad4f50cbc06c4c9",
+      "bytes": 22274
+    },
+    {
+      "file": "BARs_r3.svg",
+      "source": "PORTAL/Vis/NPP_subviews/BARs_r3.svg",
+      "sha256": "027b4d63d71ba2c3cb38937c0cc8dad680af2d8ecf617e9c20cdc3bf932d3e93",
+      "bytes": 6091
+    },
+    {
+      "file": "diag_serv_LLevel.svg",
+      "source": "PORTAL/Vis/NPP_subviews/diag_serv_LLevel.svg",
+      "sha256": "7fa663b0cf96f8ded7570cfbc974693949ab28ca63809bedf53d69ca0c414603",
+      "bytes": 1994
+    },
+    {
+      "file": "Diag_SPPB_r3.svg",
+      "source": "PORTAL/Vis/NPP_subviews/Diag_SPPB_r3.svg",
+      "sha256": "0dd10f6b48b98589177efc18e27af6e4db32ab6c8f55e77759fc82bcde779d80",
+      "bytes": 3495
+    },
+    {
+      "file": "EKP.svg",
+      "source": "PORTAL/Vis/NPP_subviews/EKP.svg",
+      "sha256": "fac792710112c2713ee2cd9e7ae8658bb9b1dbbae2c84b71754fab03e624ad07",
+      "bytes": 20023
+    },
+    {
+      "file": "graphbig_gt30_lt60_r3.svg",
+      "source": "PORTAL/Vis/NPP_subviews/graphbig_gt30_lt60_r3.svg",
+      "sha256": "4350c44971fdfaacfff6f47391695d1e99967df0bdbcf37fded703b8792fc553",
+      "bytes": 7623
+    },
+    {
+      "file": "graphbig_gt60_r3.svg",
+      "source": "PORTAL/Vis/NPP_subviews/graphbig_gt60_r3.svg",
+      "sha256": "565a16c03c160b470ee89e2997906b147dc14301dd3acbf6e0b4fdc1653abbdc",
+      "bytes": 7824
+    },
+    {
+      "file": "graphbig_lt30_r3.svg",
+      "source": "PORTAL/Vis/NPP_subviews/graphbig_lt30_r3.svg",
+      "sha256": "84423577cff7d28b4403120b9e0ca2bd30f2ad2a63fa776e02ababa737bd54c2",
+      "bytes": 8407
+    },
+    {
+      "file": "graphsmall_gt30_lt60_r3.svg",
+      "source": "PORTAL/Vis/NPP_subviews/graphsmall_gt30_lt60_r3.svg",
+      "sha256": "119aa2a960693cb4d9f7f3f3dd00b50f7e6dd5a7b69cd764459adb57eca50afe",
+      "bytes": 7302
+    },
+    {
+      "file": "graphsmall_gt60_r3.svg",
+      "source": "PORTAL/Vis/NPP_subviews/graphsmall_gt60_r3.svg",
+      "sha256": "c567026e20f7428fef7819a69bee27e19446311ff537dd9a9da4e5f6fc960696",
+      "bytes": 7508
+    },
+    {
+      "file": "graphsmall_lt30_r3.svg",
+      "source": "PORTAL/Vis/NPP_subviews/graphsmall_lt30_r3.svg",
+      "sha256": "66a837cf2fecae0bad289eb9685d866f0e92c0ab553f428ff856bfab42a58fb6",
+      "bytes": 8040
+    },
+    {
+      "file": "GW.svg",
+      "source": "PORTAL/Vis/NPP_subviews/GW.svg",
+      "sha256": "5e2d111eb4c7a7e5eab22f83d45c46e3958e440ba5306b997e5cb01a174e6ed2",
+      "bytes": 2703
+    },
+    {
+      "file": "kommutator.svg",
+      "source": "PORTAL/Vis/NPP_subviews/kommutator.svg",
+      "sha256": "c1b8345758c139aeee386d6ccf15a6ba267e49c2914cc4a7b3a1a549449ec310",
+      "bytes": 2110
+    },
+    {
+      "file": "Lay_top_right_LLevel.svg",
+      "source": "PORTAL/Vis/NPP_subviews/Lay_top_right_LLevel.svg",
+      "sha256": "d2bf94715b4e0426fddb1675609334c3fcc1c70135940d64ec8a825f9cbfa961",
+      "bytes": 2022
+    },
+    {
+      "file": "left_bottom_menu_r3.svg",
+      "source": "PORTAL/Vis/NPP_subviews/left_bottom_menu_r3.svg",
+      "sha256": "f377e152fa6c845585acd405863c31e3b8c16ea21e6dfa18a1662224e4450d5a",
+      "bytes": 13623
+    },
+    {
+      "file": "Print.svg",
+      "source": "PORTAL/Vis/NPP_subviews/Print.svg",
+      "sha256": "bf211db7a418a3566818782c3117daaf8d5162ebe6aa10887360c29b319ee929",
+      "bytes": 4718
+    },
+    {
+      "file": "ps_ana_bar_lin_spec1.svg",
+      "source": "PORTAL/Vis/NPP_subviews/ps_ana_bar_lin_spec1.svg",
+      "sha256": "9bf61e58268e5851c1b9fd2058e18504abfa71e9350c15732415525353c1ec62",
+      "bytes": 7552
+    },
+    {
+      "file": "ps_ana_bar_log_spec1.svg",
+      "source": "PORTAL/Vis/NPP_subviews/ps_ana_bar_log_spec1.svg",
+      "sha256": "6e52c639ccefd9ae12757a8ce0c116ae5cfce3b2316921044346a604a52f6801",
+      "bytes": 7955
+    },
+    {
+      "file": "ps_ana_bar_lp_dn_spec1.svg",
+      "source": "PORTAL/Vis/NPP_subviews/ps_ana_bar_lp_dn_spec1.svg",
+      "sha256": "cffb34d02bf66cb12135ccd3c2f3af1fa66725ccd735915c2360168417b69dd2",
+      "bytes": 4485
+    },
+    {
+      "file": "ps_ana_bar_lp_up_spec1.svg",
+      "source": "PORTAL/Vis/NPP_subviews/ps_ana_bar_lp_up_spec1.svg",
+      "sha256": "83359bccf11913a27602118453c1cafbfad6d1e2b69db9e1e71882a08199d3bf",
+      "bytes": 4485
+    },
+    {
+      "file": "ps_ana_bar_obr_period.svg",
+      "source": "PORTAL/Vis/NPP_subviews/ps_ana_bar_obr_period.svg",
+      "sha256": "82a95f41859ecd7df9add06e1dabc566a7e4c2dee7efd43df096f3edc97a1f9e",
+      "bytes": 7496
+    },
+    {
+      "file": "ps_ana_bar_reactivnost.svg",
+      "source": "PORTAL/Vis/NPP_subviews/ps_ana_bar_reactivnost.svg",
+      "sha256": "175f53efde354bc6234bb2e1c0e4a6f8ace4caccb2c164ab33e84cffe6708077",
+      "bytes": 3581
+    },
+    {
+      "file": "ps_ana_vexp_inv_spec1.svg",
+      "source": "PORTAL/Vis/NPP_subviews/ps_ana_vexp_inv_spec1.svg",
+      "sha256": "89cf3ae185fd7c1195cc188edde7415ae1ea0fe7ccc45ebf3f501a6a06c52067",
+      "bytes": 4973
+    },
+    {
+      "file": "ps_ana_v_inv_period.svg",
+      "source": "PORTAL/Vis/NPP_subviews/ps_ana_v_inv_period.svg",
+      "sha256": "a92f70dfc84ac3ee3f72605d376d4bbb9229c5bbcd24e2c2d0582c3cb30285fc",
+      "bytes": 4832
+    },
+    {
+      "file": "ps_Ros3_ana_900.svg",
+      "source": "PORTAL/Vis/NPP_subviews/ps_Ros3_ana_900.svg",
+      "sha256": "f12593999ee0a7afcb251db5855dedc29131f68e52782e723171d1cef2548132",
+      "bytes": 38179
+    },
+    {
+      "file": "spec_I_M.svg",
+      "source": "PORTAL/Vis/NPP_subviews/spec_I_M.svg",
+      "sha256": "c0df8d9a8bfe29f8888f3becdfef2e178d5cdae827a598d74876d1d03e2ea58a",
+      "bytes": 16542
+    },
+    {
+      "file": "TimerBARs_r3.svg",
+      "source": "PORTAL/Vis/NPP_subviews/TimerBARs_r3.svg",
+      "sha256": "dcf529d7b6835b3e4ce65d9ce29a777e08020c2a3441d99f436bf8f8a05fd552",
+      "bytes": 4732
+    },
+    {
+      "file": "TimerND_r3.svg",
+      "source": "PORTAL/Vis/NPP_subviews/TimerND_r3.svg",
+      "sha256": "4d206f6ce8b62b7763e83f3b7fd3fb92581b7034d0834dd142ed5ebdd3ffda55",
+      "bytes": 4558
+    },
+    {
+      "file": "top_menu_indication.svg",
+      "source": "PORTAL/Vis/NPP_subviews/top_menu_indication.svg",
+      "sha256": "5f97e259ac51808b4a2663ee485a166dd62ba84f831522fda4605bdc8cec7b81",
+      "bytes": 681
+    },
+    {
+      "file": "uni4_tablo.svg",
+      "source": "PORTAL/Vis/NPP_subviews/uni4_tablo.svg",
+      "sha256": "aef015631d9cd38d7fa7a053e8148b123b2a037fe99c28d89fae1c9456880a78",
+      "bytes": 18016
+    },
+    {
+      "file": "unicontrol.svg",
+      "source": "PORTAL/Vis/NPP_subviews/unicontrol.svg",
+      "sha256": "709e803689fb25f62204fbaf9bb58ec34a18bb5730f5d9575ecb78780a002b5b",
+      "bytes": 3021
+    },
+    {
+      "file": "upd.svg",
+      "source": "PORTAL/Vis/NPP_subviews/upd.svg",
+      "sha256": "549f5ba914b1f4265cc54d44a04b948dffba8ce24f43f02ab58c21b91c6c0f1b",
+      "bytes": 20226
+    }
+  ]
+}

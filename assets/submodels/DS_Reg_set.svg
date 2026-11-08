@@ -1,0 +1,449 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 100 30" width="100" height="30" id="DS_Reg_set">
+  <desc>универсальный задатчик регулятора для Dull Screen</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа Dull Screen" revision="6.2">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS оборудования"/> 
+    <rt:param name="DATA_NARY" datatype="string" value="AUTO" comment="тип привязки: AUTO/TYPEn (n = 1...3) или имя многобитового сигнала для индикаяии неисправности"/> 
+    <rt:param name="Operate" datatype="boolean" value="False" comment="Сделать объект управляемым"/> 
+    <rt:param name="NoReadings" datatype="boolean" value="false" comment="Вместо показаний уставки выводить статический 0"/> 
+    <rt:param name="ShowGoodColor" datatype="boolean" value="false" comment="Окрашивать подложку при хорошем качестве"/> 
+    <rt:param name="BG_StaticColor" datatype="string" value="none" comment="Имя цвета подложки, если объект не должен быть прозрачным"/> 
+    <rt:param name="Mask_Fail" datatype="ushort" value="16" comment="только для NARY - маска состояния &quot;Неисправность&quot;"/> 
+    <rt:var name="OU" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="SP" datatype="PlsPVAna" comment="указатель на переменную ввода задания"/> 
+    <rt:var name="pv_Fail" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="pv_Fail_Blink" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="pv_Setpoint" datatype="PlsPVAna" comment="указатель на переменную текущего задания"/> 
+    <rt:var name="Status" datatype="int" comment="обобщенное сотояние"/> 
+    <rt:var name="ACol" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="HCol" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="AStat" datatype="ushort" value="0" comment="код сигнализации"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="MyStrokeWdth" datatype="float" value="2" comment="Толщина рамок в зависимости от управляемости"/> 
+    <rt:var name="Link_Type" datatype="ushort" value="0" comment="Тип привязки: 1-ТПТС, 2-BIN, 3-NARY, 4-TYPE; 0-неизвестно или не важно. Бит 3 (==8) - нет переменной Неиспр."/> 
+    <rt:var name="MyAlarm" datatype="boolean" value="true" comment="синализации сигнала принадлежат текущему пользователю"/> 
+    <rt:var name="Operate_possible" datatype="boolean" value="true" comment="Управлять можно"/> 
+    <rt:var name="RealMask_Fail" datatype="ushort" value="0xffff" comment="окончательная маска"/> 
+    <rt:var name="RealMask_Fail_Blink" datatype="ushort" value="0xffff" comment="окончательная маска"/> 
+    <rt:var name="AckCommandCode" datatype="ushort" value="0" comment="Код команды квитирования"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub ShowVal()
+If !NoReadings Then
+	If pv_Setpoint != Nothing Then
+		Value_text.text = pv_Setpoint.ValueAscii()
+		Dim ValColor As UInt
+		ValColor = PRJSPEC.ANA_Color_pv (pv_Setpoint)
+		backgr.fill = ValColor
+		If ShowGoodColor Then
+			If ValColor == Color_ANA_GOOD Then
+				backgr.fill_opacity = 0.5
+			Else
+				backgr.fill_opacity = 1
+			End If
+		Else
+			If ValColor == Color_ANA_GOOD Then
+				backgr.visibility = &quot;hidden&quot;
+			Else
+				backgr.visibility = &quot;visible&quot;
+			End If
+		End If
+	Else
+		l.visibility = &quot;hidden&quot;
+		r.visibility = &quot;hidden&quot;
+		backgr.fill = Color_ANA_ER_LINK
+		Value_text.text = &quot;Ошибка&quot;
+	End If
+ElseIf pv_Setpoint == Nothing Then
+	backgr.visibility = &quot;visible&quot;
+	backgr.fill_opacity = 1
+	backgr.fill = Color_ANA_ER_LINK
+	Value_text.text = &quot;Ош.&quot;
+	l.visibility = &quot;hidden&quot;
+	r.visibility = &quot;hidden&quot;
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Detect_Status()
+If Link_Type == 1 Then
+	Status = PRJSPEC.TPTS_SR(KKS, ACol, HCol, AStat)
+ElseIf Link_Type == 2 Then
+	If Allow_Confirm &amp;&amp; Blink_on_NACK Then
+		If (pv_Fail.Value != 0) Then
+			If MyAlarm &amp;&amp; pv_Fail.NotAcknowledged &amp;&amp; (pv_Fail.AlarmType != PLS_ALARMTYP_NONE) Then
+				AStat = 1	//неквитированная сигнализация
+			Else
+				AStat = 2	//cквитированная сигнализация
+			End If
+		Else
+			AStat = 0	//нет рамки
+		End If
+	Else
+		If (pv_Fail.Value != 0) Then
+			AStat = 2	//cквитированная сигнализация
+		Else
+			AStat = 0	//нет рамки
+		End If
+	End If
+ElseIf Link_Type == 3 Then
+	If ((pv_Fail.Value &amp; Mask_Fail) != 0) Then
+		AStat = 2	//cквитированная сигнализация
+	Else
+		AStat = 0	//нет рамки
+	End If
+ElseIf Link_Type == 4 Then
+	AStat = 0	//нет рамки
+	If pv_Fail != Nothing Then
+		If ((pv_Fail.Value &amp; RealMask_Fail) != 0) Then
+			AStat = 2	//cквитированная сигнализация
+		End If
+	End If
+	If (AStat != 2) &amp;&amp; (pv_Fail != Nothing) Then
+		If ((pv_Fail_Blink.Value &amp; RealMask_Fail_Blink) != 0) Then
+			AStat = 1	//мигающая сигнализация
+		End If
+	End If
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub CheckUsrGr()
+If Alarms_ForUser Then	//если надо распределять сигнализаци по пользователям
+	MyAlarm = PRJSPEC.CheckPvOwner(pv_Fail.PVId, False)
+Else
+	MyAlarm = True
+End If
+Detect_Status()
+End Sub</rt:sub>
+    <rt:sub>Sub AckMe()
+If ((AStat &amp; 1) != 0) &amp;&amp; Allow_Confirm &amp;&amp; flag_confirm Then
+//если мигает рамка, разрешена кнопка квитирования, есть право квитирования
+	If (Link_Type == 1) &amp;&amp; Check_Oper_Rights(OU) Then	//TPTS и пользователь имеет право управлять
+		If ((OU.PVSuspendedFlags &amp; PLS_SUSP_CMD) == 0) Then	//нет ремонта
+			OU.Command(_Now, AckCommandCode)
+		End If
+	ElseIf Link_Type == 2 Then	//BINs
+		If (pv_Fail != Nothing) &amp;&amp; Blink_on_NACK &amp;&amp; MyAlarm Then
+		//есть переменная, надо мигать, моя сигнал-я
+			If pv_Fail.NotAcknowledged Then
+				pv_Fail.AcknowledgeAlarm(0)
+			End If
+		End If
+	ElseIf Link_Type == 4 Then	//TYPE
+		If (pv_Fail_Blink != Nothing)Then
+			If pv_Fail_Blink.NotAcknowledged Then
+				If !Alarms_ForUser || PRJSPEC.CheckPvOwner(pv_Fail.PVId, False) Then
+				//если не надо распределять сигнализаци по пользователям или это сигнализация пользователя
+					pv_Fail_Blink.AcknowledgeAlarm(0)
+				End If
+			End If
+		End If
+		If (AckCommandCode != 0) &amp;&amp; Check_Oper_Rights(OU) Then
+		//если есть код квитирования и можно управлять
+			If ((OU.PVSuspendedFlags &amp; PLS_SUSP_CMD) == 0) Then
+				OU.Command(_Now, AckCommandCode)
+			End If
+		End If
+	End If
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">AltWidth.visibility = &quot;hidden&quot;
+If (KKS != &quot;NULL&quot;) Then
+	If Left(DATA_NARY, 4) != &quot;TYPE&quot; Then
+	//в этом случае используются только стандартные имена переменных
+		//Z0 и OU не нужны для рамки неисправности, но OU надо для определения прав доступа
+		OU = BIN(KKS + &quot;_OU&quot;)
+		SP = ANA(KKS + &quot;_SP&quot;)
+		Dim CN As Short
+		If !NoReadings Then
+			If (!requests_allown) Then
+				pv_Setpoint = ANA(KKS + &quot;_&quot; + Signal_RegValve_SP)
+			Else
+				Set pv_Setpoint = ANA(KKS + &quot;_AA3&quot;)
+				If pv_Setpoint == Nothing Then
+					Set pv_Setpoint = ANA(KKS + &quot;_&quot; + Signal_RegValve_SP)
+				End If
+			End If
+			CN = pv_Setpoint.CategoryNr		//тип объекта определяем по одной из переменных задания
+		ElseIf (SP != Nothing) Then
+			CN = SP.CategoryNr
+		Else
+			CN = -1
+		End If
+		If CN &lt; 0 Then	//если не определился номер, то это ошибка
+			Link_Type = 0
+		ElseIf (CN &gt; 0) &amp;&amp; (CN &lt; 1000) Then	//это ТПТС
+			Link_Type = 1
+			If (requests_allown) Then
+				pv_Fail = BIN(KKS + &quot;_VB11&quot;)
+			End If
+			AckCommandCode = SR_BHA 	//полагаемся на то, что для KR код квитирования останется тем же = 1
+		ElseIf (DATA_NARY == &quot;AUTO&quot;) Then	//если не задано имя NARY, то это может быть только BIN
+			Link_Type = 2
+			pv_Fail = BIN(KKS + &quot;_&quot; + CStr(RTAPLS.GetConfigurationParameter(true, &quot;ProjectSignals&quot;, &quot;REGULATOR_FAIL&quot;)))
+		Else
+			pv_Fail = BIN(KKS + &quot;_&quot; + DATA_NARY)
+			Link_Type = 3
+		End If
+	Else
+		Dim ParGr_Name As String
+		Dim ParGr_Nr As Byte
+		Dim DELIMITER As String
+		Dim Tmp_Name As String
+		ParGr_Name = Right(DATA_NARY, 1)
+		If IsNumericString(ParGr_Name) Then
+			ParGr_Nr = CByte(ParGr_Name)
+			If ParGr_Nr &lt; 1 Then
+				ParGr_Nr = 1
+			ElseIf ParGr_Nr &gt; 3 Then
+				ParGr_Nr = 3
+			End If
+		Else
+			ParGr_Nr = 1
+		End If
+		ParGr_Name = &quot;REG&quot; + CStr(ParGr_Nr)
+		DELIMITER = RTAPLS.GetConfigurationParameter(True, &quot;ObjectRules_&quot; + ParGr_Name, ParGr_Name + &quot;_DELIMITER&quot;)
+		Tmp_Name = RTAPLS.GetConfigurationParameter(True, &quot;ObjectRules_&quot; + ParGr_Name, ParGr_Name + &quot;_SIGNAL_COMMAND&quot;)
+		If (Len(Tmp_Name) &gt; 0) &amp;&amp; (Tmp_Name != &quot;NONE&quot;) Then
+			Tmp_Name = KKS + DELIMITER + Tmp_Name
+			OU = BIN(Tmp_Name)
+		End If
+		Tmp_Name = RTAPLS.GetConfigurationParameter(True, &quot;ObjectRules_&quot; + ParGr_Name, ParGr_Name + &quot;_SIGNAL_SP_COMMAND&quot;)
+		If (Len(Tmp_Name) &gt; 0) &amp;&amp; (Tmp_Name != &quot;NONE&quot;) Then
+			Tmp_Name = KKS + DELIMITER + Tmp_Name
+			SP = ANA(Tmp_Name)
+		End If
+		Tmp_Name = RTAPLS.GetConfigurationParameter(True, &quot;ObjectRules_&quot; + ParGr_Name, ParGr_Name + &quot;_SIGNAL_SETPOINT&quot;)
+		If (Len(Tmp_Name) &gt; 0) &amp;&amp; (Tmp_Name != &quot;NONE&quot;) Then
+			Tmp_Name = KKS + DELIMITER + Tmp_Name
+			pv_Setpoint = ANA(Tmp_Name)
+		End If
+		Link_Type = 4
+		Tmp_Name = RTAPLS.GetConfigurationParameter(True, &quot;ObjectRules_&quot; + ParGr_Name, ParGr_Name + &quot;_USE_SINGLE_NARY&quot;)
+		If CBool(Tmp_Name) Then
+			Tmp_Name = RTAPLS.GetConfigurationParameter(True, &quot;ObjectRules_&quot; + ParGr_Name, ParGr_Name + &quot;_SIGNAL_OPEN&quot;)
+			If (Len(Tmp_Name) &gt; 0) &amp;&amp; (Tmp_Name != &quot;NONE&quot;) Then
+				Tmp_Name = KKS + DELIMITER + Tmp_Name
+				pv_Fail = BIN(Tmp_Name)
+				pv_Fail_Blink = BIN(Tmp_Name)
+			End If
+			Tmp_Name = RTAPLS.GetConfigurationParameter(True, &quot;ObjectRules_&quot; + ParGr_Name, ParGr_Name + &quot;_MASK_FAIL&quot;)
+			RealMask_Fail = CUInt(Tmp_Name)
+			Tmp_Name = RTAPLS.GetConfigurationParameter(True, &quot;ObjectRules_&quot; + ParGr_Name, ParGr_Name + &quot;_MASK_FAIL_BLINK&quot;)
+			RealMask_Fail_Blink = CUInt(Tmp_Name)
+		Else
+			Tmp_Name = RTAPLS.GetConfigurationParameter(True, &quot;ObjectRules_&quot; + ParGr_Name, ParGr_Name + &quot;_SIGNAL_FAIL&quot;)
+			If (Len(Tmp_Name) &gt; 0) &amp;&amp; (Tmp_Name != &quot;NONE&quot;) Then
+				Tmp_Name = KKS + DELIMITER + Tmp_Name
+				pv_Fail = BIN(Tmp_Name)
+			End If
+			Tmp_Name = RTAPLS.GetConfigurationParameter(True, &quot;ObjectRules_&quot; + ParGr_Name, ParGr_Name + &quot;_SIGNAL_FAIL_BLINK&quot;)
+			If (Len(Tmp_Name) &gt; 0) &amp;&amp; (Tmp_Name != &quot;NONE&quot;) Then
+				Tmp_Name = KKS + DELIMITER + Tmp_Name
+				pv_Fail_Blink = BIN(Tmp_Name)
+			End If
+			Tmp_Name = RTAPLS.GetConfigurationParameter(True, &quot;ObjectRules_&quot; + ParGr_Name, ParGr_Name + &quot;_APPLY_MASK&quot;)
+			If CBool(Tmp_Name) Then
+				Tmp_Name = RTAPLS.GetConfigurationParameter(True, &quot;ObjectRules_&quot; + ParGr_Name, ParGr_Name + &quot;_MASK_FAIL&quot;)
+				RealMask_Fail = CUInt(Tmp_Name)
+				Tmp_Name = RTAPLS.GetConfigurationParameter(True, &quot;ObjectRules_&quot; + ParGr_Name, ParGr_Name + &quot;_MASK_FAIL_BLINK&quot;)
+				RealMask_Fail_Blink = CUInt(Tmp_Name)
+			End If
+		End If
+	End If
+	//если нет переменных задания, то это очевидная ошибка
+	If (pv_Setpoint == Nothing) &amp;&amp; (SP == Nothing) Then
+		Link_Type = 0
+	End If	
+	If (pv_Fail == Nothing) &amp;&amp; (pv_Fail_Blink == Nothing) Then
+		Link_Type = Link_Type + 8
+	End If
+	If Link_Type == 4 Then	//квитирование возможно только если есть возможность мигать рамкой
+		AckCommandCode = RTAPLS.GetConfigurationParameter(True, &quot;ObjectRules_&quot; + ParGr_Name, ParGr_Name + &quot;_COMMAND_ACK&quot;)
+	End If
+End If
+If (SP == nothing) Then
+	Operate_possible = False
+Else
+	If (SP.PVCategories != 2) Then
+		Operate_possible = False
+	Else
+		Operate_possible = Operate
+	End If
+End If
+
+Dim My_w As Float
+Dim My_h As Float
+My_w = _This.width
+My_h = _This.height
+Static_BG.x = 5
+Static_BG.y = 5
+Static_BG.height = My_h - 10
+backgr.x = 5
+backgr.y = 5
+backgr.height = My_h - 10
+Al_frame.x = 2.5
+Al_frame.y = 2.5
+Al_frame.height = My_h - 5
+SelFrame.x = 2.5
+SelFrame.y = 2.5
+SelFrame.height = My_h - 5
+If NoReadings Then
+	If (pv_Setpoint == Nothing) &amp;&amp; IsViewMode Then
+		backgr.visibility = &quot;visible&quot;
+		backgr.fill_opacity = 1
+		backgr.fill = Color_ANA_ER_LINK
+		Value_text.text = &quot;Ош.&quot;
+		l.visibility = &quot;hidden&quot;
+		r.visibility = &quot;hidden&quot;
+	Else
+		backgr.visibility = &quot;hidden&quot;
+		Value_text.text = &quot;0&quot;
+		Value_text.fill = &quot;Col_Grey5&quot;
+		l.points = &quot;7.5,&quot;+CStr(My_h / 3)+&quot; 15,&quot;+CStr(My_h / 2)+&quot; 7.5,&quot;+CStr(My_h / 1.5 )
+		r.points = CStr(My_w / 2 - 7.5)+&quot;,&quot;+CStr(My_h / 3)+&quot; &quot;+CStr(My_w / 2 - 15)+&quot;,&quot;+CStr(My_h / 2)+&quot; &quot;+CStr(My_w / 2 - 7.5)+&quot;,&quot;+CStr(My_h / 1.5)
+	End If
+	Static_BG.width = My_w / 2 - 10
+	backgr.width = My_w / 2 - 10
+	Value_text.x = My_w / 4
+	RB_edge.points = &quot;5,&quot;+CStr(My_h - 5)+&quot; &quot;+CStr(My_w / 2 - 5)+&quot;,&quot;+CStr(My_h - 5)+&quot; &quot;+CStr(My_w / 2 - 5)+&quot;,5&quot;
+	LU_edge.points = &quot;5,&quot;+CStr(My_h - 5)+&quot; 5,5 &quot;+CStr(My_w / 2 - 5)+&quot;,5&quot;
+	Al_frame.width = My_w / 2 - 5
+	InGr.width = My_w / 2
+	SelFrame.width = My_w / 2 - 5
+Else
+	Static_BG.width = My_w - 10
+	backgr.width = My_w - 10
+	l.points = &quot;7.5,&quot; + CStr(My_h / 3) + &quot; 15,&quot; + CStr(My_h / 2) + &quot; 7.5,&quot; + CStr(My_h / 1.5)
+	r.points = CStr(My_w - 7.5) + &quot;,&quot; + CStr(My_h / 3) + &quot; &quot; + CStr(My_w - 15) + &quot;,&quot; + CStr(My_h / 2) + &quot; &quot; + CStr(My_w - 7.5) + &quot;,&quot; + CStr(My_h / 1.5)
+	RB_edge.points = &quot;5,&quot;+CStr(My_h - 5)+&quot; &quot;+CStr(My_w - 5)+&quot;,&quot;+CStr(My_h - 5)+&quot; &quot;+CStr(My_w - 5)+&quot;,5&quot;
+	LU_edge.points = &quot;5,&quot;+CStr(My_h - 5)+&quot; 5,5 &quot;+CStr(My_w - 5)+&quot;,5&quot;
+	Al_frame.width = My_w - 5
+	SelFrame.width = My_w - 5
+End If</rt:event>
+    <rt:event type="OnResize">Value_text.font_size = _This.height / 1.5</rt:event>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetSP">
+      <rt:chgItem>pv_Setpoint</rt:chgItem>
+      <rt:code>ShowVal()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="IsItMyAlarm">
+      <rt:condition>Blink_on_NACK &amp;&amp; Alarms_ForUser &amp;&amp; (Link_Type == 2)</rt:condition>
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>CheckUsrGr()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetStatus">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>pv_Fail</rt:chgItem>
+      <rt:chgItem>pv_Fail_Blink</rt:chgItem>
+      <rt:chgItem>OU</rt:chgItem>
+      <rt:code>Detect_Status()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChRights">
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>MyStrokeWdth = FrameStrokeWidth (Operate, OU)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="5" y="5" width="90" height="20" rx="0" ry="0" id="Static_BG" fill="none" stroke="none">
+    <rt:dyn type="fill" mode="constant" value="BG_StaticColor"/> 
+  </rect>
+  <rect x="5" y="5" width="90" height="20" rx="0" ry="0" id="backgr" fill="none" stroke="none"/> 
+  <text x="50" y="22.5" id="Value_text" fill="black" font-family="AAR_Font2" font-size="20" font-weight="bold" text-anchor="middle">
+    <rt:dyn type="fill" mode="constant" value="Color_DIGITS_G6"/> 
+888.8</text>
+  <polyline points="7.5,10 15,15 7.5,20" id="l" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <polyline points="92.5,10 85,15 92.5,20" id="r" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <polyline points="5,25 95,25 95,5" id="RB_edge" fill="none" stroke="Col_Grey4" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey1"/> 
+      <rt:xy value2="Col_Grey5"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <polyline points="5,25 5,5 95,5" id="LU_edge" fill="none" stroke="Col_Grey1" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey5"/> 
+      <rt:xy value2="Col_Grey1"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <rect x="2.5" y="2.5" width="95" height="25" rx="0" ry="0" id="Al_frame" fill="none" stroke="Col_Red" stroke-width="2">
+    <rt:dyn type="visibility" mode="cyclic" value="PRJSPEC.AlarmVis(AStat)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke" mode="constant" value="Color_Alarm"/> 
+  </rect>
+  <rect x="0" y="0" width="100" height="30" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="2.5" y="2.5" width="95" height="25" rx="0" ry="0" id="SelFrame" fill="black" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If pv_Setpoint != nothing Then
+	If (SP == nothing) Then
+		ShowWarning(&quot;Не найдена переменная\nввода задания.&quot;, 10)
+	ElseIf (Link_Type &amp; 3) == 1 Then
+		Open_ws_wf_wi(&quot;TPTS_Reg_set&quot;, KKS, Operate_possible)
+	ElseIf Link_Type == 3 Then	//Если это NARY и переменная существует
+		Open_ws_wf_wi(&quot;NARY_Reg_set&quot;, KKS + &quot;|&quot; + DATA_NARY + &quot;|&quot; + CStr(Mask_Fail), Operate_possible)
+	ElseIf Link_Type == 4 Then	//Если это TYPE
+		Dim s As String
+		s = KKS + &quot;|REG&quot; + Right(DATA_NARY, 1) + &quot;|True&quot;
+		Open_TYPE_ws_wf_wi(&quot;PRJSPEC_Reg_set&quot;, s, Operate, &quot;REG&quot; + Right(DATA_NARY, 1))
+	Else
+		Open_ws_wf_wi(&quot;BIN_Reg_set&quot;, KKS, Operate_possible)
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnRightClick">If pv_Setpoint != nothing Then
+	If (SP == nothing) Then
+		ShowWarning(&quot;Не найдена переменная\nввода задания.&quot;, 10)
+	ElseIf (Link_Type &amp; 3) == 1 Then
+		If Operate_possible &amp;&amp; Check_Oper_Rights(OU) Then
+			LoadPopUpMenu(KKS + &quot;|SR o|TPTS_Reg_set &quot; + KKS)
+		Else
+			LoadPopUpMenu(KKS + &quot;|SR i|TPTS_Reg_set &quot; + KKS)
+		End If
+	ElseIf Link_Type == 3 Then	//Если это NARY и переменная существует
+		If Operate_possible &amp;&amp; Check_Oper_Rights(OU) Then
+			LoadPopUpMenu(KKS + &quot;|REGo|NARY_Reg_set &quot; + KKS + &quot;|&quot; + DATA_NARY + &quot;|&quot; + CStr(Mask_Fail))
+		Else
+			LoadPopUpMenu(KKS + &quot;|REGi|NAR_Reg_set &quot; + KKS + &quot;|&quot; + DATA_NARY + &quot;|&quot; + CStr(Mask_Fail))
+		End If
+	ElseIf Link_Type == 4 Then	//Если это TYPE
+		Dim s As String
+		s = KKS + &quot;|REG&quot; + Right(DATA_NARY, 1) + &quot;|True&quot;
+		If Operate_possible &amp;&amp; Check_Oper_Rights(OU) Then
+			LoadPopUpMenu(KKS + &quot;|REGo|PRJSPEC_Reg_set &quot; + s)
+		Else
+			LoadPopUpMenu(KKS + &quot;|REGi|PRJSPEC_Reg_set &quot; + s)
+		End If
+	Else
+		If Operate_possible &amp;&amp; Check_Oper_Rights(OU) Then
+			LoadPopUpMenu(KKS + &quot;|REGo|BIN_Reg_set &quot; + KKS)
+		Else
+			LoadPopUpMenu(KKS + &quot;|REGi|BIN_Reg_set &quot; + KKS)
+		End If
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnMiddleClick">If pv_Setpoint != nothing Then
+	If (SP == nothing) Then
+		ShowWarning(&quot;Не найдена переменная\nввода задания.&quot;, 10)
+	Else
+		If (SP.PVCategories != 2) Then
+			ShowWarning(&quot;Переменная воода задания не выходная.&quot;, 10)
+		Else
+			Open_Win_Uni(False, &quot;rights&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS + &quot;|&quot; + CStr(Operate))
+		End If
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+  </rect>
+  <line x1="50" y1="-0.5" x2="50" y2="30" id="AltWidth" stroke="Col_InGR1" stroke-dasharray="2,2" stroke-width="2"/> 
+</svg>

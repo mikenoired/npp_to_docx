@@ -1,0 +1,38 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 500 550" width="500" height="550" id="diag_serv_LLevel">
+  <desc>диагностика состояния оборудования нижнего уровня</desc>
+  <rt:model comment="Проект Ростов-2" revision="4.3">
+    <rt:var name="TPTS_BG_color" datatype="uint" comment="Цвет при погасшем во время мигания индикаторе ТПТС"/> 
+    <rt:sub>Sub Calc_BG_Color()
+If (TPTS_Imitation_any == True) Then
+	TPTS_BG_color = Color_Imitation
+Else
+	TPTS_BG_color = Col_Ar(12)
+End If
+End Sub</rt:sub>
+    <rt:changeTrigger name="Ch_TPTS_imit">
+      <rt:chgItem>TPTS_Imitation_any</rt:chgItem>
+      <rt:code>Calc_BG_Color()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <image y="10" width="125" height="30" xlink:href="obj_Button.svg" id="Call_PTK1">
+    <rt:dyn type="Label" mode="constant" value="&quot;ПТК: ИБП, МКБ&quot;"/> 
+    <rt:dyn type="But_Color" mode="onchange" value="IBP_global | MKB_global" trans="it">
+      <rt:xy value="1" value2="Col_Green"/> 
+      <rt:xy value="2" value2="Col_Red"/> 
+      <rt:xy value="3" value2="Col_Yellow"/> 
+      <rt:xy value2="Col_Grey1"/> 
+    </rt:dyn>
+    <rt:event type="OnClick">LoadNew(&quot;diag_UPS1&quot;)</rt:event>
+  </image>
+  <g>
+    <rt:dyn type="visibility" mode="onchange" value="TPTS_Imitation_any == True" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rect x="150" y="7.5" width="17.5" height="17.5" rx="0" ry="0" fill="Col_LtBlue" stroke="black" stroke-width="1">
+      <rt:dyn type="fill" mode="constant" value="Color_Imitation"/> 
+    </rect>
+    <text x="175" y="22.5" fill="black" font-size="20" font-weight="normal">- цвет имитации сигналов</text>
+  </g>
+</svg>

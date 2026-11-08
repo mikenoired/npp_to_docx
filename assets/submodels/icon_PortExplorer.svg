@@ -1,0 +1,50 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 40 40" width="40" height="40" id="icon_PortExplorer" font-family="AAR_Font1" font-size="12" font-weight="bold" text-anchor="middle">
+  <desc>Иконка для вызова ПОРТАЛ эксплорера</desc>
+  <rt:model modelversion="7.2.0.24" comment="Стандартная подмодель ПОРТАЛа" revision="6.0">
+    <rt:param name="BG_col_name" datatype="string" value="none" comment="Имя цвета фона иконки (если none, то поверх него будет затемнение!)"/> 
+  </rt:model>
+  <rect x="0" y="0" width="40" height="40" rx="0" ry="0" id="BG" fill="none">
+    <rt:dyn type="fill" mode="constant" value="BG_col_name"/> 
+  </rect>
+  <rect x="0" y="0" width="40" height="40" rx="0" ry="0" id="BG_shade" fill="Col_Grey3" fill-opacity="0.399988">
+    <rt:dyn type="visibility" mode="constant" value="BG_col_name == &quot;none&quot;" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <g id="Trnd_Curve">
+    <polyline points="5,2.5 5,35 37.5,35" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+    <line x1="5" y1="10" x2="37.5" y2="10" stroke="Col_Grey5" stroke-width="0.5"/> 
+    <line x1="5" y1="22.5" x2="37.5" y2="22.5" stroke="Col_Grey5" stroke-width="0.5"/> 
+    <line x1="17.5" y1="35" x2="17.5" y2="2.5" stroke="Col_Grey5" stroke-width="0.5"/> 
+    <line x1="30" y1="35" x2="30" y2="2.5" stroke="Col_Grey5" stroke-width="0.5"/> 
+    <path d="M5 22.5 Q8.75 7.5 11.5 7.5 Q15 7.5 17.5 22.5 Q21 32.5 26.5 32.625 Q32.5 32.5 35 25 " fill="none" stroke="black" stroke-width="1"/> 
+  </g>
+  <g id="NotebookMain" stroke="none">
+    <rect x="20" y="2.5" width="17.5" height="22.5" rx="0" ry="0" id="Body" fill="Col_Grey1" stroke="Col_Grey4" stroke-width="0.5"/> 
+    <polyline points="20,25 37.5,25 37.5,2.5" id="Shadow" fill="none" stroke="Col_Grey4" stroke-width="0.75"/> 
+    <g id="Spiral" fill="none" stroke="Col_Grey5" stroke-width="1">
+      <path d="M21.9799 7.5 C19.4799 8 18.5259 6.273 19.4799 5 "/> 
+      <path d="M21.9799 10 C19.4799 10.5 18.5259 8.773 19.4799 7.5 "/> 
+      <path d="M21.9799 12.5 C19.4799 13 18.5259 11.273 19.4799 10 "/> 
+      <path d="M21.9799 15 C19.4799 15.5 18.5259 13.773 19.4799 12.5 "/> 
+      <path d="M21.9799 17.5 C19.4799 18 18.5259 16.273 19.4799 15 "/> 
+      <path d="M21.9799 20 C19.4799 20.5 18.5259 18.773 19.4799 17.5 "/> 
+      <path d="M21.9799 22.5 C19.4799 23 18.5259 21.273 19.4799 20 "/> 
+    </g>
+  </g>
+  <g id="lines" stroke="Col_Grey4" stroke-width="0.5">
+    <line x1="23.3125" y1="5" x2="35" y2="5"/> 
+    <line x1="23.3125" y1="7.5" x2="35" y2="7.5"/> 
+    <line x1="23.3125" y1="10" x2="35" y2="10"/> 
+    <line x1="23.3125" y1="12.5" x2="35" y2="12.5"/> 
+    <line x1="23.3125" y1="15" x2="35" y2="15"/> 
+    <line x1="23.3125" y1="17.5" x2="35" y2="17.5"/> 
+    <line x1="23.3125" y1="20" x2="35" y2="20"/> 
+    <line x1="23.3125" y1="22.5" x2="35" y2="22.5"/> 
+  </g>
+  <text x="25" y="14" fill="black">!</text>
+  <text x="30" y="22.5" fill="black">?</text>
+  <text x="32" y="12" fill="Col_Grey5">i</text>
+</svg>

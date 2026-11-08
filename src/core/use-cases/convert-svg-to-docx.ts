@@ -20,10 +20,15 @@ export async function convertSvgToDocx(
   encoding: string;
   searchRecords: SearchMarkerRecord[];
   missingResources: string[];
+  reconstructedResources: string[];
 }> {
   const rawBuffer = await readFile(svgPath);
   const { content: svgContent, encoding } = decodeSvgBuffer(rawBuffer);
-  const { svg: svgForRender, missingResources } = await prepareSvgResources(toUtf8Xml(svgContent), svgPath);
+  const {
+    svg: svgForRender,
+    missingResources,
+    reconstructedResources,
+  } = await prepareSvgResources(toUtf8Xml(svgContent), svgPath);
 
   const parsed = parseMarkers(svgContent);
   const enrichedMarkers = parsed.markers.map((marker) => ({
@@ -49,14 +54,17 @@ export async function convertSvgToDocx(
   const docxBuffer = await buildDocx(compositedPng, width, height, renderedMarkers, {
     frameName: path.basename(svgPath),
     missingResources,
+    reconstructedResources,
   });
   await writeFile(outputPath, docxBuffer);
+  await writeFile(path.join(path.dirname(outputPath), `${path.parse(svgPath).name}.svg`), svgForRender, "utf8");
 
   return {
     markers: renderedMarkers.length,
     mismatches: renderedMarkers.filter((marker) => marker.isMismatch).length,
     encoding,
     missingResources,
+    reconstructedResources,
     searchRecords: renderedMarkers
       .filter((marker) => typeof marker.submodel === "string" && marker.submodel.trim().length > 0)
       .map((marker) => ({

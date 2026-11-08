@@ -1,0 +1,469 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="codedlayout meet" viewBox="0 0 75 25" width="75" height="25" id="bin_tablo_flogic_a">
+  <desc>Табло со свободной логикой (автомасштабирование текста)</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.6">
+    <rt:param name="PointID_1" datatype="string" value="NULL" comment="идентификатор сигнала 1"/> 
+    <rt:param name="PointID_2" datatype="string" value="NULL" comment="идентификатор сигнала 2"/> 
+    <rt:param name="PointID_3" datatype="string" value="NULL" comment="идентификатор сигнала 3"/> 
+    <rt:param name="PointID_4" datatype="string" value="NULL" comment="идентификатор сигнала 4"/> 
+    <rt:param name="PointID_5" datatype="string" value="NULL" comment="идентификатор сигнала 5"/> 
+    <rt:param name="PointID_6" datatype="string" value="NULL" comment="идентификатор сигнала 6"/> 
+    <rt:param name="PointID_7" datatype="string" value="NULL" comment="идентификатор сигнала 7"/> 
+    <rt:param name="PointID_8" datatype="string" value="NULL" comment="идентификатор сигнала 8"/> 
+    <rt:param name="PointID_9" datatype="string" value="NULL" comment="идентификатор сигнала 9"/> 
+    <rt:param name="PointID_10" datatype="string" value="NULL" comment="идентификатор сигнала 10"/> 
+    <rt:param name="PointID_11" datatype="string" value="NULL" comment="идентификатор сигнала 11"/> 
+    <rt:param name="PointID_12" datatype="string" value="NULL" comment="идентификатор сигнала 12"/> 
+    <rt:param name="PointID_13" datatype="string" value="NULL" comment="идентификатор сигнала 13"/> 
+    <rt:param name="PointID_14" datatype="string" value="NULL" comment="идентификатор сигнала 14"/> 
+    <rt:param name="PointID_15" datatype="string" value="NULL" comment="идентификатор сигнала 15"/> 
+    <rt:param name="PointID_16" datatype="string" value="NULL" comment="идентификатор сигнала 16"/> 
+    <rt:param name="PointID_17" datatype="string" value="NULL" comment="идентификатор сигнала 17"/> 
+    <rt:param name="PointID_18" datatype="string" value="NULL" comment="идентификатор сигнала 18"/> 
+    <rt:param name="PointID_19" datatype="string" value="NULL" comment="идентификатор сигнала 19"/> 
+    <rt:param name="PointID_20" datatype="string" value="NULL" comment="идентификатор сигнала 20"/> 
+    <rt:param name="FreeLogic" datatype="string" value="NULL" comment="строка логического выражения для вычисления ЗНАЧЕНИЯ (до 990 символов)"/> 
+    <rt:param name="Quality_FreeLogic" datatype="string" value="NULL" comment="строка выражения для вычисления КАЧЕСТВА (до 990 символов)"/> 
+    <rt:param name="Cyclic" datatype="boolean" value="False" comment="циклическая обработка выражения (раз в сек.)"/> 
+    <rt:param name="Col_ON" datatype="string" value="Col_Yellow" comment="цвет для индикации состояния True"/> 
+    <rt:param name="Col_OFF" datatype="string" value="Col_Green" comment="цвет для индикации состояния False"/> 
+    <rt:param name="T_String" datatype="string" comment="Текст на индикаторе"/> 
+    <rt:param name="T_Color" datatype="string" value="black" comment="Цвет текста"/> 
+    <rt:param name="T_Font" datatype="string" value="inherit" comment="Шрифт"/> 
+    <rt:param name="T_Size" datatype="float" value="15" comment="Размер шрифта"/> 
+    <rt:param name="T_Style" datatype="string" value="normal" comment="Стиль"/> 
+    <rt:param name="T_Weight" datatype="string" value="normal" comment="Толщина букв шрифта"/> 
+    <rt:param name="Grad_Style" datatype="boolean" value="false" comment="Индикатор имеет градиентную заливку - объёмный фон"/> 
+    <rt:param name="Auto_Scale" datatype="boolean" value="false" comment="Автомасштабировать текст под размеры объекта"/> 
+    <rt:var name="ErrCount" datatype="boolean" value="false" comment="наличие ошибок"/> 
+    <rt:var name="ResString" datatype="string" comment="строка выражения для расчетов значения"/> 
+    <rt:var name="ResString_Quality" datatype="string" comment="строка выражения для расчетов качества"/> 
+    <rt:var name="InLimit" datatype="ushort" value="20" comment=""/> 
+    <rt:var name="InUsed" datatype="boolean" arraysize="20" comment="массив использованных объектов"/> 
+    <rt:var name="InPV" datatype="PlsPVBin" arraysize="20" comment="массив указателей"/> 
+    <rt:var name="FColor" datatype="uint" value="0x555555" comment="цвет заливки"/> 
+    <rt:var name="NoGrad" datatype="boolean" value="false" comment="отображение градиента запрещено"/> 
+    <rt:sub>Sub Calculate()
+NoGrad = False
+If ErrCount Then
+	FColor = Color_Inval
+	NoGrad = True
+	Exit Sub
+End If
+Dim i As Integer
+Dim success As Boolean
+&apos;Проверяем недостоверность
+If Quality_FreeLogic == &quot;NULL&quot; Then		//если алгоритм на задан, то плохое качество хотя бы одной переменной будет означать плохое качество
+	For i = 0 To (InLimit - 1)
+		If InUsed(i) Then
+			If (InPV(i).Quality == PLS_QUAL_BAD) Then
+				FColor = Color_Inval
+				NoGrad = True
+				Exit Sub
+			End If
+		End If
+	Next i
+Else
+	Dim ResQual As UByte
+	success = PRJSPEC.FreeCalcs(ResString_Quality, ResQual)
+	If (success == false) || (ResQual == PLS_QUAL_BAD) Then
+		FColor = Color_Inval
+		NoGrad = True
+		Exit Sub
+	End If
+End If
+&apos;вычисляем результат и меняем цвет
+Dim Res As Boolean
+success = PRJSPEC.FreeCalcs(ResString, Res)
+If (success == false) Then
+	ErrCount = True
+	FColor = Color_Inval
+	NoGrad = True
+ElseIf (Res == true) Then
+	FColor = VIS.Color(Col_ON)
+Else
+	FColor = VIS.Color(Col_OFF)
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">Dim i As Integer
+Dim j As Integer
+I__Text.visibility = &quot;hidden&quot;
+My_Text.visibility = &quot;visible&quot;
+FColor = Color_ErLink
+Dim Buf As String
+If (PointID_1 == &quot;NULL&quot;) || (FreeLogic == &quot;NULL&quot;) Then
+	ErrCount = True
+	Exit Sub
+End If
+&apos;привязываем PV-шки к тому, что есть
+If PointID_1 != &quot;NULL&quot; Then
+	InUsed(0) = True
+	InPV(0) = RTAPLS.BinPV(PointID_1)
+	If InPV(0) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(0) = False
+End If
+If PointID_2 != &quot;NULL&quot; Then
+	InUsed(1) = True
+	InPV(1) = RTAPLS.BinPV(PointID_2)
+	If InPV(1) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(1) = False
+End If
+If PointID_3 != &quot;NULL&quot; Then
+	InUsed(2) = True
+	InPV(2) = RTAPLS.BinPV(PointID_3)
+	If InPV(2) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(2) = False
+End If
+If PointID_4 != &quot;NULL&quot; Then
+	InUsed(3) = True
+	InPV(3) = RTAPLS.BinPV(PointID_4)
+	If InPV(3) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(3) = False
+End If
+If PointID_5 != &quot;NULL&quot; Then
+	InUsed(4) = True
+	InPV(4) = RTAPLS.BinPV(PointID_5)
+	If InPV(4) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(4) = False
+End If
+If PointID_6 != &quot;NULL&quot; Then
+	InUsed(5) = True
+	InPV(5) = RTAPLS.BinPV(PointID_6)
+	If InPV(5) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(5) = False
+End If
+If PointID_7 != &quot;NULL&quot; Then
+	InUsed(6) = True
+	InPV(6) = RTAPLS.BinPV(PointID_7)
+	If InPV(6) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(6) = False
+End If
+If PointID_8 != &quot;NULL&quot; Then
+	InUsed(7) = True
+	InPV(7) = RTAPLS.BinPV(PointID_8)
+	If InPV(7) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(7) = False
+End If
+If PointID_9 != &quot;NULL&quot; Then
+	InUsed(8) = True
+	InPV(8) = RTAPLS.BinPV(PointID_9)
+	If InPV(8) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(8) = False
+End If
+If PointID_10 != &quot;NULL&quot; Then
+	InUsed(9) = True
+	InPV(9) = RTAPLS.BinPV(PointID_10)
+	If InPV(9) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(9) = False
+End If
+If PointID_11 != &quot;NULL&quot; Then
+	InUsed(10) = True
+	InPV(10) = RTAPLS.BinPV(PointID_11)
+	If InPV(10) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(10) = False
+End If
+If PointID_12 != &quot;NULL&quot; Then
+	InUsed(11) = True
+	InPV(11) = RTAPLS.BinPV(PointID_12)
+	If InPV(11) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(11) = False
+End If
+If PointID_13 != &quot;NULL&quot; Then
+	InUsed(12) = True
+	InPV(12) = RTAPLS.BinPV(PointID_13)
+	If InPV(12) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(12) = False
+End If
+If PointID_14 != &quot;NULL&quot; Then
+	InUsed(13) = True
+	InPV(13) = RTAPLS.BinPV(PointID_14)
+	If InPV(13) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(13) = False
+End If
+If PointID_15 != &quot;NULL&quot; Then
+	InUsed(14) = True
+	InPV(14) = RTAPLS.BinPV(PointID_15)
+	If InPV(14) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(14) = False
+End If
+If PointID_16 != &quot;NULL&quot; Then
+	InUsed(15) = True
+	InPV(15) = RTAPLS.BinPV(PointID_16)
+	If InPV(15) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(15) = False
+End If
+If PointID_17 != &quot;NULL&quot; Then
+	InUsed(16) = True
+	InPV(16) = RTAPLS.BinPV(PointID_17)
+	If InPV(16) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(16) = False
+End If
+If PointID_18 != &quot;NULL&quot; Then
+	InUsed(17) = True
+	InPV(17) = RTAPLS.BinPV(PointID_18)
+	If InPV(17) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(17) = False
+End If
+If PointID_19 != &quot;NULL&quot; Then
+	InUsed(18) = True
+	InPV(18) = RTAPLS.BinPV(PointID_19)
+	If InPV(18) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(18) = False
+End If
+If PointID_20 != &quot;NULL&quot; Then
+	InUsed(19) = True
+	InPV(19) = RTAPLS.BinPV(PointID_20)
+	If InPV(19) == Nothing Then
+		ErrCount = True
+		Exit Sub
+	End If
+Else
+	InUsed(19) = False
+End If
+
+&apos;Разбираем строку
+FreeLogic = FreeLogic + &quot;  &quot;
+ResString = &quot;&quot;
+For i = 1 To Len(FreeLogic)
+	If (Mid(FreeLogic, i, 1) == &quot;$&quot;) Then
+		i = i + 1
+		Buf = Mid(FreeLogic, i, 2)
+		j = CInt(Buf)
+		If (j &lt; 1) || (j &gt; InLimit) || (InUsed (j - 1) == false) Then
+			ErrCount = True
+			Exit Sub
+		Else
+			ResString = ResString + &quot;RTAPLS.BinPV(\&quot;&quot; + InPV(j - 1).PVId + &quot;\&quot;).Value&quot;
+			If (j &gt; 9) Then
+				i = i + 1
+			End If
+		End If
+	ElseIf (Mid(FreeLogic, i, 1) == &quot;@&quot;) Then
+		i = i + 1
+		Buf = Mid(FreeLogic, i, 2)
+		j = CInt(Buf)
+		If (j &lt; 1) || (j &gt; InLimit) || (InUsed (j - 1) == false) Then
+			ErrCount = True
+			Exit Sub
+		Else
+			ResString = ResString + &quot;RTAPLS.BinPV(\&quot;&quot; + InPV(j - 1).PVId + &quot;\&quot;)&quot;
+			If (j &gt; 9) Then
+				i = i + 1
+			End If
+		End If
+	Else
+		ResString = ResString + Mid(FreeLogic, i, 1)
+	End If
+Next i
+If Quality_FreeLogic != &quot;NULL&quot; Then
+	Quality_FreeLogic = Quality_FreeLogic + &quot;  &quot;
+	ResString_Quality = &quot;&quot;
+	For i = 1 To Len(Quality_FreeLogic)
+		If (Mid(Quality_FreeLogic, i, 1) == &quot;$&quot;) Then
+			i = i + 1
+			Buf = Mid(Quality_FreeLogic, i, 2)
+			j = CInt(Buf)
+			If (j &lt; 1) || (j &gt; InLimit) || (InUsed (j - 1) == false) Then
+				ErrCount = True
+				Exit Sub
+			Else
+				ResString_Quality = ResString_Quality + &quot;RTAPLS.BinPV(\&quot;&quot; + InPV(j - 1).PVId + &quot;\&quot;).Quality&quot;
+				If (j &gt; 9) Then
+					i = i + 1
+				End If
+			End If
+		ElseIf (Mid(Quality_FreeLogic, i, 1) == &quot;@&quot;) Then
+			i = i + 1
+			Buf = Mid(Quality_FreeLogic, i, 2)
+			j = CInt(Buf)
+			If (j &lt; 1) || (j &gt; InLimit) || (InUsed (j - 1) == false) Then
+				ErrCount = True
+				Exit Sub
+			Else
+				ResString_Quality = ResString_Quality + &quot;RTAPLS.BinPV(\&quot;&quot; + InPV(j - 1).PVId + &quot;\&quot;)&quot;
+				If (j &gt; 9) Then
+					i = i + 1
+				End If
+			End If
+		Else
+			ResString_Quality = ResString_Quality + Mid(Quality_FreeLogic, i, 1)
+		End If
+	Next i
+End If</rt:event>
+    <rt:event type="OnResize">Dim Th_Ht As Float
+Dim Th_Wdth As Float
+Th_Ht = _This.height
+Th_Wdth = _This.width
+
+Grad_BG.width = Th_Wdth
+Grad_BG.height = Th_Ht
+body.width = Th_Wdth
+body.height = Th_Ht
+RB_border.points = &quot;0,&quot; + CStr(Th_Ht) + &quot; &quot; + CStr(Th_Wdth)+ &quot;,&quot; + CStr(Th_Ht) + &quot; &quot; + CStr(Th_Wdth) + &quot;,0&quot;
+LU_border.points =  &quot;0,&quot; + CStr(Th_Ht) + &quot; 0,0 &quot; + CStr(Th_Wdth) + &quot;,0&quot;
+My_Text.width = Th_Wdth
+My_Text.height = Th_Ht
+
+I__Text.x = Th_Wdth / 2
+I__Text.y = Th_Ht / 2
+I__Text.text = T_String
+
+SelArea.height = Th_Ht
+SelArea.width = Th_Wdth</rt:event>
+    <rt:cycleTrigger name="CycTrig" cycle="1" unit="second">
+      <rt:condition>!ErrCount &amp;&amp; Cyclic</rt:condition>
+      <rt:code>Calculate()</rt:code>
+    </rt:cycleTrigger>
+    <rt:changeTrigger name="Inittrig">
+      <rt:condition>!ErrCount</rt:condition>
+      <rt:chgItem>InPV(0)</rt:chgItem>
+      <rt:chgItem>InPV(1)</rt:chgItem>
+      <rt:chgItem>InPV(2)</rt:chgItem>
+      <rt:chgItem>InPV(3)</rt:chgItem>
+      <rt:chgItem>InPV(4)</rt:chgItem>
+      <rt:chgItem>InPV(5)</rt:chgItem>
+      <rt:chgItem>InPV(6)</rt:chgItem>
+      <rt:chgItem>InPV(7)</rt:chgItem>
+      <rt:chgItem>InPV(8)</rt:chgItem>
+      <rt:chgItem>InPV(9)</rt:chgItem>
+      <rt:chgItem>InPV(10)</rt:chgItem>
+      <rt:chgItem>InPV(11)</rt:chgItem>
+      <rt:chgItem>InPV(12)</rt:chgItem>
+      <rt:chgItem>InPV(13)</rt:chgItem>
+      <rt:chgItem>InPV(14)</rt:chgItem>
+      <rt:chgItem>InPV(15)</rt:chgItem>
+      <rt:chgItem>InPV(16)</rt:chgItem>
+      <rt:chgItem>InPV(17)</rt:chgItem>
+      <rt:chgItem>InPV(18)</rt:chgItem>
+      <rt:chgItem>InPV(19)</rt:chgItem>
+      <rt:code>Calculate()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="75" height="25" rx="0" ry="0" id="Grad_BG" fill="url(#Cylinder_horizontal2)" stroke="none"/> 
+  <rect x="0" y="0" width="75" height="25" rx="0" ry="0" id="body" fill="Col_Yellow" fill-opacity="0.599997" stroke="none">
+    <rt:dyn type="fill" mode="cyclic" value="FColor"/> 
+    <rt:dyn type="fill-opacity" mode="onchange" value="Grad_Style &amp;&amp; !NoGrad" trans="bd">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0.6"/> 
+    </rt:dyn>
+  </rect>
+  <polyline points="0,25 75,25 75,0" id="RB_border" fill="none" stroke="Col_Grey1" stroke-linecap="round" stroke-linejoin="miter" stroke-width="1"/> 
+  <polyline points="0,25 0,0 75,0" id="LU_border" fill="none" stroke="Col_Grey5" stroke-linecap="round" stroke-linejoin="miter" stroke-width="1"/> 
+  <text x="37.5" y="12.5" id="I__Text" fill="black" font-size="15" font-style="normal" font-weight="normal" text-anchor="middle" rt:text-vertanchor="middle">FREE</text>
+  <image width="75" height="25" xlink:href="TextAutoScale.svg" id="My_Text" visibility="hidden" rt:detect="disabled">
+    <rt:dyn type="T__String" mode="constant" value="T_String"/> 
+    <rt:dyn type="T__Color" mode="constant" value="T_Color"/> 
+    <rt:dyn type="T__Font" mode="constant" value="T_Font"/> 
+    <rt:dyn type="T__Size" mode="constant" value="T_Size"/> 
+    <rt:dyn type="T__Style" mode="constant" value="T_Style"/> 
+    <rt:dyn type="T__Weight" mode="constant" value="T_Weight"/> 
+    <rt:dyn type="Auto__Scale" mode="constant" value="Auto_Scale"/> 
+  </image>
+  <rect x="0" y="0" width="75" height="25" rx="0" ry="0" id="SelArea" fill="black" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If ErrCount Then
+	ShowWarning (&quot;Ошибка логики\nили привязки.&quot;, 0)
+Else
+	Dim s As String
+	Dim i As Integer
+	s = PointID_1
+	For i = 1 To (InLimit - 1)
+		If InUsed(i) Then
+			s = s + &quot;|&quot; + InPV(i).PVId
+		End If
+	Next i
+	Open_Win_Uni(False, &quot;multyKKS&quot; + InPV(0).PVId, &quot;Составной объект&quot;, &quot;wi_MultyPV&quot;, s)
+End If</rt:event>
+    <rt:event type="OnRightClick">If ErrCount Then
+	ShowWarning (&quot;Ошибка логики\nили привязки.&quot;, 0)
+Else
+	Dim s As String
+	Dim i As Int
+	Dim j As Int
+	TmpBuffer(0) = PointID_1
+	j = 1
+	For i = 1 To (InLimit - 1)
+		If InUsed(i) Then
+			TmpBuffer(j) = InPV(i).PVId
+			j = j + 1
+		End If
+	Next i
+	LoadPopUpMenu(PointID_1 + &quot;|NONi|&quot;)
+End If</rt:event>
+  </rect>
+</svg>

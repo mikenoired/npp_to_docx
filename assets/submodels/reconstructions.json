@@ -1,0 +1,74 @@
+{
+  "DS_ana_900.svg": {
+    "label": "Аналоговый сигнал",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "spds_bar.svg": {
+    "label": "Шкала",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "spds_diag_win.svg": {
+    "label": "Диагностика",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "spds_timernd.svg": {
+    "label": "Таймер",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "timer_bar.svg": {
+    "label": "Таймер шкала",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "obj_Button_trend.svg": {
+    "label": "Открыть график",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "spds_arrow.svg": {
+    "label": "Переход",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "spds_csf_block.svg": {
+    "label": "Блок контроля",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "spds_instr_button.svg": {
+    "label": "Инструкция",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "spds_menu_vert_RST4.svg": {
+    "label": "Меню",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "spds_tablo.svg": {
+    "label": "Табло",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "spds_timer_csf.svg": {
+    "label": "Таймер контроля",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "spds_graph_ts1k_RST4.svg": {
+    "label": "График сигналов",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "spds_graph_p_t_RST4.svg": {
+    "label": "График параметров",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "ps_novo2_ntp_srv.svg": {
+    "label": "Узел синхронизации",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "spec_I_M_kom.svg": {
+    "label": "Управление I M",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "ds_ktsu1_sel_num.svg": {
+    "label": "Выбор канала",
+    "status": "conditional static reconstruction; not original geometry"
+  },
+  "документ_ЦВД_низ.jpg.svg": {
+    "label": "ЦВД нижняя часть",
+    "status": "conditional static reconstruction; not original geometry"
+  }
+}

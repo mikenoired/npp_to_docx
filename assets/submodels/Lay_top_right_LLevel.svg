@@ -1,0 +1,31 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg color="Col_Grey3" xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="xMaxYMid meet" viewBox="0 0 45 50" width="45" height="50" id="Lay_top_right_LLevel" fill="Col_Green" font-family="AAP_Font1">
+  <desc>Правая часть верхнего меню - диагностика нижнего уровня</desc>
+  <rt:model comment="Проект Ростов-3" revision="4.3">
+    <rt:var name="TPTS_BG_color" datatype="uint" comment="Цвет при погасшем во время мигания индикаторе ТПТС"/> 
+    <rt:sub>Sub Calc_BG_Color()
+If (TPTS_Imitation_any == True) Then
+	TPTS_BG_color = Color_Imitation
+Else
+	TPTS_BG_color = Col_Ar(12)
+End If
+End Sub</rt:sub>
+    <rt:changeTrigger name="Ch_TPTS_imit">
+      <rt:chgItem>TPTS_Imitation_any</rt:chgItem>
+      <rt:code>Calc_BG_Color()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <polygon points="40,5.125 42.5,2.625 42.5,47.625 40,45.125" fill="url(#Cylinder_vertical)"/> 
+  <polygon points="5,5.125 2.5,2.625 42.5,2.625 40,5.125" fill="url(#Cylinder_horizontal)"/> 
+  <polygon points="5,45.125 2.5,47.625 42.5,47.625 40,45.125" fill="url(#Cylinder_horizontal)"/> 
+  <polygon points="2.5,2.625 5,5.125 5,45.125 2.5,47.625" fill="url(#Cylinder_vertical)"/> 
+  <g>
+    <rect x="7" y="14.25" width="30.25" height="20" rx="0" ry="0" id="TPTS_Indic" fill="Col_Green" stroke="Col_Grey5">
+      <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColor(TPTS_ColIndex, TPTS_BG_color)"/> 
+    </rect>
+    <text x="23.25" y="28.75" fill="black" font-size="10" font-weight="normal" text-anchor="middle">ТПТС</text>
+    <rect x="7" y="7.75" width="30.25" height="35.25" rx="0" ry="0" id="Call_diag_TPTS" fill="Col_Green" fill-opacity="0">
+      <rt:event type="OnClick">LoadNew(&quot;diag_TPTS&quot;)</rt:event>
+    </rect>
+  </g>
+</svg>

@@ -1,0 +1,22 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="codedlayout meet" viewBox="0 0 800 400" width="800" height="400" id="unicontrol" fill="none" stroke="black">
+  <rt:model comment="UniControl created by Nikitov" controlref="UniControl" modelversion="0.0.0.0">
+    <rt:param name="Columns" datatype="string" value="signal,value" comment="Колонки (имена колонок разделяются запятыми, группы разделятся точкой с запятой).\&apos;-\&apos; задает видимость колонок."/> 
+    <rt:param name="DatasourceType" datatype="string" value="T" comment="Тип представления (S - срез, L - протокол, Счисло - сравнение, T - тренд, D - диаграмма, H - гистограмма, \&apos; \&apos; - None"/> 
+    <rt:param name="DatasourceTime" datatype="string" value="10:0" comment="Диапазон выборки (&apos; &apos; - текущие данные для H,S;число - предел записей для L,D,C;время (H:M:S) - глубина для T,L,D,C;дата (D.M.Y H:M:S) - арх.данные для H,S;интервал дат (D.M.Y H:M:S - D.M.Y H:M:S) - интервал для T,L,D,C)."/> 
+    <rt:param name="DatasourceID" datatype="string" value="30BAR11CU001_XQ01 30BAR00CE013_XA41" comment="Состав выборки (список pvid (можно с &apos;*&apos;,&apos;?&apos;) через пробел;$номер_типового_протокола (сигнализации,отказы и т.д.);@имя_проектного_протокола (из базы)"/> 
+    <rt:var name="ctrl" datatype="UniControl" comment="Optional pointer to the PortalControlProto C++ class"/> 
+  </rt:model>
+  <g id="control">
+    <rect x="5" y="5" width="150" height="26" rx="0" ry="0" id="headerRect" visibility="hidden" rt:detect="disabled" fill="darkgrey" stroke="fuchsia"/> 
+    <text x="24" y="24" id="headerText" visibility="hidden" rt:detect="disabled" fill="blue" font-family="Times New Roman" font-size="20">Заголовок</text>
+    <rect x="5.5" y="31.5" width="150" height="23.5" rx="0" ry="0" id="dataRect" visibility="hidden" rt:detect="disabled" fill="lightgray" stroke="fuchsia"/> 
+    <text x="27" y="50" id="dataText" visibility="hidden" rt:detect="disabled" fill="black" font-family="Times New Roman" font-size="16">Данные</text>
+    <rect x="6" y="68" width="516.5" height="323" rx="0" ry="0" id="backgroundTrendRect" visibility="hidden" rt:detect="disabled" fill="black"/> 
+    <line x1="26" y1="81" x2="27.5" y2="298" id="axisY" visibility="hidden" rt:detect="disabled" stroke="white"/> 
+    <line x1="45.5012" y1="299.5" x2="470.501" y2="300.5" id="axisT" visibility="hidden" rt:detect="disabled" stroke="white"/> 
+    <text x="63" y="277" id="legend" visibility="hidden" rt:detect="disabled" fill="white" font-size="14">Легенда</text>
+    <text x="192.5" y="346" id="controlPart" visibility="hidden" rt:detect="disabled" fill="white" font-size="14">Кнопки<tspan x="192.5" dy="14">управления</tspan>
+    </text>
+  </g>
+</svg>

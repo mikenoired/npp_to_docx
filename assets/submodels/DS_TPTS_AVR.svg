@@ -1,0 +1,112 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 55 30" width="55" height="30" id="DS_TPTS_AVR">
+  <desc>ТПТС АВР для Dull Screen</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа Dull Screen" revision="6.2">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS оборудования"/> 
+    <rt:param name="Operate" datatype="boolean" value="False" comment="Сделать объект управляемым"/> 
+    <rt:var name="Z0" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="OU" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="VB7" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="Status" datatype="int" comment="обобщенное сотояние" value="0"/> 
+    <rt:var name="Col" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="AStat" datatype="ushort" value="0" comment="код сигнализации"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="MyStrokeWdth" datatype="float" value="2" comment="Толщина рамок в зависимости от управляемости"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub AckMe()
+If Check_Oper_Rights(OU) &amp;&amp; ((OU.PVSuspendedFlags &amp; PLS_SUSP_CMD) == 0) &amp;&amp; ((AStat &amp; 1) != 0) Then
+	OU.Command(_Now, TE_BHA)
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (KKS != &quot;NULL&quot;) Then
+	Z0 = BIN(KKS + &quot;_Z0&quot;)
+	OU = BIN(KKS + &quot;_OU&quot;)
+	VB7 = BIN(KKS + &quot;_VB7&quot;)
+End If</rt:event>
+    <rt:event type="OnResize">Al_frame.x = 2.5
+Al_frame.y = 2.5
+Al_frame.width = _This.width - 5
+Al_frame.height = _This.height - 5
+InGr.x = 0
+InGr.y = 0
+InGr.width = _This.width 
+InGr.height = _This.height</rt:event>
+    <rt:event type="OnClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Нет привязки.&quot;, 5)
+ElseIf Z0 != nothing Then
+	Open_ws_wf_wi(&quot;TPTS_AVR_6&quot;, KKS, Operate)
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnRightClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Нет привязки.&quot;, 5)
+ElseIf Z0 != nothing Then
+	If Operate &amp;&amp; Check_Oper_Rights(OU) Then
+		LoadPopUpMenu(KKS + &quot;|TE o|TPTS_AVR_6 &quot; + KKS)
+	Else
+		LoadPopUpMenu(KKS + &quot;|TE i|TPTS_AVR_6 &quot; + KKS)
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnMiddleClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Нет привязки.&quot;, 5)
+ElseIf Z0 != nothing Then
+	Open_Win_Uni(False, &quot;rights&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS+&quot;|&quot;+CStr(Operate))
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetStatus">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>Z0</rt:chgItem>
+      <rt:chgItem>OU</rt:chgItem>
+      <rt:chgItem>VB7</rt:chgItem>
+      <rt:code>Status = PRJSPEC.TPTS_TE(KKS, 3, 2, Col, AStat)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChRights">
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>MyStrokeWdth = FrameStrokeWidth(Operate, OU)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="5" y="5" width="45" height="20" rx="0" ry="0" id="Backgr" fill="url(#Cylinder_horizontal2)" stroke="none"/> 
+  <rect x="5" y="5" width="45" height="20" rx="0" ry="0" id="body" fill="Col_Yellow" fill-opacity="0.399988" stroke="none">
+    <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, Col, 10)"/> 
+    <rt:dyn type="fill-opacity" mode="onchange" value="(Status &lt; 0) || ((Status &amp; 4096)!= 0) || ((Status &amp; 0x3C) == 0)" trans="bd">
+      <rt:xy value="false" value2="0.35"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </rect>
+  <polyline points="5,25 50,25 50,5" id="RB_edge" fill="none" stroke="Col_Grey5" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey1"/> 
+      <rt:xy value2="Col_Grey5"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <polyline points="5,25 5,5 50,5" id="LU_edge" fill="none" stroke="Col_Grey1" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey5"/> 
+      <rt:xy value2="Col_Grey1"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <rect x="2.5" y="2.5" width="50" height="25" rx="0" ry="0" id="Al_frame" fill="none" stroke="Col_Red" stroke-width="2">
+    <rt:dyn type="visibility" mode="cyclic" value="PRJSPEC.AlarmVis(AStat)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke" mode="constant" value="Color_Alarm"/> 
+  </rect>
+  <rect x="0" y="0" width="55" height="30" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <text x="27.5" y="20" id="main_text" fill="black" font-family="AAP_Font3" font-size="15" font-weight="bold" text-anchor="middle">АВР</text>
+</svg>
