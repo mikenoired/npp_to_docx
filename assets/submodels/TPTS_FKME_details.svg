@@ -1,0 +1,614 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 320 35" width="320" height="35" id="TPTS_FKME_details" fill="Col_TxtStatic" font-family="AAP_Font3" font-size="12" font-weight="bold">
+  <desc>ƒетали диагностики FKME</desc>
+  <rt:model modelversion="7.2.0.23" comment="—лужебна€ подмодель ѕќ–“јЋа">
+    <rt:param name="KKS" datatype="string" value="NONE" comment="KKS FKME"/> 
+    <rt:var name="F0" datatype="PlsPVBin" comment="указатель на BST"/> 
+    <rt:var name="F1" datatype="PlsPVBin" comment="указатель на BST"/> 
+    <rt:var name="F2" datatype="PlsPVBin" comment="указатель на BST"/> 
+    <rt:var name="F3" datatype="PlsPVBin" comment="указатель на BST"/> 
+    <rt:var name="F4" datatype="PlsPVBin" comment="указатель на BST"/> 
+    <rt:var name="F5" datatype="PlsPVBin" comment="указатель на BST"/> 
+    <rt:sub>Sub SetIndicatorStatics (ByVal obj As RtSvgObj, ByVal pv As PlsPVBin, ByVal TPTSBitNr As UShort)
+If (obj == Nothing) Then
+	Exit Sub
+ElseIf (pv == Nothing) Then
+	obj.visibility = &quot;hidden&quot;
+End If
+Dim RealBitNr As UShort
+Dim mask As UShort
+RealBitNr = 16 - TPTSBitNr
+mask = 2 ** RealBitNr
+obj.title = obj.title + &quot; - &quot; + PRJSPEC.Get_BST_Descr(pv.PVId, RealBitNr)
+obj.fill_opacity = 1.0 - 0.75 * CDbl((pv.ProjSpecNr1 &amp; mask) / mask)
+End Sub</rt:sub>
+    <rt:sub>Sub F0_indicators()
+If F0 == Nothing Then
+	KN01.Qual = 0
+	KN02.Qual = 0
+	KN03.Qual = 0
+	KN04.Qual = 0
+	KN05.Qual = 0
+	KN06.Qual = 0
+	KN07.Qual = 0
+	KN08.Qual = 0
+	KN09.Qual = 0
+	KN10.Qual = 0
+	KN11.Qual = 0
+	KN12.Qual = 0
+Else
+	KN01.Qual = F0.Quality
+	KN02.Qual = F0.Quality
+	KN03.Qual = F0.Quality
+	KN04.Qual = F0.Quality
+	KN05.Qual = F0.Quality
+	KN06.Qual = F0.Quality
+	KN07.Qual = F0.Quality
+	KN08.Qual = F0.Quality
+	KN09.Qual = F0.Quality
+	KN10.Qual = F0.Quality
+	KN11.Qual = F0.Quality
+	KN12.Qual = F0.Quality
+	KN01.Stat = PRJSPEC.DetectBit(F0, 5)
+	KN02.Stat = PRJSPEC.DetectBit(F0, 6)
+	KN03.Stat = PRJSPEC.DetectBit(F0, 7)
+	KN04.Stat = PRJSPEC.DetectBit(F0, 8)
+	KN05.Stat = PRJSPEC.DetectBit(F0, 9)
+	KN06.Stat = PRJSPEC.DetectBit(F0, 10)
+	KN07.Stat = PRJSPEC.DetectBit(F0, 11)
+	KN08.Stat = PRJSPEC.DetectBit(F0, 12)
+	KN09.Stat = PRJSPEC.DetectBit(F0, 13)
+	KN10.Stat = PRJSPEC.DetectBit(F0, 14)
+	KN11.Stat = PRJSPEC.DetectBit(F0, 15)
+	KN12.Stat = PRJSPEC.DetectBit(F0, 16)
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub F1_indicators()
+If F1 == Nothing Then
+	KN13.Qual = 0
+	KN14.Qual = 0
+	KN15.Qual = 0
+	KN16.Qual = 0
+	KN17.Qual = 0
+	KN18.Qual = 0
+	KN19.Qual = 0
+	KN20.Qual = 0
+	KN21.Qual = 0
+	KN22.Qual = 0
+	KN23.Qual = 0
+	KN24.Qual = 0
+Else
+	KN13.Qual = F1.Quality
+	KN14.Qual = F1.Quality
+	KN15.Qual = F1.Quality
+	KN16.Qual = F1.Quality
+	KN17.Qual = F1.Quality
+	KN18.Qual = F1.Quality
+	KN19.Qual = F1.Quality
+	KN20.Qual = F1.Quality
+	KN21.Qual = F1.Quality
+	KN22.Qual = F1.Quality
+	KN23.Qual = F1.Quality
+	KN24.Qual = F1.Quality
+	KN13.Stat = PRJSPEC.DetectBit(F1, 5)
+	KN14.Stat = PRJSPEC.DetectBit(F1, 6)
+	KN15.Stat = PRJSPEC.DetectBit(F1, 7)
+	KN16.Stat = PRJSPEC.DetectBit(F1, 8)
+	KN17.Stat = PRJSPEC.DetectBit(F1, 9)
+	KN18.Stat = PRJSPEC.DetectBit(F1, 10)
+	KN19.Stat = PRJSPEC.DetectBit(F1, 11)
+	KN20.Stat = PRJSPEC.DetectBit(F1, 12)
+	KN21.Stat = PRJSPEC.DetectBit(F1, 13)
+	KN22.Stat = PRJSPEC.DetectBit(F1, 14)
+	KN23.Stat = PRJSPEC.DetectBit(F1, 15)
+	KN24.Stat = PRJSPEC.DetectBit(F1, 16)
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub F2_indicators()
+If F2 == Nothing Then
+	KN25.Qual = 0
+	KN26.Qual = 0
+	KN27.Qual = 0
+	KN28.Qual = 0
+	KN29.Qual = 0
+	KN30.Qual = 0
+	KN31.Qual = 0
+
+	KA01.Qual = 0
+	KA02.Qual = 0
+	KA03.Qual = 0
+	KA04.Qual = 0
+Else
+	KN25.Qual = F2.Quality
+	KN26.Qual = F2.Quality
+	KN27.Qual = F2.Quality
+	KN28.Qual = F2.Quality
+	KN29.Qual = F2.Quality
+	KN30.Qual = F2.Quality
+	KN31.Qual = F2.Quality
+
+	KA01.Qual = F2.Quality
+	KA02.Qual = F2.Quality
+	KA03.Qual = F2.Quality
+	KA04.Qual = F2.Quality
+	KN25.Stat = PRJSPEC.DetectBit(F2, 5)
+	KN26.Stat = PRJSPEC.DetectBit(F2, 6)
+	KN27.Stat = PRJSPEC.DetectBit(F2, 7)
+	KN28.Stat = PRJSPEC.DetectBit(F2, 8)
+	KN29.Stat = PRJSPEC.DetectBit(F2, 9)
+	KN30.Stat = PRJSPEC.DetectBit(F2, 10)
+	KN31.Stat = PRJSPEC.DetectBit(F2, 11)
+
+	KA01.Stat = PRJSPEC.DetectBit(F2, 13)
+	KA02.Stat = PRJSPEC.DetectBit(F2, 14)
+	KA03.Stat = PRJSPEC.DetectBit(F2, 15)
+	KA04.Stat = PRJSPEC.DetectBit(F2, 16)
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub F3_indicators()
+If F3 == Nothing Then
+	KA05.Qual = 0
+	KA06.Qual = 0
+	KA07.Qual = 0
+	KA08.Qual = 0
+	KA09.Qual = 0
+	KA10.Qual = 0
+	KA11.Qual = 0
+	KA12.Qual = 0
+	KA13.Qual = 0
+	KA14.Qual = 0
+	KA15.Qual = 0
+	KA16.Qual = 0
+Else
+	KA05.Qual = F3.Quality
+	KA06.Qual = F3.Quality
+	KA07.Qual = F3.Quality
+	KA08.Qual = F3.Quality
+	KA09.Qual = F3.Quality
+	KA10.Qual = F3.Quality
+	KA11.Qual = F3.Quality
+	KA12.Qual = F3.Quality
+	KA13.Qual = F3.Quality
+	KA14.Qual = F3.Quality
+	KA15.Qual = F3.Quality
+	KA16.Qual = F3.Quality
+	KA05.Stat = PRJSPEC.DetectBit(F3, 5)
+	KA06.Stat = PRJSPEC.DetectBit(F3, 6)
+	KA07.Stat = PRJSPEC.DetectBit(F3, 7)
+	KA08.Stat = PRJSPEC.DetectBit(F3, 8)
+	KA09.Stat = PRJSPEC.DetectBit(F3, 9)
+	KA10.Stat = PRJSPEC.DetectBit(F3, 10)
+	KA11.Stat = PRJSPEC.DetectBit(F3, 11)
+	KA12.Stat = PRJSPEC.DetectBit(F3, 12)
+	KA13.Stat = PRJSPEC.DetectBit(F3, 13)
+	KA14.Stat = PRJSPEC.DetectBit(F3, 14)
+	KA15.Stat = PRJSPEC.DetectBit(F3, 15)
+	KA16.Stat = PRJSPEC.DetectBit(F3, 16)
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub F4_indicators()
+If F4 == Nothing Then
+	KA17.Qual = 0
+	KA18.Qual = 0
+	KA19.Qual = 0
+	KA20.Qual = 0
+	KA21.Qual = 0
+	KA22.Qual = 0
+	KA23.Qual = 0
+	KA24.Qual = 0
+	KA25.Qual = 0
+	KA26.Qual = 0
+	KA27.Qual = 0
+	KA28.Qual = 0
+Else
+	KA17.Qual = F4.Quality
+	KA18.Qual = F4.Quality
+	KA19.Qual = F4.Quality
+	KA20.Qual = F4.Quality
+	KA21.Qual = F4.Quality
+	KA22.Qual = F4.Quality
+	KA23.Qual = F4.Quality
+	KA24.Qual = F4.Quality
+	KA25.Qual = F4.Quality
+	KA26.Qual = F4.Quality
+	KA27.Qual = F4.Quality
+	KA28.Qual = F4.Quality
+	KA17.Stat = PRJSPEC.DetectBit(F4, 5)
+	KA18.Stat = PRJSPEC.DetectBit(F4, 6)
+	KA19.Stat = PRJSPEC.DetectBit(F4, 7)
+	KA20.Stat = PRJSPEC.DetectBit(F4, 8)
+	KA21.Stat = PRJSPEC.DetectBit(F4, 9)
+	KA22.Stat = PRJSPEC.DetectBit(F4, 10)
+	KA23.Stat = PRJSPEC.DetectBit(F4, 11)
+	KA24.Stat = PRJSPEC.DetectBit(F4, 12)
+	KA25.Stat = PRJSPEC.DetectBit(F4, 13)
+	KA26.Stat = PRJSPEC.DetectBit(F4, 14)
+	KA27.Stat = PRJSPEC.DetectBit(F4, 15)
+	KA28.Stat = PRJSPEC.DetectBit(F4, 16)
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub F5_indicators()
+If F5 == Nothing Then
+	KA29.Qual = 0
+	KA30.Qual = 0
+	KA31.Qual = 0
+Else
+	KA29.Qual = F5.Quality
+	KA30.Qual = F5.Quality
+	KA31.Qual = F5.Quality
+	KA29.Stat = PRJSPEC.DetectBit(F5, 5)
+	KA30.Stat = PRJSPEC.DetectBit(F5, 6)
+	KA31.Stat = PRJSPEC.DetectBit(F5, 7)
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">F0 = BIN(KKS + &quot;_F0&quot;)
+If F0 != Nothing Then
+	F1 = BIN(KKS + &quot;_F1&quot;)
+	F2 = BIN(KKS + &quot;_F2&quot;)
+	F3 = BIN(KKS + &quot;_F3&quot;)
+	F4 = BIN(KKS + &quot;_F4&quot;)
+	F5 = BIN(KKS + &quot;_F5&quot;)
+Else
+	F1 = Nothing
+	F2 = Nothing
+	F3 = Nothing
+	F4 = Nothing
+	F5 = Nothing
+End If</rt:event>
+    <rt:event type="OnInitializeEnd">If F0 != Nothing Then
+	SetIndicatorStatics(KN01, F0, 5)
+	SetIndicatorStatics(KN02, F0, 6)
+	SetIndicatorStatics(KN03, F0, 7)
+	SetIndicatorStatics(KN04, F0, 8)
+	SetIndicatorStatics(KN05, F0, 9)
+	SetIndicatorStatics(KN06, F0, 10)
+	SetIndicatorStatics(KN07, F0, 11)
+	SetIndicatorStatics(KN08, F0, 12)
+	SetIndicatorStatics(KN09, F0, 13)
+	SetIndicatorStatics(KN10, F0, 14)
+	SetIndicatorStatics(KN11, F0, 15)
+	SetIndicatorStatics(KN12, F0, 16)
+End If
+If F1 != Nothing Then
+	SetIndicatorStatics(KN13, F1, 5)
+	SetIndicatorStatics(KN14, F1, 6)
+	SetIndicatorStatics(KN15, F1, 7)
+	SetIndicatorStatics(KN16, F1, 8)
+	SetIndicatorStatics(KN17, F1, 9)
+	SetIndicatorStatics(KN18, F1, 10)
+	SetIndicatorStatics(KN19, F1, 11)
+	SetIndicatorStatics(KN20, F1, 12)
+	SetIndicatorStatics(KN21, F1, 13)
+	SetIndicatorStatics(KN22, F1, 14)
+	SetIndicatorStatics(KN23, F1, 15)
+	SetIndicatorStatics(KN24, F1, 16)
+End If
+If F2 != Nothing Then
+	SetIndicatorStatics(KN25, F2, 5)
+	SetIndicatorStatics(KN26, F2, 6)
+	SetIndicatorStatics(KN27, F2, 7)
+	SetIndicatorStatics(KN28, F2, 8)
+	SetIndicatorStatics(KN29, F2, 9)
+	SetIndicatorStatics(KN30, F2, 10)
+	SetIndicatorStatics(KN31, F2, 11)
+
+	SetIndicatorStatics(KA01, F2, 13)
+	SetIndicatorStatics(KA02, F2, 14)
+	SetIndicatorStatics(KA03, F2, 15)
+	SetIndicatorStatics(KA04, F2, 16)
+End If
+If F3 != Nothing Then
+	SetIndicatorStatics(KA05, F3, 5)
+	SetIndicatorStatics(KA06, F3, 6)
+	SetIndicatorStatics(KA07, F3, 7)
+	SetIndicatorStatics(KA08, F3, 8)
+	SetIndicatorStatics(KA09, F3, 9)
+	SetIndicatorStatics(KA10, F3, 10)
+	SetIndicatorStatics(KA11, F3, 11)
+	SetIndicatorStatics(KA12, F3, 11)
+	SetIndicatorStatics(KA13, F3, 13)
+	SetIndicatorStatics(KA14, F3, 14)
+	SetIndicatorStatics(KA15, F3, 15)
+	SetIndicatorStatics(KA16, F3, 16)
+End If
+If F4 != Nothing Then
+	SetIndicatorStatics(KA17, F4, 5)
+	SetIndicatorStatics(KA18, F4, 6)
+	SetIndicatorStatics(KA19, F4, 7)
+	SetIndicatorStatics(KA20, F4, 8)
+	SetIndicatorStatics(KA21, F4, 9)
+	SetIndicatorStatics(KA22, F4, 10)
+	SetIndicatorStatics(KA23, F4, 11)
+	SetIndicatorStatics(KA24, F4, 11)
+	SetIndicatorStatics(KA25, F4, 13)
+	SetIndicatorStatics(KA26, F4, 14)
+	SetIndicatorStatics(KA27, F4, 15)
+	SetIndicatorStatics(KA28, F4, 16)
+End If
+If F5 != Nothing Then
+	SetIndicatorStatics(KA29, F5, 5)
+	SetIndicatorStatics(KA30, F5, 6)
+	SetIndicatorStatics(KA31, F5, 7)
+End If</rt:event>
+    <rt:changeTrigger name="Ch_F0">
+      <rt:chgItem>F0</rt:chgItem>
+      <rt:code>F0_indicators()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Ch_F1">
+      <rt:chgItem>F1</rt:chgItem>
+      <rt:code>F1_indicators()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Ch_F2">
+      <rt:chgItem>F2</rt:chgItem>
+      <rt:code>F2_indicators()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Ch_F3">
+      <rt:chgItem>F3</rt:chgItem>
+      <rt:code>F3_indicators()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Ch_F4">
+      <rt:chgItem>F4</rt:chgItem>
+      <rt:code>F4_indicators()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Ch_F5">
+      <rt:chgItem>F5</rt:chgItem>
+      <rt:code>F5_indicators()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <g text-anchor="end">
+    <text x="17.5" y="12.5">1</text>
+    <text x="17.5" y="30">17</text>
+  </g>
+  <g text-anchor="start">
+    <text x="300" y="12.5">16</text>
+    <text x="300" y="30">31</text>
+  </g>
+  <image x="20" width="15" height="10" xlink:href="bool_indicator.svg" id="KN01">
+    <title>F0 - 5 (KN.01)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="37.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN02">
+    <title>F0 - 6 (KN.02)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="55" width="15" height="10" xlink:href="bool_indicator.svg" id="KN03">
+    <title>F0 - 7 (KN.03)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="72.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN04">
+    <title>F0 - 8 (KN.04)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="90" width="15" height="10" xlink:href="bool_indicator.svg" id="KN05">
+    <title>F0 - 9 (KN.05)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="107.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN06">
+    <title>F0 - 10 (KN.06)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="125" width="15" height="10" xlink:href="bool_indicator.svg" id="KN07">
+    <title>F0 - 11 (KN.07)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="142.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN08">
+    <title>F0 - 12 (KN.08)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="160" width="15" height="10" xlink:href="bool_indicator.svg" id="KN09">
+    <title>F0 - 13 (KN.09)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="177.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN10">
+    <title>F0 - 14 (KN.10)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="195" width="15" height="10" xlink:href="bool_indicator.svg" id="KN11">
+    <title>F0 - 15 (KN.11)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="212.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN12">
+    <title>F0 - 16 (KN.12)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="230" width="15" height="10" xlink:href="bool_indicator.svg" id="KN13">
+    <title>F1 - 5 (KN.13)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="247.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN14">
+    <title>F1 - 6 (KN.14)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="265" width="15" height="10" xlink:href="bool_indicator.svg" id="KN15">
+    <title>F1 - 7 (KN.15)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="282.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN16">
+    <title>F1 - 8 (KN.16)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="20" y="17.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN17">
+    <title>F1 - 9 (KN.17)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="37.5" y="17.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN18">
+    <title>F1 - 10 (KN.18)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="55" y="17.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN19">
+    <title>F1 - 11 (KN.19)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="72.5" y="17.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN20">
+    <title>F1 - 12 (KN.20)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="90" y="17.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN21">
+    <title>F1 - 13 (KN.21)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="107.5" y="17.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN22">
+    <title>F1 - 14 (KN.22)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="125" y="17.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN23">
+    <title>F1 - 15 (KN.23)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="142.5" y="17.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN24">
+    <title>F1 - 16 (KN.24)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="160" y="17.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN25">
+    <title>F2 - 5 (KN.25)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="177.5" y="17.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN26">
+    <title>F2 - 6 (KN.26)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="195" y="17.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN27">
+    <title>F2 - 7 (KN.27)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="212.5" y="17.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN28">
+    <title>F2 - 8 (KN.28)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="230" y="17.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN29">
+    <title>F2 - 9 (KN.29)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="247.5" y="17.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN30">
+    <title>F2 - 10 (KN.30)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="265" y="17.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KN31">
+    <title>F2 - 11 (KN.31)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="20" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA01">
+    <title>F2 - 13 (KA.01)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="37.5" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA02">
+    <title>F2 - 14 (KA.02)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="55" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA03">
+    <title>F2 - 15 (KA.03)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="72.5" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA04">
+    <title>F2 - 16 (KA.04)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="90" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA05">
+    <title>F3 - 5 (KA.05)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="107.5" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA06">
+    <title>F3 - 6 (KA.06)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="125" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA07">
+    <title>F3 - 7 (KA.07)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="142.5" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA08">
+    <title>F3 - 8 (KA.08)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="160" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA09">
+    <title>F3 - 9 (KA.09)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="177.5" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA10">
+    <title>F3 - 10 (KA.10)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="195" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA11">
+    <title>F3 - 11 (KA.11)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="212.5" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA12">
+    <title>F3 - 12 (KA.12)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="230" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA13">
+    <title>F3 - 13 (KA.13)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="247.5" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA14">
+    <title>F3 - 14 (KA.14)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="265" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA15">
+    <title>F3 - 15 (KA.15)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="282.5" y="6.5" width="15" height="10" xlink:href="bool_indicator.svg" id="KA16">
+    <title>F3 - 16 (KA.16)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="20" y="24" width="15" height="10" xlink:href="bool_indicator.svg" id="KA17">
+    <title>F4 - 5 (KA.17)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="37.5" y="24" width="15" height="10" xlink:href="bool_indicator.svg" id="KA18">
+    <title>F4 - 6 (KA.18)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="55" y="24" width="15" height="10" xlink:href="bool_indicator.svg" id="KA19">
+    <title>F4 - 7 (KA.19)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="72.5" y="24" width="15" height="10" xlink:href="bool_indicator.svg" id="KA20">
+    <title>F4 - 8 (KA.20)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="90" y="24" width="15" height="10" xlink:href="bool_indicator.svg" id="KA21">
+    <title>F4 - 9 (KA.21)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="107.5" y="24" width="15" height="10" xlink:href="bool_indicator.svg" id="KA22">
+    <title>F4 - 10 (KA.22)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="125" y="24" width="15" height="10" xlink:href="bool_indicator.svg" id="KA23">
+    <title>F4 - 11 (KA.23)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="142.5" y="24" width="15" height="10" xlink:href="bool_indicator.svg" id="KA24">
+    <title>F4 - 12 (KA.24)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="160" y="24" width="15" height="10" xlink:href="bool_indicator.svg" id="KA25">
+    <title>F4 - 13 (KA.25)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="177.5" y="24" width="15" height="10" xlink:href="bool_indicator.svg" id="KA26">
+    <title>F4 - 14 (KA.26)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="195" y="24" width="15" height="10" xlink:href="bool_indicator.svg" id="KA27">
+    <title>F4 - 15 (KA.27)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="212.5" y="24" width="15" height="10" xlink:href="bool_indicator.svg" id="KA28">
+    <title>F4 - 16 (KA.28)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="230" y="24" width="15" height="10" xlink:href="bool_indicator.svg" id="KA29">
+    <title>F5 - 5 (KA.29)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="247.5" y="24" width="15" height="10" xlink:href="bool_indicator.svg" id="KA30">
+    <title>F5 - 6 (KA.30)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="265" y="24" width="15" height="10" xlink:href="bool_indicator.svg" id="KA31">
+    <title>F5 - 7 (KA.31)</title>
+    <rt:dyn type="Col_OFF" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+</svg>

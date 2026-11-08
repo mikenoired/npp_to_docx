@@ -1,0 +1,289 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 195 200" width="195" height="200" id="left_bottom_menu_r3">
+  <rt:model modelversion="7.2.0.23" comment="Ñîçäàíî User-PC-VAIO\User-PC 12.10.2012 10:56:22">
+    <rt:param name="dm_color_1" datatype="uint" comment=""/> 
+    <rt:param name="dm_color_2" datatype="uint" comment=""/> 
+    <rt:param name="dm_color_3" datatype="uint" comment=""/> 
+    <rt:param name="dm_color_4" datatype="uint" comment=""/> 
+    <rt:param name="dm_color_5" datatype="uint" comment=""/> 
+    <rt:param name="dm_color_6" datatype="uint" comment=""/> 
+    <rt:param name="dm_color_7" datatype="uint" comment=""/> 
+    <rt:param name="num_vd" datatype="uint" comment="Parameter num_vd"/> 
+    <rt:var name="dist_mag_color_1" datatype="string" comment="Variable dist_mag_color_1"/> 
+    <rt:var name="dist_mag_color_2" datatype="string" comment="Variable dist_mag_color_2"/> 
+    <rt:var name="dist_mag_color_3" datatype="string" comment="Variable dist_mag_color_3"/> 
+    <rt:var name="dist_mag_color_4" datatype="string" comment="Variable dist_mag_color_4"/> 
+    <rt:var name="dist_mag_color_5" datatype="string" comment="Variable dist_mag_color_5"/> 
+    <rt:var name="dist_mag_color_6" datatype="string" comment="Variable dist_mag_color_6"/> 
+    <rt:var name="dist_mag_color_7" datatype="string" comment="Variable dist_mag_color_7"/> 
+    <rt:var name="dist_ns_1" datatype="boolean" comment="No state 1" value="False"/> 
+    <rt:var name="dist_ns_2" datatype="boolean" comment="No state 2" value="False"/> 
+    <rt:var name="dist_ns_3" datatype="boolean" comment="No state 3" value="False"/> 
+    <rt:var name="dist_ns_4" datatype="boolean" comment="No state 4" value="False"/> 
+    <rt:var name="dist_ns_5" datatype="boolean" comment="No state 5" value="False"/> 
+    <rt:var name="dist_ns_6" datatype="boolean" comment="No state 6" value="False"/> 
+    <rt:var name="dist_ns_7" datatype="boolean" comment="No state 7" value="False"/> 
+    <rt:sub>Sub Color(ByVal dm_color as Uint, ByRef dist_mag_color as String)
+If dm_color == 0 Then
+	dist_mag_color = &quot;Col_Grey1&quot;
+Else
+	If dm_color == 1 or dm_color == 11 Then
+		dist_mag_color = &quot;Col_Usr1&quot;
+	Else
+		If dm_color == 2 or dm_color == 12 Then
+			dist_mag_color = &quot;Col_Yellow&quot;
+		Else
+			If dm_color == 3 or dm_color == 13 Then
+				dist_mag_color = &quot;Col_Orange&quot;
+			Else
+				If dm_color == 4 or dm_color == 14 Then
+					dist_mag_color = &quot;Col_Red&quot;
+				Else
+					dist_mag_color = &quot;none&quot;
+				End if
+			End If
+		End If
+	End If
+	
+End If
+End Sub</rt:sub>
+
+<rt:sub>Sub HalfWhite()
+		If dm_color_1 &gt; 10 Then
+			dist_ns_1 = True	
+		else
+			dist_ns_1 = False
+		End If	
+		If dm_color_2 &gt; 10 Then
+			dist_ns_2 = True	
+		else
+			dist_ns_2 = False
+		End If	
+		If dm_color_3 &gt; 10 Then
+			dist_ns_3 = True	
+		else
+			dist_ns_3 = False
+		End If			
+		If dm_color_4 &gt; 10 Then
+			dist_ns_4 = True	
+		else
+			dist_ns_4 = False
+		End If	
+		If dm_color_5 &gt; 10 Then
+			dist_ns_5 = True	
+		else
+			dist_ns_5 = False
+		End If	
+		If dm_color_6 &gt; 10 Then
+			dist_ns_6 = True	
+		else
+			dist_ns_6 = False
+		End If		
+		If dm_color_7 &gt; 10 Then
+			dist_ns_7 = True	
+		else
+			dist_ns_7 = False
+		End If	
+End Sub</rt:sub>
+
+    <rt:changeTrigger name="Color">
+      <rt:chgItem>dm_color_1</rt:chgItem>
+      <rt:chgItem>dm_color_2</rt:chgItem>
+      <rt:chgItem>dm_color_3</rt:chgItem>
+      <rt:chgItem>dm_color_4</rt:chgItem>
+      <rt:chgItem>dm_color_5</rt:chgItem>
+      <rt:chgItem>dm_color_6</rt:chgItem>
+      <rt:chgItem>dm_color_7</rt:chgItem>	  
+      <rt:code>Color(dm_color_1, dist_mag_color_1)</rt:code>
+      <rt:code>Color(dm_color_2, dist_mag_color_2)</rt:code>	  
+      <rt:code>Color(dm_color_3, dist_mag_color_3)</rt:code>
+      <rt:code>Color(dm_color_4, dist_mag_color_4)</rt:code>
+      <rt:code>Color(dm_color_5, dist_mag_color_5)</rt:code>
+      <rt:code>Color(dm_color_6, dist_mag_color_6)</rt:code>
+      <rt:code>Color(dm_color_7, dist_mag_color_7)</rt:code>	  
+      <rt:code>HalfWhite()</rt:code>	  
+	  
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="-2.9" y="-5.16667" width="202.5" height="217.917" rx="0" ry="0" fill="Col_Grey2"/> 
+  <image x="45" y="1" width="150" height="25" xlink:href="obj_Button.svg" id="kn121136">
+    <rt:dyn type="Label" mode="constant" value="&quot;ÏÎÄÊÐÈÒÈ×ÍÎÑÒÜ&quot;"/> 
+    <rt:event type="OnClick">LoadNew(&quot;SPPB1&quot;)</rt:event>
+    <rt:dyn type="But_Color" mode="constant" value="num_vd" trans="it">
+      <rt:xy value="9" value2="Col_Grey2"/> 
+      <rt:xy value="11" value2="Col_Grey3"/> 
+      <rt:xy value2="Col_Grey2"/> 
+    </rt:dyn>
+  </image>
+  <image x="45" y="31" width="150" height="25" xlink:href="obj_Button.svg" id="kn121137">
+    <rt:dyn type="Label" mode="constant" value="&quot;ÎÕËÀÆÄÅÍÈÅ ÀÇ&quot;"/> 
+    <rt:event type="OnClick">LoadNew(&quot;SPPB2&quot;)</rt:event>
+    <rt:dyn type="But_Color" mode="constant" value="num_vd" trans="it">
+      <rt:xy value="19" value2="Col_Grey2"/> 
+      <rt:xy value="21" value2="Col_Grey3"/> 
+      <rt:xy value2="Col_Grey2"/> 
+    </rt:dyn>
+  </image>
+  <image x="45" y="61" width="150" height="25" xlink:href="obj_Button.svg" id="kn121138">
+    <rt:dyn type="Label" mode="constant" value="&quot;ÎÕËÀÆÄÅÍÈÅ ÁÂ&quot;"/> 
+    <rt:event type="OnClick">LoadNew(&quot;SPPB3&quot;)</rt:event>
+    <rt:dyn type="But_Color" mode="constant" value="num_vd" trans="it">
+      <rt:xy value="29" value2="Col_Grey2"/> 
+      <rt:xy value="31" value2="Col_Grey3"/> 
+      <rt:xy value2="Col_Grey2"/> 
+    </rt:dyn>
+  </image>
+  <image x="45" y="121" width="150" height="25" xlink:href="obj_Button.svg" id="kn121139">
+    <rt:dyn type="Label" mode="constant" value="&quot;ÖÅËÎÑÒÍÎÑÒÜ 1Ê&quot;"/> 
+    <rt:event type="OnClick">LoadNew(&quot;SPPB5&quot;)</rt:event>
+    <rt:dyn type="But_Color" mode="constant" value="num_vd" trans="it">
+      <rt:xy value="49" value2="Col_Grey2"/> 
+      <rt:xy value="51" value2="Col_Grey3"/> 
+      <rt:xy value2="Col_Grey2"/> 
+    </rt:dyn>
+  </image>
+  <image x="45" y="151" width="150" height="25" xlink:href="obj_Button.svg" id="kn121140">
+    <rt:dyn type="Label" mode="constant" value="&quot;ÇÀÏÀÑ Ò/Í 1Ê&quot;"/> 
+    <rt:event type="OnClick">LoadNew(&quot;SPPB6&quot;)</rt:event>
+    <rt:dyn type="But_Color" mode="constant" value="num_vd" trans="it">
+      <rt:xy value="59" value2="Col_Grey2"/> 
+      <rt:xy value="61" value2="Col_Grey3"/> 
+      <rt:xy value2="Col_Grey2"/> 
+    </rt:dyn>
+  </image>
+  <image x="45" y="91" width="150" height="25" xlink:href="obj_Button.svg" id="kn121141">
+    <rt:dyn type="Label" mode="constant" value="&quot;ÒÅÏËÎÎÒÂÎÄ ÎÒ 1Ê&quot;"/> 
+    <rt:event type="OnClick">LoadNew(&quot;SPPB4&quot;)</rt:event>
+    <rt:dyn type="But_Color" mode="constant" value="num_vd" trans="it">
+      <rt:xy value="39" value2="Col_Grey2"/> 
+      <rt:xy value="41" value2="Col_Grey3"/> 
+      <rt:xy value2="Col_Grey2"/> 
+    </rt:dyn>
+  </image>
+  <rect x="2" y="151" width="40" height="25" rx="0" ry="0" fill="Col_Grey4" stroke="black">
+    <rt:dyn type="fill" mode="unknown" value="dist_mag_color_6"/> 
+  </rect>
+  <rect x="2" y="151" width="20" height="25" rx="0" ry="0" fill="Col_Grey1" stroke="black">
+    <rt:dyn type="visibility" mode="onchange" value="dist_ns_6" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="2" y="121" width="40" height="25" rx="0" ry="0" fill="Col_Grey4" stroke="black">
+    <rt:dyn type="fill" mode="unknown" value="dist_mag_color_5"/> 
+  </rect>
+  <rect x="2" y="121" width="20" height="25" rx="0" ry="0" fill="Col_Grey1" stroke="black">
+    <rt:dyn type="visibility" mode="onchange" value="dist_ns_5" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="2" y="91" width="40" height="25" rx="0" ry="0" fill="Col_Grey4" stroke="black">
+    <rt:dyn type="fill" mode="onchange" value="dist_mag_color_4"/> 
+  </rect>
+  <rect x="2" y="91" width="20" height="25" rx="0" ry="0" fill="Col_Grey1" stroke="black">
+    <rt:dyn type="visibility" mode="onchange" value="dist_ns_4" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="2" y="61" width="40" height="25" rx="0" ry="0" fill="Col_Grey4" stroke="black">
+    <rt:dyn type="fill" mode="unknown" value="dist_mag_color_3"/> 
+  </rect>
+  <rect x="2" y="61" width="20" height="25" rx="0" ry="0" fill="Col_Grey1" stroke="black">
+    <rt:dyn type="visibility" mode="onchange" value="dist_ns_3" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="2" y="31" width="40" height="25" rx="0" ry="0" fill="Col_Grey4" stroke="black">
+    <rt:dyn type="fill" mode="unknown" value="dist_mag_color_2"/> 
+  </rect>
+  <rect x="2" y="31" width="20" height="25" rx="0" ry="0" fill="Col_Grey1" stroke="black">
+    <rt:dyn type="visibility" mode="onchange" value="dist_ns_2" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="2" y="1" width="40" height="25" rx="0" ry="0" fill="Col_Grey4" stroke="black">
+    <rt:dyn type="fill" mode="unknown" value="dist_mag_color_1"/> 
+  </rect>
+  <rect x="2" y="1" width="20" height="25" rx="0" ry="0" fill="Col_Grey1" stroke="black">
+    <rt:dyn type="visibility" mode="onchange" value="dist_ns_1" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="43.8" y="-0.30303" width="153.03" height="28.1818" rx="0" ry="0" fill="none" stroke="Col_Blue" stroke-width="2">
+    <rt:dyn type="visibility" mode="unknown" value="num_vd" trans="ii">
+      <rt:xy value="9" value2="1"/> 
+      <rt:xy value="11" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </rect>
+  <image x="45.0303" y="181.03" width="150" height="25" xlink:href="obj_Button.svg" id="kn121142">
+    <rt:dyn type="Label" mode="constant" value="&quot;ÖÅËÎÑÒÍÎÑÒÜ ÃÎ&quot;"/> 
+    <rt:event type="OnClick">LoadNew(&quot;SPPB7&quot;)</rt:event>
+    <rt:dyn type="But_Color" mode="constant" value="num_vd" trans="it">
+      <rt:xy value="69" value2="Col_Grey2"/> 
+      <rt:xy value="71" value2="Col_Grey3"/> 
+      <rt:xy value2="Col_Grey2"/> 
+    </rt:dyn>
+  </image>
+  <rect x="2.03031" y="181.03" width="40" height="25" rx="0" ry="0" fill="Col_Grey4" stroke="black">
+    <rt:dyn type="fill" mode="unknown" value="dist_mag_color_7"/> 
+  </rect>
+  <rect x="2" y="181" width="20" height="25" rx="0" ry="0" fill="Col_Grey1" stroke="black">
+    <rt:dyn type="visibility" mode="onchange" value="dist_ns_7" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="43.8303" y="29.7273" width="153.03" height="28.1818" rx="0" ry="0" fill="none" stroke="Col_Blue" stroke-width="2">
+    <rt:dyn type="visibility" mode="unknown" value="num_vd" trans="ii">
+      <rt:xy value="19" value2="1"/> 
+      <rt:xy value="21" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="43.8606" y="59.7576" width="153.03" height="28.1818" rx="0" ry="0" fill="none" stroke="Col_Blue" stroke-width="2">
+    <rt:dyn type="visibility" mode="unknown" value="num_vd" trans="ii">
+      <rt:xy value="29" value2="1"/> 
+      <rt:xy value="31" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="43.8909" y="89.7879" width="153.03" height="28.1818" rx="0" ry="0" fill="none" stroke="Col_Blue" stroke-width="2">
+    <rt:dyn type="visibility" mode="unknown" value="num_vd" trans="ii">
+      <rt:xy value="39" value2="1"/> 
+      <rt:xy value="41" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="43.9212" y="119.818" width="153.03" height="28.1818" rx="0" ry="0" fill="none" stroke="Col_Blue" stroke-width="2">
+    <rt:dyn type="visibility" mode="unknown" value="num_vd" trans="ii">
+      <rt:xy value="49" value2="1"/> 
+      <rt:xy value="51" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="43.9515" y="149.849" width="153.03" height="28.1818" rx="0" ry="0" fill="none" stroke="Col_Blue" stroke-width="2">
+    <rt:dyn type="visibility" mode="unknown" value="num_vd" trans="ii">
+      <rt:xy value="59" value2="1"/> 
+      <rt:xy value="61" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="43.9818" y="179.879" width="153.03" height="28.1818" rx="0" ry="0" fill="none" stroke="Col_Blue" stroke-width="2">
+    <rt:dyn type="visibility" mode="unknown" value="num_vd" trans="ii">
+      <rt:xy value="69" value2="1"/> 
+      <rt:xy value="71" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </rect>
+  <line x1="199.852" y1="-6.11111" x2="199.852" y2="213.4" stroke="Col_Grey4"/> 
+  <line x1="-3" y1="-6.2" x2="-3" y2="213.6" stroke="Col_Grey4"/> 
+  <line x1="-2.9" y1="-5.65" x2="200.4" y2="-5.65" stroke="Col_Grey4"/> 
+  <line x1="222.315" y1="9.81482" x2="222.315" y2="9.81482" stroke="black"/> 
+  <line x1="-2.9" y1="213" x2="200.3" y2="213" stroke="Col_Grey4"/> 
+</svg>

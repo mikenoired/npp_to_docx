@@ -1,0 +1,73 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="none meet" viewBox="0 0 50 25" width="50" height="25" id="TextAutoScale">
+  <desc>самомасштабирующийся текст</desc>
+  <rt:model comment="вспомогательная подмодель ПОРТАЛа" revision="6.2" modelversion="0.0.0.0">
+    <rt:timeTrigger name="Scale" delay="2">
+      <rt:condition>Auto__Scale</rt:condition>
+      <rt:code>RecalculateFont()</rt:code>
+    </rt:timeTrigger>
+    <rt:timeTrigger name="My_Main" delay="1">
+      <rt:code>Main_()</rt:code>
+    </rt:timeTrigger>
+    <rt:param name="T__String" datatype="string" comment="Текст на индикаторе" value="12345"/> 
+    <rt:param name="T__Color" datatype="string" value="black" comment="Цвет текста"/> 
+    <rt:param name="T__Font" datatype="string" comment="Шрифт" value="inherit"/> 
+    <rt:param name="T__Size" datatype="float" comment="Размер шрифта" value="200"/> 
+    <rt:param name="T__Style" datatype="string" value="normal" comment="Стиль"/> 
+    <rt:param name="T__Weight" datatype="string" value="normal" comment="Толщина букв шрифта"/> 
+    <rt:param name="Auto__Scale" datatype="boolean" value="false" comment="Автомасштабировать текст под размеры подложки"/> 
+    <rt:var name="Recalculated_Font" datatype="float" comment="Размер шрифта после масштабирования"/> 
+    <rt:var name="Min_Font" datatype="float" comment="Минимально возможный шрифт" value="1,0"/> 
+    <rt:var name="Th_w" datatype="float" comment=""/> 
+    <rt:var name="Th_h" datatype="float" comment=""/> 
+    <rt:var name="Ready" datatype="boolean" value="false" comment="Пора вызывать циклические тригеры"/> 
+    <rt:sub>Sub RecalculateFont()
+	Dim x as Float
+	Dim y as Float
+	Dim width as Float
+	Dim height as Float
+	Dim Font_w as Float
+	Dim Font_h as Float
+
+	Th_w = BGrownd.width 			// - 5.0 
+	Th_h = BGrownd.height 			// - 2.5
+	I_Text.CalculateTextSize(T__String, x, y, width, height)
+	If (width &gt; Th_w) || (height &gt; Th_h) Then
+		Font_w = T__Size * Th_w / width 
+		//Font_h = T__Size * Th_h / height 
+		Font_h = CInt(Th_h / (I_Text.NumChildren() + 1))
+		If Font_w &lt; Font_h Then
+			Recalculated_Font = CInt(Font_w)
+		Else
+			Recalculated_Font = CInt(Font_h)
+		End If
+		If (Recalculated_Font &lt; Min_Font) Then  
+			Recalculated_Font = Min_Font
+		End If
+	End If
+	I_Text.y = Th_h / 2.0 			//+ 1.25
+	I_Text.visibility = &quot;visible&quot;
+End Sub</rt:sub>
+    <rt:sub>Sub Main_()
+	I_Text.text = T__String
+	I_Text.font_size = T__Size
+	I_Text.font_style = T__Style
+	I_Text.font_weight = T__Weight
+	I_Text.font_family = T__Font
+	If !Auto__Scale Then
+		I_Text.visibility = &quot;visible&quot;
+	End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">I_Text.visibility = &quot;hidden&quot;
+Recalculated_Font = T__Size
+Main_()</rt:event>
+  </rt:model>
+  <rect x="0" y="0" width="50" height="25" rx="0" ry="0" id="BGrownd" fill="none" stroke="none"/> 
+  <text x="25" y="12.5" id="I_Text" visibility="visible" rt:detect="enabled" text-anchor="middle" rt:text-vertanchor="bbox_center">
+    <rt:dyn type="fill" mode="onchange" value="T__Color"/> 
+    <rt:dyn type="font-family" mode="onchange" value="T__Font"/> 
+    <rt:dyn type="font-size" mode="onchange" value="Recalculated_Font"/> 
+    <rt:dyn type="font-style" mode="unknown" value="T__Style"/> 
+    <rt:dyn type="font-weight" mode="onchange" value="T__Weight"/> 
+String</text>
+</svg>

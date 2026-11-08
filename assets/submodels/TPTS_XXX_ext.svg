@@ -1,0 +1,20 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 50 80" width="50" height="80" id="TPTS_XXX_ext">
+  <desc>Модуль расширения ТПТС</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="4.0-6.0">
+    <rt:param name="ModName" datatype="string" value="XXX" comment="имя модуля"/> 
+    <rt:param name="MN" datatype="string" value="xxxx-xx" comment="типовой номер модуля"/> 
+  </rt:model>
+  <rect x="0" y="0" width="50" height="80" rx="0" ry="0" id="backgr" fill="Col_Grey2" stroke="Col_Grey5" stroke-linejoin="miter" stroke-width="2"/> 
+  <polyline points="0,80 0,0 50,0" id="LT_border" fill="none" stroke="Col_Grey1" stroke-linecap="butt" stroke-linejoin="miter" stroke-width="2"/> 
+  <g fill="black" font-family="AAP_Font1" font-weight="normal" text-anchor="middle">
+    <text x="25" y="17.5" id="Mod_name" font-size="15" font-weight="bold">
+      <rt:dyn type="text" mode="constant" value="ModName"/> 
+XXX</text>
+    <text x="25" y="27.75" id="Mod_number" font-size="9">
+      <rt:dyn type="text" mode="constant" value="MN"/> 
+xxxx-xx</text>
+    <text x="25.375" y="50.375" font-size="10">Модуль<tspan x="25.375" dy="10">расшир.</tspan>
+    </text>
+  </g>
+</svg>

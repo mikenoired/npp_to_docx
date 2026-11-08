@@ -1,0 +1,41 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 265 40" width="265" height="40" id="spec_PTK" stroke="Col_Grey5">
+  <title>Подмодель для диагностики ПТК</title>
+  <rt:model modelversion="7.2.0.21" comment="Стандартная подмодель ПОРТАЛа" revision="6.0">
+    <rt:param name="KKS" datatype="string" value="NONE" comment="KKS единицы оборудования (стойки)"/> 
+  </rt:model>
+  <rect x="0" y="0" width="265" height="40" rx="0" ry="0" fill="none"/> 
+  <image x="7.5" y="7.5" width="75" height="25" xlink:href="bitwise_tablo_4bits.svg" id="IBP">
+    <rt:dyn type="PointID_1" mode="constant" value="KKS + &quot;E01_ZV01 0&quot;"/> 
+    <rt:dyn type="PointID_2" mode="constant" value="KKS + &quot;E01_ZV01 1&quot;"/> 
+    <rt:dyn type="Text_0000" mode="constant" value="&quot;ИБП&quot;"/> 
+    <rt:dyn type="Text_0001" mode="constant" value="&quot;ИБП&quot;"/> 
+    <rt:dyn type="Text_0010" mode="constant" value="&quot;ИБП&quot;"/> 
+    <rt:dyn type="Text_0011" mode="constant" value="&quot;ИБП&quot;"/> 
+    <rt:dyn type="Color_0001" mode="constant" value="&quot;Col_Red&quot;"/> 
+    <rt:dyn type="Color_0010" mode="constant" value="&quot;Col_Yellow&quot;"/> 
+    <rt:dyn type="Color_0011" mode="constant" value="&quot;Col_Grey1&quot;"/> 
+    <rt:dyn type="Color_0000" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <image x="182.5" y="7.5" width="75" height="25" xlink:href="bitwise_tablo_4bits.svg" id="MKB">
+    <rt:dyn type="PointID_1" mode="constant" value="KKS + &quot;E02_ZV01 0&quot;"/> 
+    <rt:dyn type="PointID_2" mode="constant" value="KKS + &quot;E02_ZV01 1&quot;"/> 
+    <rt:dyn type="Text_0000" mode="constant" value="&quot;МКБ&quot;"/> 
+    <rt:dyn type="Text_0001" mode="constant" value="&quot;МКБ&quot;"/> 
+    <rt:dyn type="Text_0010" mode="constant" value="&quot;МКБ&quot;"/> 
+    <rt:dyn type="Text_0011" mode="constant" value="&quot;МКБ&quot;"/> 
+    <rt:dyn type="Color_0001" mode="constant" value="&quot;Col_Red&quot;"/> 
+    <rt:dyn type="Color_0010" mode="constant" value="&quot;Col_Yellow&quot;"/> 
+    <rt:dyn type="Color_0011" mode="constant" value="&quot;Col_Grey1&quot;"/> 
+    <rt:dyn type="Color_0000" mode="constant" value="&quot;Col_Grey4&quot;"/> 
+  </image>
+  <text x="130" y="27.5" fill="Col_Grey5" font-family="AAP_Font3" font-size="17" font-weight="bold" text-anchor="middle">
+    <rt:dyn type="text" mode="constant" value="KKS"/> 
+KKS</text>
+  <rect x="2.5" y="2.5" width="85" height="35" rx="0" ry="0" id="Sel_Area_IBP" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">Call_Win(&quot;wd_IBP&quot;, KKS)</rt:event>
+  </rect>
+  <rect x="177.5" y="2.5" width="85" height="35" rx="0" ry="0" id="Sel_Area_MKB" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">Call_Win(&quot;wd_MKB&quot;, KKS)</rt:event>
+  </rect>
+</svg>

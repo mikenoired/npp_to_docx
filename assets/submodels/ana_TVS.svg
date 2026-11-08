@@ -1,0 +1,135 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 60 70" width="60" height="70" id="ana_TVS">
+  <desc>Индикатор ТВС для Dull Screen</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа Dull Screen" revision="6.0">
+    <rt:param name="PointID" datatype="string" value="NULL" comment="полный идентификатор сигнала"/> 
+    <rt:param name="SP5" datatype="float" value="325" comment="граница смены цвета индикации 5"/> 
+    <rt:param name="SP4" datatype="float" value="321" comment="граница смены цвета индикации 4"/> 
+    <rt:param name="SP3" datatype="float" value="318" comment="граница смены цвета индикации 3"/> 
+    <rt:param name="SP2" datatype="float" value="315" comment="граница смены цвета индикации 2"/> 
+    <rt:param name="SP1" datatype="float" value="310" comment="граница смены цвета индикации 1"/> 
+    <rt:param name="Color6" datatype="string" value="Col_Red" comment="цвет при значении сигнала больше границы 5"/> 
+    <rt:param name="Color5" datatype="string" value="Col_Yellow" comment="цвет при значении сигнала между гр. 4 и 5"/> 
+    <rt:param name="Color4" datatype="string" value="Col_Green" comment="цвет при значении сигнала между гр. 3 и 4"/> 
+    <rt:param name="Color3" datatype="string" value="Col_Cyan" comment="цвет при значении сигнала между гр. 2 и 3"/> 
+    <rt:param name="Color2" datatype="string" value="Col_LtBlue" comment="цвет при значении сигнала между гр. 1 и 2"/> 
+    <rt:param name="Color1" datatype="string" value="Col_Magenta" comment="цвет при значении сигнала меньше границы 1"/> 
+    <rt:param name="DimIt" datatype="boolean" value="false" comment="Приглушить палитру - сделать фон полупрозрачным."/> 
+    <rt:param name="Grad_Style" datatype="boolean" value="false" comment="Индикатор имеет градиентную заливку - объёмный фон"/> 
+    <rt:var name="pv" datatype="PlsPVAna" comment="указатель на переменную"/> 
+    <rt:var name="In_Group" datatype="boolean" comment="в группе"/> 
+    <rt:var name="ValStr" datatype="string" value="***" comment="строка индикации"/> 
+    <rt:var name="ValColor" datatype="uint" comment="цвет индикации"/> 
+    <rt:var name="ValStrDelayed" datatype="string" value="***" comment="строка индикации обновляемая раз в секунду"/> 
+    <rt:var name="DoNotDim" datatype="boolean" value="false" comment="Нельзя приглушать палитру (для отображения недостоверности и т.п.)"/> 
+    <rt:sub>Sub ValCalc()
+DoNotDim = False
+If PointID == &quot;NULL&quot; Then
+	ValStr = &quot;&quot;
+	ValStrDelayed = &quot;&quot;
+	ValColor = VIS.Color(&quot;Col_Grey3&quot;)
+ElseIf pv == Nothing Then
+	ValStr = &quot;Ошибка&quot;
+	ValColor = Color_ANA_ER_LINK
+	DoNotDim = True
+	ValStrDelayed = &quot;Ошибка&quot;
+	readings.font_size = 14
+Else
+	Dim v As Double
+	v = pv.Value
+	If ANA_indication_delay Then
+		ValStr = pv.ValueAscii()
+	Else
+		ValStrDelayed = pv.ValueAscii()
+	End If
+	If ((pv.SuspendedFlags &amp; PLS_SUSP_CMD) &gt; 0 ) Then
+		ValColor = Color_Remont
+		DoNotDim = True
+	ElseIf (pv.Quality == PLS_QUAL_BAD) Then
+		ValColor = Color_Inval
+		DoNotDim = True
+	ElseIf (pv.QualitySubstatus == PLS_QUALSUB_LOCALOVERRIDE) Then
+		ValColor = Color_Imitation
+		DoNotDim = True
+	ElseIf (pv.QualitySubstatus == PLS_QUALSUB_RANGEEXCEEDED) Then
+		ValColor = Color_Inval
+		DoNotDim = True
+	ElseIf (SP5 != -9999) &amp;&amp; (v &gt; SP5) Then
+		ValColor = VIS.Color(Color6)
+	ElseIf (SP4 != -9999) &amp;&amp; (v &gt; SP4) Then
+		ValColor = VIS.Color(Color5)
+	ElseIf (SP3 != -9999) &amp;&amp; (v &gt; SP3) Then
+		ValColor = VIS.Color(Color4)
+	ElseIf (SP2 != -9999) &amp;&amp; (v &gt; SP2) Then
+		ValColor = VIS.Color(Color3)
+	ElseIf (SP1 != -9999) &amp;&amp; (v &gt; SP1) Then
+		ValColor = VIS.Color(Color2)
+	Else
+		ValColor = VIS.Color(Color1)
+	End If
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">Set pv = ANA(PointID)
+If pv != Nothing Then
+	ValStrDelayed = pv.ValueAscii()
+	ValStr = ValStrDelayed
+End If
+ValColor = Color_ANA_ER_LINK</rt:event>
+    <rt:event type="OnClick">If PointID = &quot;NULL&quot; Then
+	ShowMessage(&quot;Статический объект.&quot;, 5)
+ElseIf pv == nothing Then
+	NoLink(PointID)
+Else
+	Call_Win (&quot;ws_ANA_NB&quot;, PointID + &quot;|-1&quot;)
+End If</rt:event>
+    <rt:event type="OnRightClick">If PointID = &quot;NULL&quot; Then
+	ShowMessage(&quot;Статический объект.&quot;, 5)
+ElseIf pv == nothing Then
+	NoLink(PointID)
+Else
+	LoadPopUpMenu(PointID + &quot;|ANAi|ws_ANA_NB &quot; + PointID + &quot;|-1&quot;)
+End If</rt:event>
+    <rt:cycleTrigger name="UpdateDelay" cycle="1" unit="second">
+      <rt:condition>ANA_indication_delay</rt:condition>
+      <rt:code>ValStrDelayed = ValStr</rt:code>
+    </rt:cycleTrigger>
+    <rt:changeTrigger name="GRP">
+      <rt:condition>pv != Nothing</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(pv.PVId) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc">
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:chgItem>SP1</rt:chgItem>
+      <rt:chgItem>SP2</rt:chgItem>
+      <rt:chgItem>SP3</rt:chgItem>
+      <rt:chgItem>SP4</rt:chgItem>
+      <rt:chgItem>SP5</rt:chgItem>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <polygon points="0,17.5 30,0 60,17.5 60,52.5 30,70 0,52.5" id="backgr" fill="url(#Circle_LeftFront)" stroke="none">
+    <rt:dyn type="visibility" mode="onchange" value="Grad_Style" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </polygon>
+  <polygon points="0,17.5 30,0 60,17.5 60,52.5 30,70 0,52.5" id="body" fill="Col_Green" fill-opacity="0.5" stroke="gray" stroke-width="2">
+    <rt:dyn type="fill" mode="onchange" value="ValColor"/> 
+    <rt:dyn type="fill-opacity" mode="onchange" value="DimIt &amp;&amp; !&#09;DoNotDim" trans="bd">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0.5"/> 
+    </rt:dyn>
+  </polygon>
+  <text x="30" y="42.5" id="readings" fill="black" font-family="AAP_Font3" font-size="16" font-weight="bold" text-anchor="middle">
+    <rt:dyn type="text" mode="onchange" value="ValStrDelayed"/> 
+888.8</text>
+  <g id="InGr">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rect x="2.5" y="20" width="55" height="30" rx="0" ry="0" fill="none" stroke="Col_Grey1" stroke-width="4"/> 
+    <rect x="2.5" y="20" width="55" height="30" rx="0" ry="0" fill="none" stroke="Col_InGR1" stroke-width="2"/> 
+  </g>
+</svg>

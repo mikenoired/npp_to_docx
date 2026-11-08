@@ -1,0 +1,110 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg baseProfile="" xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 100 25" width="100" height="25" id="obj_ButtonH" fill="Col_Grey2" font-family="inherit">
+  <desc>Кнопка с фиксацией</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="4.2-6.0">
+    <rt:param name="Label" datatype="string" value="Кнопочка" comment="Текст на кнопке"/> 
+    <rt:param name="Trigger" datatype="boolean" value="False" comment="Состояние кнопки НАЖАТА"/> 
+    <rt:param name="But_Color" datatype="string" value="Col_Grey2" comment="Цвет фона кнопки"/> 
+    <rt:param name="Txt_Color" datatype="string" value="black" comment="Цвет текста кнопки"/> 
+    <rt:param name="T_Font" datatype="string" value="AAP_Font3" comment="Шрифт"/> 
+    <rt:param name="T_Size" datatype="float" value="15" comment="Размер шрифта"/> 
+    <rt:param name="T_Style" datatype="string" value="normal" comment="Стиль"/> 
+    <rt:param name="T_Weight" datatype="string" value="bold" comment="Толщина букв шрифта"/> 
+    <rt:param name="Disable" datatype="boolean" value="False" comment="Сделать кнопку недоступной"/> 
+    <rt:var name="D_Color" datatype="uint" value="0" comment="my new var"/> 
+    <rt:var name="L_Color" datatype="uint" value="0xFFFFFF" comment="my new var"/> 
+    <rt:var name="PrevTrig" datatype="boolean" value="False" comment="my new var"/> 
+    <rt:var name="Local_But_Color" datatype="string" value="Col_Grey2" comment="Локальный цвет фона"/> 
+    <rt:var name="Local_Txt_Color" datatype="string" value="black" comment="Локальный цвет текста"/> 
+    <rt:var name="Initial_rt_detect" datatype="byte" comment="Начальное значение rt:detect"/> 
+    <rt:var name="First_call" datatype="boolean" value="True" comment="Первая загрузка"/> 
+    <rt:sub>Sub ChangeShape()
+If Trigger Then
+	LU_edge.stroke = D_Color
+	RB_edge.stroke = L_Color
+Else
+	LU_edge.stroke = L_Color
+	RB_edge.stroke = D_Color
+End If
+PrevTrig = !Trigger
+End Sub</rt:sub>
+    <rt:sub>Sub StatusColor()
+If Disable Then
+	Local_But_Color = &quot;Col_Grey2&quot;
+	Local_Txt_Color = &quot;Col_Grey3&quot;
+	_This.rt_detect = &quot;disabled&quot;
+	PrevTrig = False
+	Trigger = False
+	LU_edge.stroke = L_Color
+	RB_edge.stroke = D_Color
+Else
+	Local_But_Color = But_Color
+	Local_Txt_Color = Txt_Color
+	If First_call Then
+		_This.rt_detect = Initial_rt_detect
+		First_call = false
+	Else
+		_This.rt_detect = &quot;enabled&quot;
+	End If
+End If
+End Sub</rt:sub>
+    <rt:event type="OnMouseDown">PrevTrig = Trigger
+Trigger = True
+Backgr_cover.fill_opacity = 0.1
+	LU_edge.stroke = D_Color
+	RB_edge.stroke = L_Color
+But_text.dx = - 1
+But_text.dy = T_Size * ( - But_text.get_NumChildren()) * 0.5 - 1</rt:event>
+    <rt:event type="OnMouseUp">If PrevTrig Then
+	Trigger = False
+	LU_edge.stroke = L_Color
+	RB_edge.stroke = D_Color
+End If
+Backgr_cover.fill_opacity = 0
+But_text.dx = 0
+But_text.dy = T_Size * ( - But_text.get_NumChildren()) * 0.5</rt:event>
+    <rt:event type="OnMouseOut">If PrevTrig Then
+	Trigger = False
+	LU_edge.stroke = L_Color
+	RB_edge.stroke = D_Color
+End If
+Backgr_cover.fill_opacity = 0
+But_text.dx = 0
+But_text.dy = T_Size * ( - But_text.get_NumChildren()) * 0.5</rt:event>
+    <rt:event type="OnInitialize">Initial_rt_detect = _This.rt_detect</rt:event>
+    <rt:changeTrigger name="ChButCol">
+      <rt:condition>!Disable</rt:condition>
+      <rt:chgItem>But_Color</rt:chgItem>
+      <rt:code>Local_But_Color = But_Color</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChTxtCol">
+      <rt:condition>!Disable</rt:condition>
+      <rt:chgItem>Txt_Color</rt:chgItem>
+      <rt:code>Local_Txt_Color = Txt_Color</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChDisable">
+      <rt:chgItem>Disable</rt:chgItem>
+      <rt:code>StatusColor()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="UpAndDown">
+      <rt:chgItem>Trigger</rt:chgItem>
+      <rt:code>ChangeShape()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="100" height="25" rx="0" ry="0" id="Backgr" stroke="none">
+    <rt:dyn type="fill" mode="onchange" value="Local_But_Color"/> 
+  </rect>
+  <rect x="0" y="0" width="100" height="25" rx="0" ry="0" id="Backgr_cover" fill="black" fill-opacity="0" stroke="none"/> 
+  <text x="50" y="18.75" dy="0" id="But_text" fill="black" fill-opacity="1" font-family="AAP_Font3" font-size="15" font-style="normal" font-weight="bold" text-anchor="middle">
+    <rt:dyn type="text" mode="onchange" value="Label"/> 
+    <rt:dyn type="fill" mode="onchange" value="Local_Txt_Color"/> 
+    <rt:dyn type="font-family" mode="constant" value="T_Font"/> 
+    <rt:dyn type="font-weight" mode="constant" value="T_Weight"/> 
+    <rt:dyn type="font-size" mode="constant" value="T_Size"/> 
+    <rt:dyn type="font-style" mode="constant" value="T_Style"/> 
+    <rt:dyn type="dy" mode="cyclic" value="T_Size * ( - But_text.get_NumChildren()) * 0.5"/> 
+    <rt:dyn type="y" mode="constant" value="T_Size / 2 + _This.height * 0.42"/> 
+К. с фикс.</text>
+  <polyline points="0,25 100,25 100,0" id="RB_edge" fill="none" stroke="black" stroke-opacity="0.399805" stroke-width="2"/> 
+  <polyline points="0,25 0,0 100,0" id="LU_edge" fill="none" stroke="white" stroke-opacity="0.399805" stroke-width="2"/> 
+</svg>

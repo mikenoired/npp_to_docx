@@ -1,0 +1,194 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 150 30" width="150" height="30" id="DS_TPTS_IBR_set">
+  <desc>ТПТС (IBR) задатчик (Dull Screen)</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа (Dull Screen)" revision="6.2">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS оборудования"/> 
+    <rt:param name="Operate" datatype="boolean" value="False" comment="Сделать объект управляемым"/> 
+    <rt:param name="HideBut" datatype="boolean" value="False" comment="убрать кнопку Авт./Дист. с окон управления"/> 
+    <rt:param name="ShowGoodColor" datatype="boolean" value="false" comment="окрашивать подложку при хорошем качестве"/> 
+    <rt:param name="BG_StaticColor" datatype="string" value="none" comment="Имя цвета подложки, если объект не должен быть прозрачным"/> 
+    <rt:var name="Z0" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="OU" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="VB13" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="pv_CurSetting" datatype="PlsPVAna" comment="указатель"/> 
+    <rt:var name="Status" datatype="int" comment="обобщенное сотояние"/> 
+    <rt:var name="ACol" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="HCol" datatype="ushort" value="13" comment="код цвета"/> 
+    <rt:var name="AStat" datatype="ushort" value="0" comment="код сигнализации"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="MyStrokeWdth" datatype="float" value="2" comment="Толщина рамок в зависимости от управляемости"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub AckMe()
+If Check_Oper_Rights(OU) &amp;&amp; ((OU.PVSuspendedFlags &amp; PLS_SUSP_CMD) == 0) &amp;&amp; ((AStat &amp; 1) != 0) Then
+	OU.Command(_Now, IBR_BHA)
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub ShowVal()
+If pv_CurSetting == Nothing Then
+	Value_text.text = &quot;Ошибка&quot;
+	body.fill = Color_ANA_ER_LINK
+	bg_A.visibility = &quot;hidden&quot;
+	bg_H.visibility = &quot;hidden&quot;
+	indic_A.visibility = &quot;hidden&quot;
+	indic_H.visibility = &quot;hidden&quot;
+	l.visibility = &quot;hidden&quot;
+	r.visibility = &quot;hidden&quot;
+Else
+	Dim ValColor As UInt
+	ValColor = PRJSPEC.ANA_Color_pv(pv_CurSetting)
+	Value_text.text = pv_CurSetting.ValueAscii()
+	body.fill = ValColor
+	If ShowGoodColor Then
+		If ValColor == Color_ANA_GOOD Then
+			body.fill_opacity = 0.5
+		Else
+			body.fill_opacity = 1
+		End If
+	Else
+		If ValColor == Color_ANA_GOOD Then
+			body.visibility = &quot;hidden&quot;
+		Else
+			body.visibility = &quot;visible&quot;
+		End If
+	End If
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (KKS != &quot;NULL&quot;) Then
+	Z0 = BIN(KKS + &quot;_Z0&quot;)
+	OU = BIN(KKS + &quot;_OU&quot;)
+	If (!requests_allown) Then
+		pv_CurSetting = ANA(KKS + &quot;_&quot; + Signal_Setter_Value)
+	Else
+		VB13 = BIN(KKS + &quot;_VB13&quot;)
+		pv_CurSetting = ANA(KKS + &quot;_AA1&quot;)
+		If pv_CurSetting == nothing Then
+			Set pv_CurSetting = ANA(KKS + &quot;_&quot; + Signal_Setter_Value)
+		End If
+	End If
+End If</rt:event>
+    <rt:event type="OnResize">Dim My_w As Float
+Dim My_h As Float
+My_w = _This.width
+My_h = _This.height
+Static_BG.x = 5
+Static_BG.y = 5
+Static_BG.width = My_w - 10
+Static_BG.height = My_h - 10
+body.x = 5
+body.y = 5
+body.width = My_w - 10
+body.height = My_h - 10
+LU_edge.points = &quot;5,&quot; + CStr(My_h - 5) + &quot; 5,5 &quot; + CStr(My_w - 5) + &quot;,5&quot;
+RB_edge.points = &quot;5,&quot; + CStr(My_h - 5) + &quot; &quot; + CStr(My_w - 5) + &quot;,&quot; + CStr(My_h - 5) + &quot; &quot; + CStr(My_w - 5) + &quot;,5&quot;
+Al_frame.x = 2.5
+Al_frame.y = 2.5
+Al_frame.width = My_w - 5
+Al_frame.height = My_h - 5
+bg_H.cx = 10 + My_h / 6
+bg_H.r = My_h / 6
+bg_H.stroke_width = My_h / 30
+indic_H.cx = 10 + My_h / 6
+indic_H.r = My_h / 6
+bg_A.cx = My_w - 10 - My_h / 6
+bg_A.r = My_h / 6
+bg_A.stroke_width = My_h / 30
+indic_A.cx = My_w - 10 - My_h / 6
+indic_A.r = My_h / 6
+l.points = CStr(12.5 + My_h / 3) + &quot;,&quot; + CStr(My_h / 3) + &quot; &quot; + CStr(20 + My_h / 3) + &quot;,&quot; + CStr(My_h / 2) + &quot; &quot; + CStr(12.5 + My_h / 3) + &quot;,&quot; + CStr(My_h / 1.5)
+l.stroke_width = My_h / 30
+r.points = CStr(My_w - 12.5 - My_h / 3) + &quot;,&quot; + CStr(My_h / 3) + &quot; &quot; + CStr(My_w - 20 - My_h / 3) + &quot;,&quot; + CStr(My_h / 2) + &quot; &quot; + CStr(My_w - 12.5 - My_h / 3) + &quot;,&quot; + CStr(My_h / 1.5)
+r.stroke_width = My_h / 30
+Value_text.font_size = My_h / 1.5</rt:event>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetSP">
+      <rt:chgItem>pv_CurSetting</rt:chgItem>
+      <rt:code>ShowVal()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetStatus">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>Z0</rt:chgItem>
+      <rt:chgItem>OU</rt:chgItem>
+      <rt:chgItem>VB13</rt:chgItem>
+      <rt:code>Status = PRJSPEC.TPTS_IBR(KKS, ACol, HCol, AStat)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChRights">
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>MyStrokeWdth = FrameStrokeWidth (Operate, OU)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="5" y="5" width="140" height="20" rx="0" ry="0" id="Static_BG" fill="none" stroke="none">
+    <rt:dyn type="fill" mode="constant" value="BG_StaticColor"/> 
+  </rect>
+  <rect x="5" y="5" width="140" height="20" rx="0" ry="0" id="body" fill="none" stroke="none"/> 
+  <text x="75" y="22.5" id="Value_text" fill="black" font-family="AAR_Font2" font-size="20" font-weight="bold" text-anchor="middle">888.8</text>
+  <polyline points="5,25 145,25 145,5.875" id="RB_edge" fill="none" stroke="Col_Grey5" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey1"/> 
+      <rt:xy value2="Col_Grey5"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <polyline points="5,25 5,5 145,5" id="LU_edge" fill="none" stroke="Col_Grey1" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey5"/> 
+      <rt:xy value2="Col_Grey1"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <polyline points="22.5,10 30,15 22.5,20" id="l" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <polyline points="127.5,10 120,15 127.5,20" id="r" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <circle cx="15" cy="15" r="5" id="bg_H" fill="url(#DS_circle)" stroke="Col_Grey5" stroke-width="1"/> 
+  <circle cx="135" cy="15" r="5" id="bg_A" fill="url(#DS_circle)" stroke="Col_Grey5" stroke-width="1"/> 
+  <circle cx="15" cy="15" r="5" id="indic_H" fill="Col_Green" fill-opacity="0.349997" stroke="none">
+    <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, HCol, 11)"/> 
+    <rt:dyn type="fill-opacity" mode="onchange" value="(Status &lt; 0) || ((Status &amp; 4096)!= 0) || ((Status &amp; 0xC) == 0)" trans="bd">
+      <rt:xy value="false" value2="0.35"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </circle>
+  <circle cx="135" cy="15" r="5" id="indic_A" fill="Col_Yellow" fill-opacity="0.349997" stroke="none">
+    <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, ACol, 11)"/> 
+    <rt:dyn type="fill-opacity" mode="onchange" value="(Status &lt; 0) || ((Status &amp; 4096)!= 0) || ((Status &amp; 0x30) == 0)" trans="bd">
+      <rt:xy value="false" value2="0.35"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </circle>
+  <rect x="2.5" y="2.5" width="145" height="25" rx="0" ry="0" id="Al_frame" fill="none" stroke="Col_Red" stroke-width="2">
+    <rt:dyn type="visibility" mode="cyclic" value="PRJSPEC.AlarmVis(AStat)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke" mode="constant" value="Color_Alarm"/> 
+  </rect>
+  <rect x="0" y="0" width="150" height="30" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="5" y="5" width="140" height="20" rx="0" ry="0" id="SelFrame" fill="black" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If Z0 != nothing Then
+	Open_ws_wf_wi(&quot;TPTS_IBR_set&quot;, KKS + &quot;|&quot; + CStr(HideBut), Operate)
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnRightClick">If Z0 != nothing Then
+	If Operate &amp;&amp; Check_Oper_Rights(OU) Then
+		LoadPopUpMenu(KKS + &quot;|IBRo|TPTS_IBR_set &quot; + KKS + &quot;|&quot; + CStr(HideBut))
+	Else
+		LoadPopUpMenu(KKS + &quot;|IBRi|TPTS_IBR_set &quot; + KKS + &quot;|&quot; + CStr(HideBut))
+	End If
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnMiddleClick">If Z0 != nothing Then
+	Open_Win_Uni(False, &quot;rights&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS+&quot;|&quot;+CStr(Operate))
+Else
+	NoLink(KKS)
+End If</rt:event>
+  </rect>
+</svg>

@@ -1,0 +1,172 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 1200 25" width="1200" height="25" id="obj_NodeWS" stroke="Col_Grey2" font-family="AAP_Font3" font-size="15" font-weight="bold">
+  <desc>строка состояния рабочей станции</desc>
+  <rt:model comment="Служебная подмодель ПОРТАЛа" revision="4.4-6.1">
+    <rt:param name="NdID" datatype="RtaNode" comment="интерфейс узла"/> 
+    <rt:param name="Active" datatype="boolean" value="false" comment="выделение подсветкой"/> 
+    <rt:param name="LocalNetMask" datatype="ushort" value="3" comment="реальная маска локальной сети"/> 
+    <rt:sub>Sub GetNodeStatus()
+Dim WS_ID As String
+Dim NStatus As UShort
+Dim NDStatus As UShort
+Dim NodeNet As UShort
+Dim IP1 As String
+Dim IP2 As String
+Dim CPU_load As UShort
+Dim LocalNDID As UInt
+
+If NdID == Nothing Then
+	t_ID.text = &quot;&quot;
+	rect_ID.fill = Col_Ar(7)
+	t_Status.text = &quot;&quot;
+	rect_Status.fill = Col_Ar(7)
+	t_Net_1.text = &quot;&quot;
+	t_Net_2.text = &quot;&quot;
+	rect_Net_1.fill = Col_Ar(7)
+	rect_Net_2.fill = Col_Ar(7)
+	t_CPU.text = &quot;&quot;
+	rect_CPU.fill = Col_Ar(7)
+	t_DataOK.text = &quot;&quot;
+	rect_DataOK.fill = Col_Ar(7)
+	t_Repl_S.text = &quot;&quot;
+	rect_Repl_S.fill = Col_Ar(7)
+	t_Repl_R.text = &quot;&quot;
+	rect_Repl_R.fill = Col_Ar(7)
+	t_Vis.text = &quot;&quot;
+	rect_Vis.fill = Col_Ar(7)
+
+Else
+	NdID.Refresh()
+	WS_ID = NdID.NodeName
+	NStatus = NdID.NodeStatus
+	IP1 = NdID.IPAddress
+	IP2 = NdID.IPAddress_2
+	LocalNDID = RTA.LocalNode.NodeId
+	If NdID.NodeId == LocalNDID Then
+		NodeNet = LocalNetMask &amp; 0xC	&apos;берём только старшие биты
+	Else
+		NodeNet = NdID.NetMask &amp; 0xC
+		&apos;далее, если своя сеть есть (старшие биты), то младшие биты по И переносим в старшие
+		&apos;это позволит быстрее определять отказы т.к. старшие биты обсчитываются через несколько минут
+		If ((LocalNetMask &amp; 4) &gt; 0) Then
+			NodeNet = NodeNet &amp; (((NdID.NetMask &amp; 1) * 4) | 8)
+		End If
+		If ((LocalNetMask &amp; 8) &gt; 0) Then
+			NodeNet = NodeNet &amp; (((NdID.NetMask &amp; 2) * 4) | 4)
+		End If
+	End If
+	CPU_load = NdID.CPULoad
+	Dim Alt_WS_ID As String
+	Alt_WS_ID = CStr(RTAPLS.GetConfigurationParameter(False, &quot;SYS_NODES&quot;, WS_ID))
+	If (Len(Alt_WS_ID) &gt; 1) &amp;&amp; (GetState(Alt_WS_ID) != _BadState) Then
+		t_ID.text = PLStrCut(Alt_WS_ID, 25)
+	Else
+		t_ID.text = PLStrCut(WS_ID, 20)
+	End If
+	If Active Then
+		If NdID.NodeId == LocalNDID Then
+			rect_ID.fill = Col_Ar(2)
+		Else
+			rect_ID.fill = Col_Ar(14)
+		End If
+	Else
+		If NdID.NodeId == LocalNDID Then
+			rect_ID.fill = Col_Ar(14)
+		Else
+			rect_ID.fill = Col_Ar(8)
+		End If
+	End If
+	t_Status.text = ENodeState(NStatus, False)
+	rect_Status.fill = NodStatColor(NStatus)
+	t_Net_1.text = IP1
+	t_Net_2.text = IP2
+	If NStatus &lt; 4 Then
+		rect_Net_1.fill = Col_Ar(8)
+		rect_Net_2.fill = Col_Ar(8)
+		t_CPU.text = &quot;--&quot;
+		rect_CPU.fill = Col_Ar(8)
+		t_DataOK.text = &quot;--&quot;
+		rect_DataOK.fill = Col_Ar(8)
+		t_Repl_S.text = &quot;--&quot;
+		rect_Repl_S.fill = Col_Ar(8)
+		t_Repl_R.text = &quot;--&quot;
+		rect_Repl_R.fill = Col_Ar(8)
+		t_Vis.text = &quot;--&quot;
+		rect_Vis.fill = Col_Ar(8)
+	Else
+		If (IP1 == &quot;&quot;) || ((LocalNetMask &amp; 0xC) == 0) Then
+			rect_Net_1.fill = Col_Ar(8)
+		Else
+			rect_Net_1.fill = Col_Ar((NodeNet &amp; 4) / 4 + 1)
+		End If	
+		If (IP2 == &quot;&quot;) || ((LocalNetMask &amp; 0xC) == 0) Then
+			rect_Net_2.fill = Col_Ar(8)
+		Else
+			rect_Net_2.fill = Col_Ar((NodeNet &amp; 8) / 8 + 1)
+		End If	
+		t_CPU.text = CStr(CPU_load)
+		If CPU_load &gt; 90 Then
+			rect_CPU.fill = Col_Ar(1)
+		ElseIf CPU_load &gt; 75 Then
+			rect_CPU.fill = Col_Ar(3)
+		Else
+			rect_CPU.fill = Col_Ar(2)
+		End If
+		NDStatus = NdID.DataStatus
+		If (NDStatus &amp; RTDATA_STAT_OK) &gt; 0 Then
+			t_DataOK.text = &quot;Да&quot;
+			rect_DataOK.fill = Col_Ar(2)
+		Else
+			t_DataOK.text = &quot;Нет&quot;
+			rect_DataOK.fill = Col_Ar(1)
+		End If
+&apos;задачи сделаны через флаги
+		If (NDStatus &amp; RTDATA_STAT_FEATURE_7_OK) Then
+			t_Repl_S.text = &quot;Работает&quot;
+			rect_Repl_S.fill = Col_Ar(2)
+		Else
+			t_Repl_S.text = &quot;Не работает&quot;
+			rect_Repl_S.fill = Col_Ar(1)
+		End If
+		If (NDStatus &amp; RTDATA_STAT_FEATURE_8_OK) Then
+			t_Repl_R.text = &quot;Работает&quot;
+			rect_Repl_R.fill = Col_Ar(2)
+		Else
+			t_Repl_R.text = &quot;Не работает&quot;
+			rect_Repl_R.fill = Col_Ar(1)
+		End If
+		If (NDStatus &amp; RTDATA_STAT_FEATURE_4_OK) Then
+			t_Vis.text = &quot;Работает&quot;
+			rect_Vis.fill = Col_Ar(2)
+		Else
+			t_Vis.text = &quot;Не работает&quot;
+			rect_Vis.fill = Col_Ar(1)
+		End If
+	End If
+End If
+
+End Sub</rt:sub>
+    <rt:cycleTrigger name="ShowData" cycle="1" unit="second">
+      <rt:code>GetNodeStatus()</rt:code>
+    </rt:cycleTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="1200" height="25" rx="0" ry="0" id="backgr" fill="Col_Grey1"/> 
+  <rect x="0" y="0" width="225" height="25" rx="0" ry="0" id="rect_ID" fill="Col_Grey1"/> 
+  <rect x="225" y="0" width="250" height="25" rx="0" ry="0" id="rect_Status" fill="Col_Grey1"/> 
+  <rect x="475" y="0" width="150" height="25" rx="0" ry="0" id="rect_Net_1" fill="Col_Grey1"/> 
+  <rect x="625" y="0" width="150" height="25" rx="0" ry="0" id="rect_Net_2" fill="Col_Grey1"/> 
+  <rect x="775" y="0" width="50" height="25" rx="0" ry="0" id="rect_CPU" fill="Col_Grey1"/> 
+  <rect x="825" y="0" width="50" height="25" rx="0" ry="0" id="rect_DataOK" fill="Col_Grey1"/> 
+  <rect x="875" y="0" width="100" height="25" rx="0" ry="0" id="rect_Repl_S" fill="Col_Grey1"/> 
+  <rect x="975" y="0" width="100" height="25" rx="0" ry="0" id="rect_Repl_R" fill="Col_Grey1"/> 
+  <rect x="1075" y="0" width="125" height="25" rx="0" ry="0" id="rect_Vis" fill="Col_Grey1"/> 
+  <text x="10" y="17.5" id="t_ID">Рабочая станция</text>
+  <text x="235" y="17.5" id="t_Status">Статус</text>
+  <text x="485" y="17.5" id="t_Net_1">IP адрес 1</text>
+  <text x="635" y="17.5" id="t_Net_2">IP адрес 2</text>
+  <text x="800" y="17.5" id="t_CPU" text-anchor="middle">CPU</text>
+  <text x="850" y="17.5" id="t_DataOK" text-anchor="middle">НЕТ</text>
+  <text x="880" y="17.5" id="t_Repl_S">Не работает</text>
+  <text x="980" y="17.5" id="t_Repl_R">Не работает</text>
+  <text x="1080" y="17.5" id="t_Vis">Не работает</text>
+</svg>

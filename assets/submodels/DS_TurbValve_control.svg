@@ -1,0 +1,273 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="-27.5 -27.5 55 55" width="55" height="55" id="DS_TurbValve_control">
+  <desc>Регулирующий клапан турбины</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.2">
+    <rt:param name="PointID_ANA" datatype="string" value="NULL" comment="идентификатор сигнала положения клапана"/> 
+    <rt:param name="PointID_BIN_C" datatype="string" value="NULL" comment="идентификатор сигнала концевика «Закрыто»"/> 
+    <rt:param name="PointID_Fail" datatype="string" value="NULL" comment="идентификатор сигнала  «Неисправность»"/> 
+    <rt:param name="SP_open" datatype="float" value="100" comment="граница состояния ОТКРЫТО"/> 
+    <rt:param name="SP_close" datatype="float" value="0" comment="граница состояния ЗАКРЫТО, если нет BIN ЗАКРЫТО"/> 
+    <rt:var name="pv" datatype="PlsPVAna" comment="указатель переменной степени открытия"/> 
+    <rt:var name="pv_C" datatype="PlsPVBin" comment="указатель переменной ЗАКР."/> 
+    <rt:var name="pv_Fail" datatype="PlsPVBin" comment="указатель переменной Неисправность"/> 
+    <rt:var name="MyAlarm_frame" datatype="boolean" value="true" comment="синализация сигнала неисправности принадлежит текущему пользователю"/> 
+    <rt:var name="In_Alarm_frame" datatype="ubyte" value="0" comment="Наличие сигнализации неисправности"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub AckMe()
+If Allow_Confirm &amp;&amp; flag_confirm &amp;&amp; (In_Alarm_frame &gt; 0) &amp;&amp; MyAlarm_frame Then
+	If pv_Fail.NotAcknowledged Then
+		pv_Fail.AcknowledgeAlarm(0)
+	End If
+	In_Alarm_frame = False
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Calculate()
+If (PointID_ANA == &quot;NULL&quot;) &amp;&amp; (PointID_BIN_C == &quot;NULL&quot;) Then
+	_This.transform = &quot;scale(0.75 0.75 0 0)&quot;
+	Al_frame.visibility = &quot;hidden&quot;
+	Cir_big.fill = Color_Static
+	Cir_medium.fill = Color_Static
+	Open_degree.fill = Color_Static
+	Cir_small.fill = Color_Static
+	Exit Sub
+ElseIf ((PointID_ANA == &quot;NULL&quot;) &amp;&amp; (pv == Nothing)) || ((PointID_BIN_C == &quot;NULL&quot;) &amp;&amp; (pv_C == Nothing)) Then
+	Cir_big.fill = Color_ErLink
+	Cir_medium.fill = Color_ErLink
+	Open_degree.fill = Color_ErLink
+	Cir_small.fill = Color_ErLink
+	Exit Sub
+Else
+	Cir_big.fill = Color_CLOSE_M
+	Cir_medium.fill = Color_CLOSE_M
+	Open_degree.fill = Color_OPEN_M
+	Cir_small.fill = Color_OPEN_M
+End If
+If (pv != Nothing) Then
+	If (pv.Quality == PLS_QUAL_BAD) Then
+		Cir_big.fill = Color_Inval
+		Cir_medium.fill = Color_Inval
+		Open_degree.fill = Color_Inval
+		Cir_small.fill = Color_Inval
+	ElseIf ((pv.SuspendedFlags &amp; PLS_SUSP_CMD)  &gt; 0) Then
+		Cir_big.fill = Color_Remont
+		Cir_medium.fill = Color_Remont
+		Open_degree.fill = Color_Remont
+		Cir_small.fill = Color_Remont
+	ElseIf (pv.Value &gt;= SP_open) Then
+		Cir_big.fill = Color_OPEN_M
+		Cir_medium.fill = Color_OPEN_M
+		Cir_small.fill = Color_OPEN_M
+	ElseIf (pv_C == Nothing) &amp;&amp; (pv.Value &lt;= SP_close) Then
+		Cir_big.fill = Color_CLOSE_M
+		Open_degree.fill = Color_CLOSE_M
+		Cir_small.fill = Color_CLOSE_M
+	End If
+End If
+If (pv_C != Nothing) Then
+	If (pv_C.Quality == PLS_QUAL_BAD) Then
+		Cir_big.fill = Color_Inval
+		Cir_medium.fill = Color_Inval
+		Open_degree.fill = Color_Inval
+		Cir_small.fill = Color_Inval
+	ElseIf ((pv_C.SuspendedFlags &amp; PLS_SUSP_CMD)  &gt; 0) Then
+		Cir_big.fill = Color_Remont
+		Cir_medium.fill = Color_Remont
+		Open_degree.fill = Color_Remont
+		Cir_small.fill = Color_Remont
+	ElseIf pv_C.Value Then
+		Cir_big.fill = Color_CLOSE_M
+		Cir_medium.fill = Color_CLOSE_M
+		Open_degree.fill = Color_CLOSE_M
+		Cir_small.fill = Color_CLOSE_M
+	End If
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub CheckUsrGr()
+If Alarms_ForUser Then	//если надо распределять сигнализаци по пользователям
+	MyAlarm_frame = PRJSPEC.CheckPvOwner(pv_Fail.PVId, False)
+	If !MyAlarm_frame Then
+		In_Alarm_frame = 0
+	End If
+Else
+	MyAlarm_frame = True
+End If
+Calculate_Fail()
+End Sub</rt:sub>
+    <rt:sub>Sub Calculate_Fail()
+If pv_Fail != Nothing Then
+	If pv_Fail.Value Then
+		Al_frame.visibility = &quot;visible&quot;
+		If Allow_Confirm &amp;&amp; Blink_on_NACK Then
+			If MyAlarm_frame &amp;&amp; pv_Fail.NotAcknowledged Then
+				If pv_Fail.AlarmType != PLS_ALARMTYP_NONE Then
+					In_Alarm_frame = 3	//нормальная неквитированная сигнализация
+				Else
+					In_Alarm_frame = 0
+				End If
+			Else
+				In_Alarm_frame = 0
+			End If
+		Else
+			In_Alarm_frame = 0
+		End If
+
+	Else
+		In_Alarm_frame = 0
+		Al_frame.visibility = &quot;hidden&quot;
+	End If
+Else
+	In_Alarm_frame = 0
+	Al_frame.visibility = &quot;hidden&quot;
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Calculate_degree()
+If pv == Nothing Then
+	Open_degree.fill = Color_Inval
+Else
+	Open_degree.fill = Color_OPEN_M
+	Dim s As String
+	Dim x As Double
+	Dim y As Double
+	Dim r As Double
+	Dim pi As Double
+	Dim angle As Double
+	Dim val As Double
+	pi = 3.14159265
+	r = 15.0
+	val = pv.Value
+	If val &lt; 0 Then
+		val = 0
+	ElseIf val &gt; 100 Then
+		val = 100
+	End If
+	angle = pi * (1.0 - 2.0 * val / 100.0)
+	x = r * Cos(angle) 
+	y = - r * Sin(angle)
+	s = &quot;M0 0 L&quot;
+	s = s + CStr(x) + &quot; &quot; + CStr(y) + &quot; A&quot; + CStr(r) + &quot; &quot; + CStr(r) + &quot; 0 &quot;
+	If y &lt; 0 Then
+		s = s + &quot;0&quot;
+	Else
+		s = s + &quot;1&quot;
+	End If
+	s = s + &quot; 0 -&quot; + CStr(r) + &quot; 0 Z&quot;
+	Open_degree.d = s
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (PointID_ANA != &quot;NULL&quot;) Then
+	pv = ANA(PointID_ANA)
+End If
+If (PointID_BIN_C != &quot;NULL&quot;) Then
+	pv_C = BIN(PointID_BIN_C)
+End If
+If (PointID_Fail != &quot;NULL&quot;) Then
+	pv_Fail = BIN(PointID_Fail)
+End If
+Calculate()</rt:event>
+    <rt:changeTrigger name="IsItMyAlarm">
+      <rt:condition>Blink_on_NACK &amp;&amp; Alarms_ForUser</rt:condition>
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>CheckUsrGr()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChPV_C">
+      <rt:condition>pv_C != Nothing</rt:condition>
+      <rt:chgItem>pv_C</rt:chgItem>
+      <rt:code>Calculate()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChPV_Fail">
+      <rt:condition>pv_Fail != Nothing</rt:condition>
+      <rt:chgItem>pv_Fail</rt:chgItem>
+      <rt:code>Calculate_Fail()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChPV_O">
+      <rt:condition>pv != Nothing</rt:condition>
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:code>Calculate()</rt:code>
+      <rt:code>Calculate_degree()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>pv != Nothing</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(pv.PVId) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <circle cx="0" cy="0" r="20" id="Cir_big" fill="Col_LtGreen" stroke="Col_Grey5" stroke-width="1"/> 
+  <line x1="-20" y1="0" x2="20" y2="0" stroke="Col_Grey5" stroke-width="1"/> 
+  <circle cx="0" cy="0" r="15" id="Cir_medium" fill="Col_LtGreen" stroke="none"/> 
+  <path d="M-1.4077e-010 -6.62969e-005 L-0.330801 14.9963 A15 15 0 1 0 -15 -3.23526e-006 Z" id="Open_degree" fill="Col_LtYellow" stroke="Col_Grey4" stroke-width="0.5"/> 
+  <circle cx="0" cy="0" r="15" id="Cir_medium_transparent" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <circle cx="0" cy="0" r="10" id="Cir_small" fill="Col_LtYellow" stroke="Col_Grey5" stroke-width="1"/> 
+  <rect x="-27.5" y="-27.5" width="55" height="55" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="-22.5" y="-22.5" width="45" height="45" rx="0" ry="0" id="Al_frame" fill="none" stroke="Col_Red" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="ShowInAlarmColor(In_Alarm_frame, Color_Alarm, 0xffffffff)"/> 
+  </rect>
+  <rect x="-27.5" y="-27.5" width="55" height="55.5" rx="0" ry="0" id="SelFrame" fill="Col_BGmain" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">Dim MsgStr As String
+If (PointID_ANA == &quot;NULL&quot;) &amp;&amp; (PointID_BIN_C == &quot;NULL&quot;) Then
+	ShowMessage (&quot;Это статический объект.&quot;, 5)
+ElseIf (pv == Nothing) Then	//ANA должен быть привязан всегда
+	MsgStr = &quot;Ошибка привязки.\nPointID_ANA = \&quot;&quot; + PointID_ANA + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (pv_C == Nothing) &amp;&amp; (PointID_BIN_C != &quot;NULL&quot;) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_BIN_C = \&quot;&quot; + PointID_BIN_C + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (PointID_Fail != &quot;NULL&quot;) &amp;&amp; (pv_Fail == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_Fail = \&quot;&quot; + PointID_Fail + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (pv_C == Nothing) &amp;&amp; (pv_Fail == Nothing) Then
+	Call_Win (&quot;ws_ANA_FN&quot;, PointID_ANA + &quot;|-1&quot;)
+Else
+	Dim s As String
+	s = PointID_ANA
+	If (pv_C != Nothing) Then
+		s = s + &quot;|&quot; + PointID_BIN_C
+	Else
+		s = s + &quot;|&quot;
+	End If
+	If (pv_Fail != Nothing) Then
+		s = s + &quot;|&quot; + PointID_Fail
+	End If
+	Open_Win_Uni(False, &quot;wi_&quot; + PointID_ANA, &quot;Регулирующий клапан &quot; + pv.CategoryText, &quot;wi_TurbValve_control&quot;, s)
+End If</rt:event>
+    <rt:event type="OnRightClick">Dim MsgStr As String
+If (PointID_ANA == &quot;NULL&quot;) &amp;&amp; (PointID_BIN_C == &quot;NULL&quot;) Then
+	ShowMessage (&quot;Это статический объект.&quot;, 5)
+ElseIf (pv == Nothing) Then	//ANA должен быть привязан всегда
+	MsgStr = &quot;Ошибка привязки.\nPointID_ANA = \&quot;&quot; + PointID_ANA + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (pv_C == Nothing) &amp;&amp; (PointID_BIN_C != &quot;NULL&quot;) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_BIN_C = \&quot;&quot; + PointID_BIN_C + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (PointID_Fail != &quot;NULL&quot;) &amp;&amp; (pv_Fail == Nothing) Then
+	MsgStr = &quot;Ошибка привязки.\nPointID_Fail = \&quot;&quot; + PointID_Fail + &quot;\&quot;&quot;
+	ShowWarning (MsgStr, 0)
+ElseIf (pv_C == Nothing) &amp;&amp; (pv_Fail == Nothing) Then
+	LoadPopUpMenu(PointID_ANA + &quot;|ANAi|ws_ANA_FN &quot; + PointID_ANA + &quot;|-1&quot;)
+Else
+	Dim i As UShort
+	Dim s As String
+	s = PointID_ANA
+	TmpBuffer(0) = PointID_ANA
+	If (pv_C != Nothing) Then
+		TmpBuffer(1) = PointID_BIN_C 
+		s = s + &quot;|&quot; + PointID_BIN_C
+		i = 2
+	Else
+		s = s + &quot;|&quot;
+		i = 1
+	End If
+	If (pv_Fail != Nothing) Then
+		TmpBuffer(i) = PointID_Fail
+		s = s + &quot;|&quot; + PointID_Fail
+	End If
+	TmpMnuPar = PointID_ANA + &quot;|ONEi|wi_TurbValve_control &quot; + s
+	LoadPopUpMenu(TmpMnuPar)
+End If</rt:event>
+  </rect>
+</svg>

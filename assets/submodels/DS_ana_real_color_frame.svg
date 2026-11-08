@@ -1,0 +1,314 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 175 35" width="175" height="35" id="DS_ana_real_color_frame" stroke-linecap="square">
+  <desc>Рамка для аналоговых индикаторов с индикацией по XK</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.2">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS общий для всех сигналов"/> 
+    <rt:param name="SIGNAL_base" datatype="string" value="XK" comment="Общее название сигналов окрашивания (блокировок)"/> 
+    <rt:param name="SIGNAL_fail" datatype="string" value="XK90" comment="Имя сигнала отказа функции - красная рамка"/> 
+    <rt:param name="ShowGoodColor" datatype="boolean" value="false" comment="окрашивать в зелёный при отсутствии сигналов окрашивания (блокировок)"/> 
+    <rt:param name="ShowFrame" datatype="boolean" value="false" comment="выводить рамку"/> 
+    <rt:param name="FillEntireFrame" datatype="boolean" value="false" comment="закрашивать весь прямоугольник, а не только рамку"/> 
+    <rt:var name="XKs_OK" datatype="boolean" value="False" comment="Нашелся хотя бы один XK* сигнал."/> 
+    <rt:var name="XK" datatype="PlsPVBin" arraysize="6" comment="указатель"/> 
+    <rt:var name="XM90" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="In_Group" datatype="boolean" value="False" comment="объект в группе"/> 
+    <rt:var name="pvId" datatype="string" comment="имя первой найденной переменной для передачи в меню"/> 
+    <rt:var name="XK_values_in_one" datatype="ushort" value="0" comment="Все значения KX битами одной переменной, младшие биты - младшие нарушения"/> 
+    <rt:var name="XK_NACKs_in_one" datatype="ushort" value="0" comment="Все неквитированности KX битами одной переменной, младшие биты - младшие нарушения"/> 
+    <rt:var name="XK_BADs_in_one" datatype="ushort" value="0" comment="Все недостоверности KX битами одной переменной, младшие биты - младшие нарушения"/> 
+    <rt:var name="ValColor" datatype="uint" comment="цвет индикации"/> 
+    <rt:var name="In_Alarm" datatype="ubyte" comment="Наличие сигнализации" value="0"/> 
+    <rt:var name="In_Alarm_frame" datatype="ubyte" value="0" comment="Наличие сигнализации неисправности"/> 
+    <rt:var name="MyAlarm" datatype="boolean" value="true" comment="синализации сигнала принадлежат текущему пользователю"/> 
+    <rt:var name="MyAlarm_frame" datatype="boolean" value="true" comment="синализация сигнала неисправности принадлежит текущему пользователю"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub AckMe()
+If Allow_Confirm &amp;&amp; Blink_on_NACK &amp;&amp; flag_confirm Then
+	If (In_Alarm &gt; 0) &amp;&amp; MyAlarm Then
+		AckThisBinPV(XK(0))
+		AckThisBinPV(XK(1))
+		AckThisBinPV(XK(2))
+		AckThisBinPV(XK(3))
+		AckThisBinPV(XK(4))
+		AckThisBinPV(XK(5))
+		In_Alarm = False
+	End If
+	If (In_Alarm_frame &gt; 0) &amp;&amp; MyAlarm_frame Then
+		AckThisBinPV(XM90)
+		In_Alarm_frame = False
+	End If
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub AckThisBinPV(ByVal curPV As PlsPVBin)
+	If (curPV != Nothing) Then
+		If curPV.NotAcknowledged Then
+			curPV.AcknowledgeAlarm(0)
+		End If
+	End If
+End Sub</rt:sub>
+    <rt:sub>Sub Calculate()
+Dim MyColor As UInt
+If XKs_OK Then
+	MyColor = generate_color()
+	If (MyColor == Color_ANA_GOOD) Then
+		If !ShowGoodColor Then
+			MyColor = 0xffffffff	//отсутствие цвета
+		Else
+			body.fill_opacity = 0.5
+			body.stroke_opacity = 0.5
+		End If
+	Else
+		body.fill_opacity = 1
+		body.stroke_opacity = 1
+	End If
+Else
+	MyColor = Color_ErLink
+End If
+ValColor = MyColor
+If FillEntireFrame Then
+	body.fill = MyColor
+End If
+If XM90 != Nothing Then
+	If XM90.Value Then
+		Al_frame.visibility = &quot;visible&quot;
+		If Allow_Confirm &amp;&amp; Blink_on_NACK Then
+			If MyAlarm_frame &amp;&amp; XM90.NotAcknowledged Then
+				If XM90.AlarmType != PLS_ALARMTYP_NONE Then
+					In_Alarm_frame = 3	//нормальная неквитированная сигнализация
+				Else
+					In_Alarm_frame = 0
+				End If
+			Else
+				In_Alarm_frame = 0
+			End If
+		Else
+			In_Alarm_frame = 0
+		End If
+
+	Else
+		In_Alarm_frame = 0
+		Al_frame.visibility = &quot;hidden&quot;
+	End If
+Else
+	In_Alarm_frame = 0
+	Al_frame.visibility = &quot;hidden&quot;
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Detect_XK_state(ByVal pv As PlsPVBin, ByVal BitMask As UShort)
+If pv != Nothing Then
+	If ((pv.Value != 0) &amp;&amp; (pv.Quality != PLS_QUAL_BAD)) Then
+		XK_values_in_one = XK_values_in_one | BitMask
+		XK_BADs_in_one = XK_BADs_in_one &amp; ~BitMask
+	Else
+		XK_values_in_one = XK_values_in_one &amp; ~BitMask
+		If (pv.Quality == PLS_QUAL_BAD) Then
+			XK_BADs_in_one = XK_BADs_in_one | BitMask
+		End If
+	End If
+	If (pv.NotAcknowledged &amp;&amp; MyAlarm) Then
+		XK_NACKs_in_one = XK_NACKs_in_one | BitMask
+	Else
+		XK_NACKs_in_one = XK_NACKs_in_one &amp; ~BitMask
+	End If
+	Calculate()
+End If
+End Sub</rt:sub>
+    <rt:sub>Function generate_color() As UInt
+//разблюдовка битов: HI_A LO_A HI_W LO_W HI_T LO_T
+If ((XK_values_in_one &amp; 0x30) != 0) || ((XK_BADs_in_one &amp; 0x30) != 0) Then
+	If (XK_values_in_one &amp; 0x20) != 0 Then
+		generate_color = Color_ANA_HI_A
+	ElseIf (XK_values_in_one &amp; 0x10) != 0 Then
+		generate_color = Color_ANA_LO_A
+	Else
+		generate_color = Color_Inval
+	End If
+	If ((XK_NACKs_in_one &amp; 0x30) != 0) &amp;&amp; MyAlarm Then
+		In_Alarm = 3
+	Else
+		In_Alarm = 0
+	End If
+ElseIf ((XK_values_in_one &amp; 0xC) != 0) || ((XK_BADs_in_one &amp; 0xC) != 0) Then
+	If (XK_values_in_one &amp; 8) != 0 Then
+		generate_color = Color_ANA_HI_P
+	ElseIf (XK_values_in_one &amp; 4) != 0 Then
+		generate_color = Color_ANA_LO_P
+	Else
+		generate_color = Color_Inval
+	End If
+	If ((XK_NACKs_in_one &amp; 0xC) != 0) &amp;&amp; MyAlarm Then
+		In_Alarm = 3
+	Else
+		In_Alarm = 0
+	End If
+ElseIf ((XK_values_in_one &amp; 3) != 0) || ((XK_BADs_in_one &amp; 3) != 0) Then
+	If (XK_values_in_one &amp; 2) != 0 Then
+		generate_color = Color_ANA_HI_T
+	ElseIf (XK_values_in_one &amp; 1) != 0 Then
+		generate_color = Color_ANA_LO_T
+	Else
+		generate_color = Color_Inval
+	End If
+	If ((XK_NACKs_in_one &amp; 3) != 0) &amp;&amp; MyAlarm Then
+		In_Alarm = 3
+	Else
+		In_Alarm = 0
+	End If
+Else
+	generate_color = Color_ANA_GOOD
+	If (XK_NACKs_in_one != 0) &amp;&amp; MyAlarm Then
+		In_Alarm = 1
+	Else
+		In_Alarm = 0
+	End If
+End If
+End Function</rt:sub>
+    <rt:sub>Sub CheckUsrGr()
+If Alarms_ForUser Then	//если надо распределять сигнализаци по пользователям
+	MyAlarm = PRJSPEC.CheckPvOwner(pvId, False)
+	If !MyAlarm Then
+		In_Alarm = 0
+	End If
+	MyAlarm_frame = PRJSPEC.CheckPvOwner(XM90.PVId, False)
+	If !MyAlarm_frame Then
+		In_Alarm_frame = 0
+	End If
+Else
+	MyAlarm = true
+	MyAlarm_frame = True
+End If
+Calculate()
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">Set XK(0) = BIN(KKS + &quot;_&quot; + SIGNAL_base + Right(BIN_LO_A, 2))
+Set XK(1) = BIN(KKS + &quot;_&quot; + SIGNAL_base + Right(BIN_LO_P, 2))
+Set XK(2) = BIN(KKS + &quot;_&quot; + SIGNAL_base + Right(BIN_LO_T, 2))
+Set XK(3) = BIN(KKS + &quot;_&quot; + SIGNAL_base + Right(BIN_HI_T, 2))
+Set XK(4) = BIN(KKS + &quot;_&quot; + SIGNAL_base + Right(BIN_HI_P, 2))
+Set XK(5) = BIN(KKS + &quot;_&quot; + SIGNAL_base + Right(BIN_HI_A, 2))
+Set XM90 = BIN(KKS + &quot;_&quot; + SIGNAL_fail)
+ValColor = Color_ErLink
+Al_frame.visibility = &quot;hidden&quot;
+InGr_InGr_angle.stroke_width = 2
+Dim i As Int
+For i = 0 to 5
+	If (XK(i) != Nothing) Then
+		pvId = XK(i).PVId
+		XKs_OK = True
+		Exit Sub
+	End If
+Next i
+CheckUsrGr()</rt:event>
+    <rt:event type="OnInitializeEnd">If FillEntireFrame Then
+	body.fill = Color_ErLink
+End If</rt:event>
+    <rt:event type="OnResize">body.x = 2.5
+body.y = 2.5
+body.width = _This.width - 5.0
+body.height = _This.height - 5.0
+body.stroke_width = 5
+Al_frame.x = -2.5
+Al_frame.y = -2.5
+Al_frame.width = _This.width + 5.0
+Al_frame.height = _This.height + 5.0
+Al_frame.stroke_width = 2
+LU_border.stroke_width = 1
+RB_border.stroke_width = 1
+InGr_InGr_angle.points = CStr(_This.width - 7) + &quot;,0 &quot; + CStr(_This.width) + &quot;,0 &quot; + CStr(_This.width) + &quot;,7&quot;</rt:event>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>(KKS != &quot;NULL&quot;) &amp;&amp; XKs_OK</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Show_Color">
+      <rt:condition>XM90 != Nothing</rt:condition>
+      <rt:chgItem>XM90</rt:chgItem>
+      <rt:code>Calculate()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Tr_XK_H_A">
+      <rt:condition>XK(5) != Nothing</rt:condition>
+      <rt:chgItem>XK(5)</rt:chgItem>
+      <rt:code>Detect_XK_state(XK(5), 0x20)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Tr_XK_H_P">
+      <rt:condition>XK(4) != Nothing</rt:condition>
+      <rt:chgItem>XK(4)</rt:chgItem>
+      <rt:code>Detect_XK_state(XK(4), 8)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Tr_XK_H_T">
+      <rt:condition>XK(3) != Nothing</rt:condition>
+      <rt:chgItem>XK(3)</rt:chgItem>
+      <rt:code>Detect_XK_state(XK(3), 2)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Tr_XK_L_T">
+      <rt:condition>XK(2) != Nothing</rt:condition>
+      <rt:chgItem>XK(2)</rt:chgItem>
+      <rt:code>Detect_XK_state(XK(2), 1)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Tr_XK_L_P">
+      <rt:condition>XK(1) != Nothing</rt:condition>
+      <rt:chgItem>XK(1)</rt:chgItem>
+      <rt:code>Detect_XK_state(XK(1), 4)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Tr_XK_L_A">
+      <rt:condition>XK(0) != Nothing</rt:condition>
+      <rt:chgItem>XK(0)</rt:chgItem>
+      <rt:code>Detect_XK_state(XK(0), 0x10)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="IsItMyAlarm">
+      <rt:condition>Blink_on_NACK &amp;&amp; Alarms_ForUser</rt:condition>
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>CheckUsrGr()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="2.5" y="2.5" width="170" height="30" rx="0" ry="0" id="body" fill="none" stroke="Col_Green" stroke-width="5">
+    <rt:dyn type="stroke" mode="cyclic" value="ShowInAlarmColor(In_Alarm, ValColor, 0xffffffff)"/> 
+  </rect>
+  <polyline points="0,35 175,35 175,0" id="RB_border" fill="none" stroke="Col_Grey1" stroke-opacity="0.75" stroke-width="1">
+    <rt:dyn type="visibility" mode="constant" value="ShowFrame" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </polyline>
+  <polyline points="0,35 0,0 175,0" id="LU_border" fill="none" stroke="Col_Grey5" stroke-opacity="0.75" stroke-width="1">
+    <rt:dyn type="visibility" mode="constant" value="ShowFrame" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </polyline>
+  <rect x="-2.5" y="-2.5" width="180" height="40" rx="0" ry="0" id="Al_frame" fill="none" stroke="Col_Red" stroke-dasharray="5,5" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="ShowInAlarmColor(In_Alarm_frame, Color_Alarm, 0xffffffff)"/> 
+  </rect>
+  <g id="InGr">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rect x="0" y="0" width="175" height="35" rx="0" ry="0" id="InGr_rect" fill="none" stroke="Col_InGR1" stroke-width="2"/> 
+    <polygon points="167.5,0 175,0 175,7.5" id="InGr_angle" fill="Col_InGR1" stroke="none"/> 
+  </g>
+  <rect x="0" y="0" width="175" height="35" rx="0" ry="0" id="SelFrame" fill="black" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If !XKs_OK Then
+	NoLink(KKS)
+Else
+	Call_Win (&quot;wi_ana_real_color_frame&quot;, KKS + &quot;|&quot; + SIGNAL_base + &quot;|&quot; + SIGNAL_fail)
+End If</rt:event>
+    <rt:event type="OnRightClick">If !XKs_OK Then
+	NoLink(KKS)
+Else
+	Dim i As Int
+	Dim j As Int
+	j = 0
+	For i = 0 To 5
+		If XK(i) != Nothing Then
+			TmpBuffer(j) = XK(i).PVId
+			j = j + 1
+		End If
+	Next i
+	If XM90 != Nothing Then
+		TmpBuffer(j) = XM90.PVId
+		j = j + 1
+	End If
+	LoadPopUpMenu(KKS + &quot;|KKSi|wi_ana_real_color_frame &quot; + KKS + &quot;|&quot; + SIGNAL_base + &quot;|&quot; + SIGNAL_fail)
+End If</rt:event>
+  </rect>
+</svg>

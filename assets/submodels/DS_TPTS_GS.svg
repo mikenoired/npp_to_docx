@@ -1,0 +1,560 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 100 75" width="100" height="75" id="DS_TPTS_GS" stroke-width="0.898438" font-family="AAP_Font3" font-size="15">
+  <desc>ТПТС Групповое управление для Dull Screen</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа (Dull Screen)" revision="6.0">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS"/> 
+    <rt:param name="Operate" datatype="boolean" value="False" comment="Сделать объект управляемым"/> 
+    <rt:param name="GR_number" datatype="ubyte" value="9" comment="Сколько рабочих групп"/> 
+    <rt:param name="StopStart" datatype="boolean" value="True" comment="Называть программы «ПУСК» и «ОСТАНОВ»"/> 
+    <rt:var name="Z0" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="Z1" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="Z2" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="Z3" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="Z4" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="OU" datatype="PlsPVBin" comment="указатель"/> 
+    <rt:var name="Col_Fr_1" datatype="ushort" value="10" comment="код цвета рамки гр. 1"/> 
+    <rt:var name="Col_Fr_2" datatype="ushort" value="10" comment="код цвета рамки гр. 2"/> 
+    <rt:var name="Col_Fr_3" datatype="ushort" value="10" comment="код цвета рамки гр. 3"/> 
+    <rt:var name="Col_Fr_4" datatype="ushort" value="10" comment="код цвета рамки гр. 4"/> 
+    <rt:var name="Col_Fr_5" datatype="ushort" value="10" comment="код цвета рамки гр. 5"/> 
+    <rt:var name="Col_Fr_6" datatype="ushort" value="10" comment="код цвета рамки гр. 6"/> 
+    <rt:var name="Col_Fr_7" datatype="ushort" value="10" comment="код цвета рамки гр. 7"/> 
+    <rt:var name="Col_Fr_8" datatype="ushort" value="10" comment="код цвета рамки гр. 8"/> 
+    <rt:var name="Col_Fr_9" datatype="ushort" value="10" comment="код цвета рамки гр. 9"/> 
+    <rt:var name="AStat" datatype="ushort" value="0" comment="код сигнализации"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="объект в группе"/> 
+    <rt:var name="Col_AH" datatype="ushort" value="13" comment="код цвета A-H"/> 
+    <rt:var name="Col_ST" datatype="ushort" value="13" comment="код цвета Пуск-Ост"/> 
+    <rt:var name="MyStrokeWdth" datatype="float" value="2" comment="Толщина рамок в зависимости от управляемости"/> 
+    <rt:sub>Sub ShStatus()
+Dim NV_bits As UShort
+Dim AH_Status As Short
+Dim ST_Status As Short
+body.fill_opacity = 0.35
+Repair_mode.visibility = &quot;hidden&quot;
+If OU != Nothing Then
+	If ((OU.SuspendedFlags &amp; PLS_SUSP_CMD) != 0) Then
+		AStat = 0
+		Repair_mode.visibility = &quot;visible&quot;
+		Col_AH = 6	&apos;CFG_COLOR_REMONT
+		body.fill_opacity = 1
+		Progr_start.visibility = &quot;hidden&quot;
+		Progr_stop.visibility = &quot;hidden&quot;
+		Progr_bg.visibility = &quot;hidden&quot;
+		Prog_num.visibility = &quot;hidden&quot;
+		Exit Sub
+	End If
+End If
+If (Z0.Quality != PLS_QUAL_BAD) Then
+	NV_bits = Z0.Value &amp; 0x3C0
+	If ((NV_bits &amp; 0xC0) &gt; 0) Then
+		AH_Status = -1
+	Else
+		AH_Status = (Z0.Value &amp; 1) * 2 + (Z0.Value &amp; 2) * 4
+	End If
+	If ((NV_bits &amp; 0x300) &gt; 0) Then
+		ST_Status = -1
+	Else
+		ST_Status = (Z0.Value &amp; 4) * 8 + (Z0.Value &amp; 8) * 32
+	End If
+Else
+	AH_Status = 0
+	ST_Status = 0
+End If
+If (Z1.Quality != PLS_QUAL_BAD) Then
+	If AH_Status != -1 Then
+		AH_Status = Z1.Value &amp; 0xF
+	End If
+	If ST_Status != -1 Then
+		ST_Status = Z1.Value &amp; 0x3F0
+	End If
+	AStat = (Z1.Value &amp; 0xC00) / 0x400
+Else
+	If (AH_Status == 0) Then
+		AH_Status = -1
+	End If
+	If (ST_Status == 0) Then
+		ST_Status = -1
+	End If
+End If
+
+If (AH_Status == -1)Then	&apos;недостоверность
+	Col_AH = 15	&apos;CFG_COLOR_INVALID
+	body.fill_opacity = 1
+ElseIf ((AH_Status &amp; 0xE) == 0x2) Then
+	Col_AH = 2
+ElseIf ((AH_Status &amp; 0xE) == 0x4) Then
+	Col_AH = 3 | 0x40
+ElseIf ((AH_Status &amp; 0xE) == 0x8) Then
+	Col_AH = 3
+Else
+	Col_AH = 15
+	body.fill_opacity = 1
+End If
+If (ST_Status == -1)Then
+	Col_ST = 0
+	Progr_start.visibility = &quot;hidden&quot;
+	Progr_stop.visibility = &quot;hidden&quot;
+	Progr_bg.visibility = &quot;visible&quot;
+	Prog_num.visibility = &quot;visible&quot;
+	Prog_num.text = &quot;X&quot;
+ElseIf ((ST_Status &amp; 0x3F0) == 0x10) Then
+		If StopStart Then
+			Progr_bg.visibility = &quot;hidden&quot;
+			Prog_num.visibility = &quot;hidden&quot;
+			Progr_start.visibility = &quot;hidden&quot;
+			Progr_stop.visibility = &quot;visible&quot;
+		Else
+			Progr_bg.visibility = &quot;visible&quot;
+			Prog_num.visibility = &quot;visible&quot;
+			Prog_num.text = &quot;2&quot;
+			Progr_start.visibility = &quot;hidden&quot;
+			Progr_stop.visibility = &quot;hidden&quot;
+		End If
+	Col_ST = 0x40
+ElseIf ((ST_Status &amp; 0x3F0) == 0x20) Then
+		If StopStart Then
+			Progr_bg.visibility = &quot;hidden&quot;
+			Prog_num.visibility = &quot;hidden&quot;
+			Progr_start.visibility = &quot;hidden&quot;
+			Progr_stop.visibility = &quot;visible&quot;
+		Else
+			Progr_bg.visibility = &quot;visible&quot;
+			Prog_num.visibility = &quot;visible&quot;
+			Prog_num.text = &quot;2&quot;
+			Progr_start.visibility = &quot;hidden&quot;
+			Progr_stop.visibility = &quot;hidden&quot;
+		End If
+	Col_ST = 0
+ElseIf ((ST_Status &amp; 0x3F0) == 0x40) Then
+		If StopStart Then
+			Progr_bg.visibility = &quot;hidden&quot;
+			Prog_num.visibility = &quot;hidden&quot;
+			Progr_start.visibility = &quot;hidden&quot;
+			Progr_stop.visibility = &quot;visible&quot;
+		Else
+			Progr_bg.visibility = &quot;visible&quot;
+			Prog_num.visibility = &quot;visible&quot;
+			Prog_num.text = &quot;2&quot;
+			Progr_start.visibility = &quot;hidden&quot;
+			Progr_stop.visibility = &quot;hidden&quot;
+		End If
+	Col_ST = 0x10
+ElseIf ((ST_Status &amp; 0x3F0) == 0x80) Then
+		If StopStart Then
+			Progr_bg.visibility = &quot;hidden&quot;
+			Prog_num.visibility = &quot;hidden&quot;
+			Progr_start.visibility = &quot;visible&quot;
+			Progr_stop.visibility = &quot;hidden&quot;
+		Else
+			Progr_bg.visibility = &quot;visible&quot;
+			Prog_num.visibility = &quot;visible&quot;
+			Prog_num.text = &quot;1&quot;
+			Progr_start.visibility = &quot;hidden&quot;
+			Progr_stop.visibility = &quot;hidden&quot;
+		End If
+	Col_ST = 0x40
+ElseIf ((ST_Status &amp; 0x3F0) == 0x100) Then
+		If StopStart Then
+			Progr_bg.visibility = &quot;hidden&quot;
+			Prog_num.visibility = &quot;hidden&quot;
+			Progr_start.visibility = &quot;visible&quot;
+			Progr_stop.visibility = &quot;hidden&quot;
+		Else
+			Progr_bg.visibility = &quot;visible&quot;
+			Prog_num.visibility = &quot;visible&quot;
+			Prog_num.text = &quot;1&quot;
+			Progr_start.visibility = &quot;hidden&quot;
+			Progr_stop.visibility = &quot;hidden&quot;
+		End If
+	Col_ST = 0
+ElseIf ((ST_Status &amp; 0x3F0) == 0x200) Then
+		If StopStart Then
+			Progr_bg.visibility = &quot;hidden&quot;
+			Prog_num.visibility = &quot;hidden&quot;
+			Progr_start.visibility = &quot;visible&quot;
+			Progr_stop.visibility = &quot;hidden&quot;
+		Else
+			Progr_bg.visibility = &quot;visible&quot;
+			Prog_num.visibility = &quot;visible&quot;
+			Prog_num.text = &quot;1&quot;
+			Progr_start.visibility = &quot;hidden&quot;
+			Progr_stop.visibility = &quot;hidden&quot;
+		End If
+	Col_ST = 0x10
+Else
+	Progr_bg.visibility = &quot;visible&quot;
+	Progr_start.visibility = &quot;hidden&quot;
+	Progr_stop.visibility = &quot;hidden&quot;
+	Prog_num.visibility = &quot;hidden&quot;
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub ShGroups()
+Dim GR_Status As Short
+If OU != Nothing Then
+	If ((OU.SuspendedFlags &amp; PLS_SUSP_CMD) != 0) Then
+		HighlightGrTxt(GR_work_1, False)
+		HighlightGrTxt(GR_work_2, False)
+		HighlightGrTxt(GR_work_3, False)
+		HighlightGrTxt(GR_work_4, False)
+		HighlightGrTxt(GR_work_5, False)
+		HighlightGrTxt(GR_work_6, False)
+		HighlightGrTxt(GR_work_7, False)
+		HighlightGrTxt(GR_work_8, False)
+		HighlightGrTxt(GR_work_9, False)
+		Exit Sub
+	End If
+End If
+If (Z4.Quality != PLS_QUAL_BAD) Then
+	GR_Status = Z4.Value
+	If ((GR_Status &amp; 0x1) &gt; 0) Then
+		HighlightGrTxt(GR_work_1, True)
+	Else
+		HighlightGrTxt(GR_work_1, False)
+	End If
+	If ((GR_Status &amp; 0x2) &gt; 0) Then
+		HighlightGrTxt(GR_work_2, True)
+	Else
+		HighlightGrTxt(GR_work_2, False)
+	End If
+	If ((GR_Status &amp; 0x4) &gt; 0) Then
+		HighlightGrTxt(GR_work_3, True)
+	Else
+		HighlightGrTxt(GR_work_3, False)
+	End If
+	If ((GR_Status &amp; 0x8) &gt; 0) Then
+		HighlightGrTxt(GR_work_4, True)
+	Else
+		HighlightGrTxt(GR_work_4, False)
+	End If
+	If ((GR_Status &amp; 0x10) &gt; 0) Then
+		HighlightGrTxt(GR_work_5, true)
+	Else
+		HighlightGrTxt(GR_work_5, False)
+	End If
+	If ((GR_Status &amp; 0x20) &gt; 0) Then
+		HighlightGrTxt(GR_work_6, True)
+	Else
+		HighlightGrTxt(GR_work_6, False)
+	End If
+	If ((GR_Status &amp; 0x40) &gt; 0) Then
+		HighlightGrTxt(GR_work_7, True)
+	Else
+		HighlightGrTxt(GR_work_7, False)
+	End If
+	If ((GR_Status &amp; 0x80) &gt; 0) Then
+		HighlightGrTxt(GR_work_8, True)
+	Else
+		HighlightGrTxt(GR_work_8, False)
+	End If
+	If ((GR_Status &amp; 0x100) &gt; 0) Then
+		HighlightGrTxt(GR_work_9, True)
+	Else
+		HighlightGrTxt(GR_work_9, False)
+	End If
+Else
+	HighlightGrTxt(GR_work_1, False)
+	HighlightGrTxt(GR_work_2, False)
+	HighlightGrTxt(GR_work_3, False)
+	HighlightGrTxt(GR_work_4, False)
+	HighlightGrTxt(GR_work_5, False)
+	HighlightGrTxt(GR_work_6, False)
+	HighlightGrTxt(GR_work_7, False)
+	HighlightGrTxt(GR_work_8, False)
+	HighlightGrTxt(GR_work_9, False)
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub ShGroupFrames()
+Dim GR_frame_Status As Short
+If OU != Nothing Then
+	If ((OU.SuspendedFlags &amp; PLS_SUSP_CMD) != 0) Then
+		Col_Fr_1 = 10	&apos;нулевая палитра = Col_Grey3
+		Col_Fr_2 = 10
+		Col_Fr_3 = 10
+		Col_Fr_4 = 10
+		Col_Fr_5 = 10
+		Col_Fr_6 = 10
+		Col_Fr_7 = 10
+		Col_Fr_8 = 10
+		Col_Fr_9 = 10
+		Exit Sub
+	End If
+End If
+If (Z2.Quality != PLS_QUAL_BAD) Then
+	GR_frame_Status = Z2.Value
+	If ((GR_frame_Status &amp; 0x10) &gt; 0) Then
+		Col_Fr_1 = 0x40	&apos;нулевая палитра = мигающий Black
+	ElseIf ((GR_frame_Status &amp; 0x20) &gt; 0) Then
+		Col_Fr_1 = 0	&apos;нулевая палитра = black
+	Else
+		Col_Fr_1 = 10	&apos;нулевая палитра = Col_Grey3
+	End If
+	If ((GR_frame_Status &amp; 0x40) &gt; 0) Then
+		Col_Fr_2 = 0x40
+	ElseIf ((GR_frame_Status &amp; 0x80) &gt; 0) Then
+		Col_Fr_2 = 0
+	Else
+		Col_Fr_2 = 10
+	End If
+	If ((GR_frame_Status &amp; 0x100) &gt; 0) Then
+		Col_Fr_3 = 0x40
+	ElseIf ((GR_frame_Status &amp; 0x200) &gt; 0) Then
+		Col_Fr_3 = 0
+	Else
+		Col_Fr_3 = 10
+	End If
+	If ((GR_frame_Status &amp; 0x400) &gt; 0) Then
+		Col_Fr_4 = 0x40
+	ElseIf ((GR_frame_Status &amp; 0x800) &gt; 0) Then
+		Col_Fr_4 = 0
+	Else
+		Col_Fr_4 = 10
+	End If
+Else
+	Col_Fr_1 = 10
+	Col_Fr_2 = 10
+	Col_Fr_3 = 10
+	Col_Fr_4 = 10
+End If
+If (Z3.Quality != PLS_QUAL_BAD) Then
+	GR_frame_Status = Z3.Value
+	If ((GR_frame_Status &amp; 0x1) &gt; 0) Then
+		Col_Fr_5 = 0x40
+	ElseIf ((GR_frame_Status &amp; 0x2) &gt; 0) Then
+		Col_Fr_5 = 0
+	Else
+		Col_Fr_5 = 10
+	End If
+	If ((GR_frame_Status &amp; 0x4) &gt; 0) Then
+		Col_Fr_6 = 0x40
+	ElseIf ((GR_frame_Status &amp; 0x8) &gt; 0) Then
+		Col_Fr_6 = 0
+	Else
+		Col_Fr_6 = 10
+	End If
+	If ((GR_frame_Status &amp; 0x10) &gt; 0) Then
+		Col_Fr_7 = 0x40
+	ElseIf ((GR_frame_Status &amp; 0x20) &gt; 0) Then
+		Col_Fr_7 = 0
+	Else
+		Col_Fr_7 = 10
+	End If
+	If ((GR_frame_Status &amp; 0x40) &gt; 0) Then
+		Col_Fr_8 = 0x40
+	ElseIf ((GR_frame_Status &amp; 0x80) &gt; 0) Then
+		Col_Fr_8 = 0
+	Else
+		Col_Fr_8 = 10
+	End If
+	If ((GR_frame_Status &amp; 0x100) &gt; 0) Then
+		Col_Fr_9 = 0x40
+	ElseIf ((GR_frame_Status &amp; 0x200) &gt; 0) Then
+		Col_Fr_9 = 0
+	Else
+		Col_Fr_9 = 10
+	End If
+Else
+	Col_Fr_5 = 10
+	Col_Fr_6 = 10
+	Col_Fr_7 = 10
+	Col_Fr_8 = 10
+	Col_Fr_9 = 10
+End If
+
+End Sub</rt:sub>
+    <rt:sub>Sub HighlightGrTxt(ByVal TxtObj As RtSvgObj, ByVal Highlight As Boolean)
+If Highlight Then
+	TxtObj.fill = 0
+	TxtObj.font_size = 15
+	TxtObj.font_weight = &quot;bold&quot;
+Else
+	TxtObj.fill = 0x505050
+	TxtObj.font_size = 10
+	TxtObj.font_weight = &quot;normal&quot;
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (KKS != &quot;NULL&quot;) Then
+	Z0 = BIN(KKS + &quot;_Z0&quot;)
+	Z1 = BIN(KKS + &quot;_Z1&quot;)
+	Z2 = BIN(KKS + &quot;_Z2&quot;)
+	Z3 = BIN(KKS + &quot;_Z3&quot;)
+	Z4 = BIN(KKS + &quot;_Z4&quot;)
+	OU = BIN(KKS + &quot;_OU&quot;)
+	If GR_number &gt; 9 Then
+		GR_number = 9
+	End If
+End If
+If Z0 == Nothing Then
+	Col_AH = 14
+	Col_ST = 14
+	body.fill_opacity = 1
+	HighlightGrTxt(GR_work_1, False)
+	HighlightGrTxt(GR_work_2, False)
+	HighlightGrTxt(GR_work_3, False)
+	HighlightGrTxt(GR_work_4, False)
+	HighlightGrTxt(GR_work_5, False)
+	HighlightGrTxt(GR_work_6, False)
+	HighlightGrTxt(GR_work_7, False)
+	HighlightGrTxt(GR_work_8, False)
+	HighlightGrTxt(GR_work_9, False)
+End If</rt:event>
+    <rt:event type="OnResize">Al_frame.x = 2.5
+Al_frame.y = 2.5
+Al_frame.width = _This.width - 5
+Al_frame.height = _This.height - 5
+InGr.x = 0
+InGr.y = 0
+InGr.width = _This.width 
+InGr.height = _This.height</rt:event>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>KKS != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(KKS) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChRights">
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>MyStrokeWdth = FrameStrokeWidth (Operate, OU)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetGroups">
+      <rt:condition>Z4 != Nothing</rt:condition>
+      <rt:chgItem>Z4</rt:chgItem>
+      <rt:chgItem>OU</rt:chgItem>
+      <rt:code>ShGroups()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetGroupFrames">
+      <rt:condition>(Z2 != Nothing) &amp;&amp; (Z3 != Nothing)</rt:condition>
+      <rt:chgItem>Z2</rt:chgItem>
+      <rt:chgItem>Z3</rt:chgItem>
+      <rt:chgItem>OU</rt:chgItem>
+      <rt:code>ShGroupFrames()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GetStatus">
+      <rt:condition>(Z0 != Nothing) &amp;&amp; (Z1 != Nothing)</rt:condition>
+      <rt:chgItem>Z0</rt:chgItem>
+      <rt:chgItem>Z1</rt:chgItem>
+      <rt:chgItem>OU</rt:chgItem>
+      <rt:code>ShStatus()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="7.5" y="7.5" width="85" height="60" rx="0" ry="0" id="backgr" fill="url(#Cylinder_horizontal2)" stroke="none"/> 
+  <rect x="7.5" y="7.5" width="85" height="60" rx="0" ry="0" id="body" fill="Col_Grey2" fill-opacity="0.349997" stroke="none">
+    <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, Col_AH, 11)"/> 
+  </rect>
+  <g id="Progr_bg">
+    <rect x="10" y="20" width="22.5" height="35" rx="0" ry="0" fill="Col_Grey2" stroke="Col_Grey4"/> 
+    <polyline points="10,55 32.5,55 32.5,20" fill="none" stroke="Col_Grey5" stroke-width="1.5"/> 
+    <g stroke="Col_Grey4">
+      <line x1="12.5" y1="25" x2="27.5" y2="25"/> 
+      <line x1="12.5" y1="27.5" x2="22.5" y2="27.5"/> 
+      <line x1="12.5" y1="30" x2="27.5" y2="30" stroke="Col_Grey5" stroke-width="1.5"/> 
+      <line x1="12.5" y1="32.5" x2="30" y2="32.5"/> 
+      <line x1="12.5" y1="35" x2="20" y2="35"/> 
+    </g>
+  </g>
+  <text x="20" y="52.5" id="Prog_num" visibility="hidden" rt:detect="disabled" fill="black" font-family="AAP_Font1" font-size="20" font-weight="bold" text-anchor="middle">
+    <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, Col_ST, 7)"/> 
+X</text>
+  <g id="Progr_start" visibility="hidden" rt:detect="disabled">
+    <polyline points="15,47.5 27.5,37.5 15,27.5" fill="black" stroke="Col_Grey4">
+      <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, Col_ST, 7)"/> 
+    </polyline>
+    <line x1="15" y1="27.5" x2="15" y2="46.75" stroke="Col_Grey1" stroke-width="1"/> 
+  </g>
+  <g id="Progr_stop" visibility="hidden" rt:detect="disabled">
+    <rect x="12.5" y="30" width="15" height="15" rx="0" ry="0" fill="black" stroke="Col_Grey5">
+      <rt:dyn type="fill" mode="cyclic" value="PRJSPEC.ObjectColorEx(3, Col_ST, 7)"/> 
+    </rect>
+    <polyline points="12.5,45 12.5,30 27.5,30" fill="none" stroke="Col_Grey1"/> 
+  </g>
+  <polygon points="10,47.5 10,42.5 12.5,40 17.5,40 25,32.5 25,27.5 27.5,25 32.5,25 27.5,30 30,32.5 35,27.5 35,32 32.5,35 27.5,35 20,42.5 20,47.5 17.5,50 12.5,50 17.5,45 15,42.5" id="Repair_mode" visibility="hidden" rt:detect="disabled" fill="black" stroke="none"/> 
+  <rect x="37.5" y="12.5" width="15" height="15" rx="0" ry="0" id="GR_st_1" fill="none" stroke="black">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.ObjectColorEx(0, Col_Fr_1, 8)"/> 
+  </rect>
+  <rect x="55" y="12.5" width="15" height="15" rx="0" ry="0" id="GR_st_2" fill="none" stroke="black">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.ObjectColorEx(0, Col_Fr_2, 8)"/> 
+  </rect>
+  <rect x="72.5" y="12.5" width="15" height="15" rx="0" ry="0" id="GR_st_3" fill="none" stroke="black">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.ObjectColorEx(0, Col_Fr_3, 8)"/> 
+  </rect>
+  <rect x="37.5" y="30" width="15" height="15" rx="0" ry="0" id="GR_st_4" fill="none" stroke="black">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.ObjectColorEx(0, Col_Fr_4, 8)"/> 
+  </rect>
+  <rect x="55" y="30" width="15" height="15" rx="0" ry="0" id="GR_st_5" fill="none" stroke="black">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.ObjectColorEx(0, Col_Fr_5, 8)"/> 
+  </rect>
+  <rect x="72.5" y="30" width="15" height="15" rx="0" ry="0" id="GR_st_6" fill="none" stroke="black">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.ObjectColorEx(0, Col_Fr_6, 8)"/> 
+  </rect>
+  <rect x="37.5" y="47.5" width="15" height="15" rx="0" ry="0" id="GR_st_7" fill="none" stroke="black">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.ObjectColorEx(0, Col_Fr_7, 8)"/> 
+  </rect>
+  <rect x="55" y="47.5" width="15" height="15" rx="0" ry="0" id="GR_st_8" fill="none" stroke="black">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.ObjectColorEx(0, Col_Fr_8, 8)"/> 
+  </rect>
+  <rect x="72.5" y="47.5" width="15" height="15" rx="0" ry="0" id="GR_st_9" fill="none" stroke="black">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.ObjectColorEx(0, Col_Fr_9, 8)"/> 
+  </rect>
+  <text x="45" y="25" id="GR_work_1" fill="black" font-weight="bold" text-anchor="middle">1</text>
+  <text x="62.5" y="25" id="GR_work_2" fill="black" font-weight="bold" text-anchor="middle">2</text>
+  <text x="80" y="25" id="GR_work_3" fill="black" font-weight="bold" text-anchor="middle">3</text>
+  <text x="45" y="42.5" id="GR_work_4" fill="black" font-weight="bold" text-anchor="middle">4</text>
+  <text x="62.5" y="43" id="GR_work_5" fill="black" font-weight="bold" text-anchor="middle">5</text>
+  <text x="80" y="42.5" id="GR_work_6" fill="black" font-weight="bold" text-anchor="middle">6</text>
+  <text x="45" y="60" id="GR_work_7" fill="black" font-weight="bold" text-anchor="middle">7</text>
+  <text x="62.5" y="60" id="GR_work_8" fill="black" font-weight="bold" text-anchor="middle">8</text>
+  <text x="80" y="60" id="GR_work_9" fill="black" font-weight="bold" text-anchor="middle">9</text>
+  <polyline points="7.5,67.5 92.5,67.5 92.5,7.5" id="RB_edge" fill="none" stroke="Col_Grey5" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey1"/> 
+      <rt:xy value2="Col_Grey5"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <polyline points="7.5,67.5 7.5,7.5 92.5,7.5" id="LU_edge" fill="none" stroke="Col_Grey1" stroke-width="2">
+    <rt:dyn type="stroke" mode="cyclic" value="PRJSPEC.Selected(KKS) ^ (MyStrokeWdth &lt; 2)" trans="bt">
+      <rt:xy value="false" value2="Col_Grey5"/> 
+      <rt:xy value2="Col_Grey1"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke-width" mode="onchange" value="MyStrokeWdth"/> 
+  </polyline>
+  <rect x="5" y="5" width="90" height="65" rx="0" ry="0" id="Al_frame" fill="none" stroke="Col_Red" stroke-width="2">
+    <rt:dyn type="visibility" mode="cyclic" value="PRJSPEC.AlarmVis(AStat)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="stroke" mode="constant" value="Color_Alarm"/> 
+  </rect>
+  <rect x="0" y="0" width="100" height="75" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="0" y="0" width="100" height="75" rx="0" ry="0" id="Sel_area" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnMiddleClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Нет привязки.&quot;, 5)
+ElseIf Z0 != nothing Then
+	Open_Win_Uni(False, &quot;rights&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS + &quot;|&quot; + CStr(Operate))
+Else
+	NoLink(KKS)
+End If</rt:event>
+    <rt:event type="OnClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Нет привязки.&quot;, 5)
+ElseIf Z0 != nothing Then
+	Open_ws_wf_wi(&quot;TPTS_GS_6&quot;, KKS + &quot;|&quot; + CStr(GR_number) + &quot;|&quot; + CStr(StopStart), Operate)
+Else
+	ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS, 0)
+End If</rt:event>
+    <rt:event type="OnRightClick">If KKS == &quot;NULL&quot; Then
+	ShowMessage (&quot;Нет привязки.&quot;, 5)
+ElseIf Z0 != nothing Then
+	If Operate &amp;&amp; Check_Oper_Rights(OU) Then
+		LoadPopUpMenu(KKS + &quot;|GS o|TPTS_GS_6 &quot; + KKS + &quot;|&quot; + CStr(GR_number) + &quot;|&quot; + CStr(StopStart))
+	Else
+		LoadPopUpMenu(KKS + &quot;|GS i|TPTS_GS_6 &quot; + KKS + &quot;|&quot; + CStr(GR_number) + &quot;|&quot; + CStr(StopStart))
+	End If
+Else
+	ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS, 0)
+End If</rt:event>
+  </rect>
+</svg>

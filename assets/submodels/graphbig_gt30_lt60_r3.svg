@@ -1,0 +1,117 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg color="Col_Grey2" xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="-100 0 1900 900" width="1274" height="910" id="graphbig_gt30_lt60_r3">
+  <rt:model modelversion="7.2.0.23" comment="Создано VNIIAES-ASUTP\geskin 30.11.2012 16:47:41">
+    <rt:param name="PointID1" datatype="double" comment="Температура"/> 
+    <rt:param name="PointID2" datatype="double" comment="Давление"/> 
+    <rt:param name="PointID3" datatype="string" comment="Текст - координаты"/> 
+    <rt:param name="PointID4" datatype="boolean" comment="Отображать"/> 
+    <rt:var name="x_coord" datatype="double" comment=""/> 
+    <rt:var name="y_coord" datatype="double" comment=""/> 
+    <rt:var name="x_coord_T" datatype="double" comment=""/> 
+    <rt:var name="y_coord_T" datatype="double" comment=""/> 
+    <rt:var name="x_coord_P" datatype="double" comment=""/> 
+    <rt:var name="y_coord_P" datatype="double" comment=""/> 
+    <rt:sub>Sub graph()
+	if (PointID1 &gt;= 20) &amp;&amp; (PointID1 &lt;= 168) then
+		x_coord = 10*(PointID1 - 20)
+		y_coord = 900 - (PointID2 - 50)*3.6
+	elseif (PointID1 &gt; 168) then
+		x_coord = 1480
+		y_coord = 900 - (PointID2 - 50)*3.6
+	else	
+		x_coord = -1000000
+		y_coord = 900 - (PointID2 - 50)*3.6
+	end if
+	if (PointID2 &gt; 300) then	
+		y_coord = 0
+	end if	
+	if (PointID2 &lt; 50) then	
+		y_coord = 900
+	end if	
+	x_coord_T = x_coord + 15
+	y_coord_T = y_coord + 55
+	x_coord_P = x_coord + 15
+	y_coord_P = y_coord - 20	
+	if (x_coord&gt;1285) then 
+		x_coord_T = 1300 
+		x_coord_P = 1300		
+	end if
+	if (y_coord&gt;850) then 
+		y_coord_T = y_coord - 20 
+		y_coord_P = y_coord - 75 
+	end if
+	
+End Sub</rt:sub>
+    <rt:changeTrigger name="graph">
+      <rt:chgItem>PointID1</rt:chgItem>
+      <rt:chgItem>PointID2</rt:chgItem>
+      <rt:code>graph()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="-155.424" y="0" width="1668.33" height="1015" rx="0" ry="0" fill="white" fill-opacity="0">
+    <title>Нажать для перехода обратно к видеокадру &quot;Целостность первого контура&quot;</title>
+    <rt:event type="OnClick">LoadNew(&quot;SPPB5&quot;)</rt:event>
+  </rect>
+  <g>
+    <rt:dyn type="visibility" mode="unknown" value="PointID4" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <polygon points="0,900 0,0 1480,0 1480,900" fill="Col_Red" stroke="black"/> 
+    <polygon points="0,900 0,436.122 9.967,428.116 19.935,414.864 29.902,398.225 39.869,379.588 49.84,359.986 59.807,340.196 69.774,320.8 79.742,302.227 89.709,284.796 99.677,268.733 109.644,254.203 119.611,241.319 129.579,230.155 139.549,220.752 149.516,213.124 161.577,206.273 1196.12,206.273 1480,206.273 1480,900" fill="Col_Orange" stroke="black"/> 
+    <polygon points="0,900 0,650.873 9.967,645.606 19.935,635.998 29.902,624.308 39.869,611.874 49.84,599.425 59.807,587.282 69.774,575.51 79.742,564.012 89.709,552.625 99.677,541.148 109.644,529.38 119.611,517.151 129.579,504.342 139.549,490.882 149.516,476.762 159.484,462.031 169.451,446.807 179.418,431.269 189.386,415.66 199.353,400.273 209.32,385.463 219.288,371.639 229.255,359.251 239.226,348.804 249.193,340.844 259.16,335.948 265.141,334.742 1196.12,334.742 1480,334.742 1480,900" fill="Col_Yellow" stroke="black"/> 
+    <polygon points="1384,99 1396,136 1372,136" transform="rotate(90 1050 566)"/> 
+    <text x="1467" y="946.25" font-size="30" font-weight="bold">T,°С</text>
+    <text x="-100" y="-26.75" font-size="30" font-weight="bold">P, кгс/см2</text>
+    <polygon points="0,-17 12,20 -12,20"/> 
+    <text x="-23" y="949" font-size="30" font-weight="bold">20</text>
+    <text x="177" y="949" font-size="30" font-weight="bold">40</text>
+    <text x="378" y="949" font-size="30" font-weight="bold">60</text>
+    <text x="579" y="949" font-size="30" font-weight="bold">80</text>
+    <text x="770" y="949" font-size="30" font-weight="bold">100</text>
+    <text x="971" y="949" font-size="30" font-weight="bold">120</text>
+    <text x="-65.788" y="910.333" font-size="30" font-weight="bold">50</text>
+    <text x="-87" y="731.394" font-size="30" font-weight="bold">100</text>
+    <text x="-87" y="551" font-size="30" font-weight="bold">150</text>
+    <text x="-87" y="370" font-size="30" font-weight="bold">200</text>
+    <text x="-87" y="190" font-size="30" font-weight="bold">250</text>
+    <line x1="0" y1="900" x2="1480" y2="900" stroke="black" stroke-width="5"/> 
+    <line x1="-20" y1="180" x2="1480" y2="180" stroke="black" stroke-dasharray="10,10" stroke-width="2"/> 
+    <line x1="-20" y1="360" x2="1480" y2="360" stroke="black" stroke-dasharray="10,10" stroke-width="2"/> 
+    <line x1="-20" y1="540" x2="1480" y2="540" stroke="black" stroke-dasharray="10,10" stroke-width="2"/> 
+    <line x1="-20" y1="720" x2="1480" y2="720" stroke="black" stroke-dasharray="10,10" stroke-width="2"/> 
+    <line x1="200" y1="0" x2="200" y2="920" stroke="black" stroke-dasharray="10,10" stroke-width="2"/> 
+    <line x1="400" y1="0" x2="400" y2="920" stroke="black" stroke-dasharray="10,10" stroke-width="2"/> 
+    <line x1="600" y1="0" x2="600" y2="920" stroke="black" stroke-dasharray="10,10" stroke-width="2"/> 
+    <line x1="800" y1="0" x2="800" y2="920" stroke="black" stroke-dasharray="10,10" stroke-width="2"/> 
+    <line x1="1000" y1="0" x2="1000" y2="920" stroke="black" stroke-dasharray="10,10" stroke-width="2"/> 
+    <line x1="1200" y1="0" x2="1200" y2="920" stroke="black" stroke-dasharray="10,10" stroke-width="2"/> 
+    <line x1="1400" y1="0" x2="1400" y2="920" stroke="black" stroke-dasharray="10,10" stroke-width="2"/> 
+    <text x="1171.67" y="949.667" font-size="30" font-weight="bold">140</text>
+    <line x1="0" y1="10" x2="0" y2="900" stroke="black" stroke-width="5"/> 
+    <text x="1365.82" y="949.818" font-size="30" font-weight="bold">&gt;160</text>
+    <text x="1486.06" y="217.152" font-size="30" font-weight="bold">242,7 кгс/см2</text>
+    <text x="1486.36" y="347.455" font-size="30" font-weight="bold">207,0 кгс/см2</text>
+    <rect x="-92.878" y="-41.9696" width="1787.45" height="1003.03" rx="0" ry="0" fill="white" fill-opacity="0">
+      <title>Нажать для перехода обратно к видеокадру &quot;Целостность первого контура&quot;</title>
+      <rt:event type="OnClick">LoadNew(&quot;SPPB5&quot;)</rt:event>
+    </rect>
+    <polyline points="101.5,475 228.5,415 332.5,381 456.5,358" fill="none" stroke="Col_Cyan" stroke-dasharray="5,5" stroke-width="3">
+      <rt:dyn type="points" mode="onchange" value="PointID3"/> 
+    </polyline>
+    <circle cx="341.615" cy="565" r="12.3077" fill="Col_Cyan">
+      <rt:dyn type="cx" mode="onchange" value="x_coord"/> 
+      <rt:dyn type="cy" mode="onchange" value="y_coord"/> 
+    </circle>
+    <text x="378.5" y="539" font-size="40" font-weight="bold">
+      <rt:dyn type="text" mode="onchange" value="&apos;P= &apos; + CStr(Round(PointID2, 2))"/> 
+      <rt:dyn type="x" mode="onchange" value="x_coord_P"/> 
+      <rt:dyn type="y" mode="onchange" value="y_coord_P"/> 
+x_coord</text>
+    <text x="376.545" y="620.909" font-size="40" font-weight="bold">
+      <rt:dyn type="text" mode="onchange" value="&apos;T= &apos; + CStr(Round(PointID1, 2))"/> 
+      <rt:dyn type="x" mode="onchange" value="x_coord_T"/> 
+      <rt:dyn type="y" mode="onchange" value="y_coord_T"/> 
+y_coord</text>
+  </g>
+</svg>

@@ -1,0 +1,27 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 275 12" width="275" height="12" id="scroll_line" font-family="AAP_Font3" font-weight="bold">
+  <rt:model comment="Служебная подмодель ПОРТАЛа" revision="4.0-6.0">
+    <rt:param name="Txt_line" datatype="string" comment="Выводимая строка"/> 
+    <rt:param name="IsActive" datatype="boolean" value="False" comment="Активность подсветки"/> 
+    <rt:param name="NumChars" datatype="int" value="25" comment="Количество символов в строке"/> 
+    <rt:param name="Background_Color" datatype="string" value="white" comment="Цвет подложки строки без выделения"/> 
+    <rt:sub>Sub HighlightMe()
+If IsActive Then
+	Backgr.fill = &quot;Col_Blue&quot;
+	TxtStr.fill = &quot;Col_Yellow&quot;
+Else
+	Backgr.fill = Background_Color
+	TxtStr.fill = &quot;black&quot;
+End If
+End Sub</rt:sub>
+    <rt:event type="OnResize">TxtStr.font_size = _This.height * 0.75</rt:event>
+    <rt:changeTrigger name="ChColor">
+      <rt:chgItem>IsActive</rt:chgItem>
+      <rt:code>HighlightMe()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="275" height="12.5" rx="0" ry="0" id="Backgr" fill="Col_Blue" stroke="none"/> 
+  <text x="2.25" y="9.25" id="TxtStr" fill="Col_Yellow" clip-path="url(#Backgr)">
+    <rt:dyn type="text" mode="cyclic" value="PLStrCut(Txt_line ,NumChars)"/> 
+Строка</text>
+</svg>

@@ -1,0 +1,97 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 150 25" width="150" height="25" id="ps_ana_vexp_inv_spec1" font-family="AAP_Font1">
+  <desc>Аналоговый индикатор - экспоненциаьлные показания на фоне цвета качества</desc>
+  <rt:model comment="Пользовательская подмодель ПОРТАЛа" revision="4.1">
+    <rt:param name="PointID" datatype="string" comment="Идентификатор сигнала"/> 
+    <rt:param name="PointID_AZ" datatype="string" value="NULL" comment="идентификатор переменной верхней аварийной границы"/> 
+    <rt:param name="NumDig" datatype="ushort" value="2" comment="количество знаков после десятичной точки"/> 
+    <rt:var name="pv" datatype="PlsPVAna" comment="аналоговый сигнал БД"/> 
+    <rt:var name="pv_AZ" datatype="PlsPVAna" comment="DB var"/> 
+    <rt:var name="In_Group" datatype="boolean" comment="в группе"/> 
+    <rt:var name="ValStr" datatype="string" value="***" comment="строка индикации"/> 
+    <rt:var name="ValColor" datatype="uint" comment="цвет индикации"/> 
+    <rt:sub>Sub ValCalc()
+If pv == Nothing Then
+	ValStr = &quot;- - -&quot;
+	ValColor = Color_ANA_ER_LINK
+Else
+	ValStr = PRJSPEC.CExp(pv.Value, NumDig)
+End If
+	If (pv_AZ == Nothing) Then
+		ValColor = Color_NB(pv)
+	Else
+		If (pv.Value &gt; pv_AZ.Value) Then
+			ValColor = Color_ANA_HI_A
+		ElseIf (pv.Value &gt; (pv_AZ.Value * 105.0 / 107.0)) Then
+			ValColor = Color_ANA_HI_P
+		Else
+			ValColor = Color_ANA_GOOD
+		End If
+	End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">Set pv = ANA(PointID)
+If PointID_AZ != &quot;NULL&quot; Then
+	Set pv_AZ = ANA(PointID_AZ)
+End If
+ValColor = Color_ANA_ER_LINK</rt:event>
+    <rt:event type="OnResize">InGr.x = 2.5
+InGr.width = _This.width - 5</rt:event>
+    <rt:event type="OnClick">Dim s As String
+If pv == Nothing Then
+	s = &quot;Ошибка привязки.\nPointID = \&quot;&quot; + PointID + &quot;\&quot;&quot;
+	ShowWarning (s, 0)
+ElseIf (PointID_AZ != &quot;NULL&quot;) &amp;&amp; (pv_AZ == Nothing) Then
+	s = &quot;Ошибка привязки.\nPointID_AZ = \&quot;&quot; + PointID_AZ + &quot;\&quot;&quot;
+	ShowWarning (s, 0)
+ElseIf (pv_AZ.Value &gt; pv.RangeHigh) || (pv_AZ.Value &lt; pv.RangeLow) Then
+	s = &quot;Ошибка.\nВеличина уставки\nвышла за диапазон.&quot;
+	ShowWarning (s, 0)
+ElseIf (PointID_AZ == &quot;NULL&quot;) Then
+	Call_Win (&quot;ws_ANA_NB&quot;, pv.PVId + &quot;|&quot; + CStr(NumDig))
+Else
+	s = pv.PVId + &quot;|&quot; + pv_AZ.PVId
+	Open_Win_Uni(False, &quot;wi_&quot; + PointID, &quot;Составной объект &quot; + pv.CategoryText, &quot;wi_MultyPV&quot;, s)
+End If</rt:event>
+    <rt:event type="OnRightClick">Dim s As String
+If pv == Nothing Then
+	s = &quot;Ошибка привязки.\nPointID = \&quot;&quot; + PointID + &quot;\&quot;&quot;
+	ShowWarning (s, 0)
+ElseIf (PointID_AZ != &quot;NULL&quot;) &amp;&amp; (pv_AZ == Nothing) Then
+	s = &quot;Ошибка привязки.\nPointID_AZ = \&quot;&quot; + PointID_AZ + &quot;\&quot;&quot;
+	ShowWarning (s, 0)
+ElseIf (pv_AZ.Value &gt; pv.RangeHigh) || (pv_AZ.Value &lt; pv.RangeLow) Then
+	s = &quot;Ошибка.\nВеличина уставки\nвышла за диапазон.&quot;
+	ShowWarning (s, 0)
+ElseIf (PointID_AZ == &quot;NULL&quot;) Then
+	LoadPopUpMenu(pv.PVId + &quot;|ANAi|ws_ANA_NB &quot; + pv.PVId + &quot;|&quot;+CStr(NumDig))
+Else
+	TmpBuffer(0) = pv.PVId
+	TmpBuffer(1) = pv_AZ.PVId
+	LoadPopUpMenu(PointID + &quot;|NONi|&quot;)
+End If</rt:event>
+    <rt:changeTrigger name="GRP">
+      <rt:condition>pv != Nothing</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(pv.PVId) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc">
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:chgItem>pv_AZ.IsValid</rt:chgItem>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="150" height="25" rx="0" ry="0" id="Backgr" fill="Col_Green" stroke="none">
+    <rt:dyn type="fill" mode="onchange" value="ValColor"/> 
+  </rect>
+  <polyline points="0,25 0,0 150,0" id="LU_edge" fill="none" stroke="#eeeeee" stroke-width="2"/> 
+  <polyline points="0,25 150,25 150,0" id="RB_edge" fill="none" stroke="#666666" stroke-width="2"/> 
+  <text x="75" y="20" id="V_text" fill="black" font-size="20" font-weight="bold" text-anchor="middle">
+    <rt:dyn type="text" mode="onchange" value="ValStr"/> 
+-8.888e-88</text>
+  <rect x="2.5" y="2.5" width="145" height="20" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="1.5">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+</svg>

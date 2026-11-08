@@ -1,0 +1,671 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 100 25" width="100" height="25" id="DS_ana_bar_h" stroke="Col_Grey5">
+  <desc>Универсальный барограф с заливкой от нуля горизонтальный</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.2">
+    <rt:param name="FKKS" datatype="string" value="" comment="KKS или полный идентификатор сигнала"/> 
+    <rt:param name="FName" datatype="boolean" value="False" comment="идентификатор (True) или KKS (False)"/> 
+    <rt:param name="Suffix" datatype="string" value="XQ01" comment="суффикс в идентификаторе после KKS"/> 
+    <rt:param name="NoBounds" datatype="boolean" value="False" comment="Не окрашивать показания при переходе через границы"/> 
+    <rt:param name="FillFromZero" datatype="boolean" value="True" comment="Заливать вверх положительную область и вниз - отрицательную"/> 
+    <rt:param name="ShowLogScale" datatype="boolean" value="False" comment="Показывать в логарифмическом масштабе"/> 
+    <rt:param name="UseExternalBounds" datatype="boolean" value="false" comment="Использовать пользовательские уставки из параметров привязки (только при NoBounds = False)"/> 
+    <rt:param name="val_HR" datatype="double" value="-9999" comment="значение верхнего диапазона барографа (только для UseExternalBounds)"/> 
+    <rt:param name="val_LR" datatype="double" value="-9999" comment="значение нижнего диапазона барографа (только для UseExternalBounds)"/> 
+    <rt:param name="val_HAB" datatype="double" value="-9999" comment="значение верхней аварийной уставки (только для UseExternalBounds)"/> 
+    <rt:param name="val_HWB" datatype="double" value="-9999" comment="значение верхней предупредительной уставки (только для UseExternalBounds)"/> 
+    <rt:param name="val_HTB" datatype="double" value="-9999" comment="значение верхней технологической уставки (только для UseExternalBounds)"/> 
+    <rt:param name="val_LTB" datatype="double" value="-9999" comment="значение нижней технологической уставки (только для UseExternalBounds)"/> 
+    <rt:param name="val_LWB" datatype="double" value="-9999" comment="значение нижней предупредительной уставки (только для UseExternalBounds)"/> 
+    <rt:param name="val_LAB" datatype="double" value="-9999" comment="значение нижней аварийной уставки (только для UseExternalBounds)"/> 
+    <rt:var name="pv" datatype="PlsPVAna" comment="аналоговый сигнал БД"/> 
+    <rt:var name="B_HIHI" datatype="PlsPVBin" value="" comment="DB var"/> 
+    <rt:var name="B_HI" datatype="PlsPVBin" value="" comment="DB var"/> 
+    <rt:var name="B_H" datatype="PlsPVBin" value="" comment="DB var"/> 
+    <rt:var name="B_L" datatype="PlsPVBin" value="" comment="DB var"/> 
+    <rt:var name="B_LO" datatype="PlsPVBin" value="" comment="DB var"/> 
+    <rt:var name="B_LOLO" datatype="PlsPVBin" value="" comment="DB var"/> 
+    <rt:var name="B_IMITATION" datatype="PlsPVBin" value="" comment="DB var"/> 
+    <rt:var name="val_R_HI" datatype="double" value="" comment="actual value"/> 
+    <rt:var name="val_B_HIHI" datatype="double" value="" comment="actual value"/> 
+    <rt:var name="val_B_HI" datatype="double" value="" comment="actual value"/> 
+    <rt:var name="val_B_H" datatype="double" value="" comment="actual value"/> 
+    <rt:var name="val_B_L" datatype="double" value="" comment="actual value"/> 
+    <rt:var name="val_B_LO" datatype="double" value="" comment="actual value"/> 
+    <rt:var name="val_B_LOLO" datatype="double" value="" comment="actual value"/> 
+    <rt:var name="val_R_LO" datatype="double" value="" comment="actual value"/> 
+    <rt:var name="NPos" datatype="float" comment="null level"/> 
+    <rt:var name="LPos" datatype="float" comment="L level"/> 
+    <rt:var name="LoPos" datatype="float" comment="Lo level"/> 
+    <rt:var name="LoLoPos" datatype="float" comment="LoLo level"/> 
+    <rt:var name="HPos" datatype="float" comment="H level"/> 
+    <rt:var name="HiPos" datatype="float" comment="Hi level"/> 
+    <rt:var name="HiHiPos" datatype="float" comment="HiHi level"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="object in group"/> 
+    <rt:var name="wdth" datatype="float" comment="object width"/> 
+    <rt:var name="ValColor" datatype="uint" comment="цвет индикации"/> 
+    <rt:var name="In_Alarm" datatype="ubyte" comment="Наличие сигнализации" value="0"/> 
+    <rt:var name="MyAlarm" datatype="boolean" value="true" comment="синализации сигнала принадлежат текущему пользователю"/> 
+    <rt:var name="HasError" datatype="boolean" value="false" comment="при инициализации произошла ошибка"/> 
+    <rt:var name="Object_Type" datatype="ubyte" value="0" comment="Тип объекта 1-обычный; 2-логарифмический"/> 
+    <rt:var name="Range_Error" datatype="boolean" value="False" comment="Верхняя граница меньше нижней"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub AckMe()
+If Allow_Confirm &amp;&amp; Blink_on_NACK &amp;&amp; flag_confirm &amp;&amp; (In_Alarm &gt; 0) &amp;&amp; MyAlarm Then
+	If pv.NotAcknowledged Then
+		pv.AcknowledgeAlarm(0)
+	End If
+	AckThisBinPV(B_HIHI)
+	AckThisBinPV(B_HI)
+	AckThisBinPV(B_H)
+	AckThisBinPV(B_L)
+	AckThisBinPV(B_LO)
+	AckThisBinPV(B_LOLO)
+&apos;	AckThisBinPV(B_IMITATION)
+	In_Alarm = False
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub AckThisBinPV(ByVal curPV As PlsPVBin)
+	If (curPV != Nothing) Then
+		If curPV.NotAcknowledged Then
+			curPV.AcknowledgeAlarm(0)
+		End If
+	End If
+End Sub</rt:sub>
+    <rt:sub>Sub ValCalc()
+Dim v As double
+Dim aux_size As Float
+If (pv == Nothing) || (Object_Type == 0) Then
+	body.x = 0
+	body.width = wdth
+	Exit Sub
+ElseIf (val_R_HI == val_R_LO) Then
+	body.x = 0
+	body.width = wdth
+Else
+	v = pv.Value
+	If (v &gt; val_R_HI) Then
+		v = val_R_HI
+		H_range_exceed.visibility = &quot;visible&quot;
+		L_range_exceed.visibility = &quot;hidden&quot;
+	ElseIf (v &lt; val_R_LO) Then
+		v = val_R_LO
+		L_range_exceed.visibility = &quot;visible&quot;
+		H_range_exceed.visibility = &quot;hidden&quot;
+	Else
+		H_range_exceed.visibility = &quot;hidden&quot;
+		L_range_exceed.visibility = &quot;hidden&quot;
+	End If
+	If Object_Type == 1 Then
+		If FillFromZero Then
+			If (val_R_LO * val_R_HI &lt; 0) Then
+				If (v &gt;= 0) Then
+					body.x = val_R_LO / (val_R_LO - val_R_HI) * wdth
+					body.width = v / (val_R_HI - val_R_LO) * wdth
+				Else
+					body.x = (v - val_R_LO) / (val_R_HI - val_R_LO) * wdth
+					body.width = -v / (val_R_HI - val_R_LO) * wdth
+				End If
+			ElseIf (val_R_HI &lt; 0) Then
+				body.x = (v - val_R_LO) / (val_R_HI - val_R_LO) * wdth
+				body.width = (val_R_HI - v) / (val_R_HI - val_R_LO) * wdth
+			Else
+				body.x = 0
+				body.width = (v - val_R_LO) / (val_R_HI - val_R_LO) * wdth
+			End If
+		Else
+			body.x = 0
+			body.width = (v - val_R_LO) / (val_R_HI - val_R_LO) * wdth
+		End If
+	ElseIf Object_Type == 2 Then
+		If val_R_LO &gt; 0 Then		//слева-направо
+			body.x = 0
+			body.width = (Log(v / val_R_LO)) / (Log(val_R_HI / val_R_LO)) * wdth
+		ElseIf val_R_HI &lt; 0 Then	//справа-налево
+			If v == 0 Then	//защита от деления на ноль
+				v = val_R_HI * 0.99
+			End If
+			body.x = (Log(val_R_LO / v)) / (Log(val_R_LO / val_R_HI)) * wdth
+			body.width = Log(v / val_R_HI) / Log(val_R_LO / val_R_HI) * wdth
+		Else
+			body.x = 0
+			body.width = (v - val_R_LO) / (val_R_HI - val_R_LO) * wdth
+		End If
+		
+	Else
+		body.x = 0
+		body.width = wdth
+	End If
+End If
+If NoBounds Then
+	ValColor = Color_NB(pv)
+ElseIf UseExternalBounds Then
+	v = pv.Value
+	ValColor = Color_ANA_GOOD
+	If Range_Error Then
+		ValColor = Color_Inval
+	ElseIf ((pv.SuspendedFlags &amp; PLS_SUSP_CMD) &gt; 0 ) Then
+		ValColor = Color_Remont
+	ElseIf (pv.Quality == PLS_QUAL_BAD) Then
+		ValColor = Color_Inval
+	ElseIf (pv.QualitySubstatus == PLS_QUALSUB_LOCALOVERRIDE) Then
+		ValColor = Color_Imitation
+	ElseIf (v &gt; val_R_HI) || (v &lt; val_R_LO) Then
+		ValColor = Color_Inval
+	ElseIf (val_B_HIHI &lt; val_R_HI) &amp;&amp; (v &gt; val_B_HIHI) Then
+		ValColor = Color_ANA_HI_A
+	ElseIf (val_B_LOLO &gt; val_R_LO) &amp;&amp; (v &lt; val_B_LOLO) Then
+		ValColor = Color_ANA_LO_A
+	ElseIf (val_B_HI &lt; val_R_HI) &amp;&amp; (v &gt; val_B_HI) Then
+		ValColor = Color_ANA_HI_P
+	ElseIf (val_B_LO &gt; val_R_LO) &amp;&amp; (v &lt; val_B_LO) Then
+		ValColor = Color_ANA_LO_P
+	ElseIf (val_B_H &lt; val_R_HI) &amp;&amp; (v &gt; val_B_H) Then
+		ValColor = Color_ANA_HI_T
+	ElseIf (val_B_L &gt; val_R_LO) &amp;&amp; (v &lt; val_B_L) Then
+		ValColor = Color_ANA_LO_T
+	End If
+ElseIf FName Then
+	ValColor = PRJSPEC.ANA_Color_pv(pv)
+Else
+	ValColor = PRJSPEC.ANA_Color_XH(FKKS, Suffix)
+End If
+If (ValColor == Color_ANA_GOOD) &amp;&amp; !In_Alarm Then
+	ValColor = Middle_Color_Wieghted(ValColor, 0xcdcdcd, 0.5)
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Show_Bounds()
+If (pv != Nothing) Then
+	If UseExternalBounds &amp;&amp; !NoBounds Then
+		val_R_HI = val_HR
+		val_R_LO = val_LR
+		Range_Error = (val_R_LO &gt;= val_R_HI)
+		If !Range_Error Then
+			If (val_HAB == -9999) Then
+				val_B_HIHI = val_R_HI + (val_R_HI - val_R_LO)/100.0
+			Else
+				val_B_HIHI = val_HAB
+			End If
+			If (val_HWB == -9999) Then
+				val_B_HI = val_R_HI + (val_R_HI - val_R_LO)/100.0
+			Else
+				val_B_HI = val_HWB
+			End If
+			If (val_HTB == -9999) Then
+				val_B_H = val_R_HI + (val_R_HI - val_R_LO)/100.0
+			Else
+				val_B_H = val_HTB
+			End If
+			If (val_LTB == -9999) Then
+				val_B_L = val_R_LO - (val_R_HI - val_R_LO)/100.0
+			Else
+				val_B_L = val_LTB
+			End If
+			If (val_LWB == -9999) Then
+				val_B_LO = val_R_LO - (val_R_HI - val_R_LO)/100.0
+			Else
+				val_B_LO = val_LWB
+			End If
+			If (val_LAB == -9999) Then
+				val_B_LOLO = val_R_LO - (val_R_HI - val_R_LO)/100.0
+			Else
+				val_B_LOLO = val_LAB
+			End If
+		End If
+	Else
+		val_R_HI = pv.RangeHigh
+		val_R_LO = pv.RangeLow
+		Range_Error = CBool(val_R_LO &gt;= val_R_HI)
+
+		If !Range_Error Then
+			If pv.UseBoundsHigh(2) &amp;&amp; !NoBounds Then
+				val_B_HIHI = pv.BoundsHigh(2)
+			Else
+				val_B_HIHI = val_R_HI + (val_R_HI - val_R_LO)/100.0
+			End If
+			If pv.UseBoundsHigh(1) &amp;&amp; !NoBounds Then
+				val_B_HI = pv.BoundsHigh(1)
+			Else
+				val_B_HI = val_R_HI + (val_R_HI - val_R_LO)/100.0
+			End If
+			If pv.UseBoundsHigh(0) &amp;&amp; !NoBounds Then
+				val_B_H = pv.BoundsHigh(0)
+			Else
+				val_B_H = val_R_HI + (val_R_HI - val_R_LO)/100.0
+			End If
+			If pv.UseBoundsLow(0) &amp;&amp; !NoBounds Then
+				val_B_L = pv.BoundsLow(0)
+			Else
+				val_B_L = val_R_LO - (val_R_HI - val_R_LO)/100.0
+			End If
+			If pv.UseBoundsLow(1) &amp;&amp; !NoBounds Then
+				val_B_LO = pv.BoundsLow(1)
+			Else
+				val_B_LO = val_R_LO - (val_R_HI - val_R_LO)/100.0
+			End If
+			If pv.UseBoundsLow(2) &amp;&amp; !NoBounds Then
+				val_B_LOLO = pv.BoundsLow(2)
+			Else
+				val_B_LOLO = val_R_LO - (val_R_HI - val_R_LO)/100.0
+			End If
+		End If
+	End If
+End If
+
+If (pv != Nothing) &amp;&amp; !Range_Error Then
+	If ((val_R_HI * val_R_LO) &lt; 0) &amp;&amp; FillFromZero Then
+		line_null.visibility = &quot;visible&quot;
+		NPos = val_R_LO / (val_R_LO - val_R_HI) * wdth
+	Else
+		line_null.visibility = &quot;hidden&quot;
+		NPos = 0
+	End if
+
+	If val_B_HIHI &lt;= val_R_HI Then
+		rect_hihi.visibility = &quot;visible&quot;
+		HiHiPos = AutoPos(val_B_HIHI)
+	Else
+		rect_hihi.visibility = &quot;hidden&quot;
+		HiHiPos = 0
+	End If
+	If val_B_HI &lt;= val_R_HI Then
+		rect_hi.visibility = &quot;visible&quot;
+		HiPos = AutoPos(val_B_HI)
+	Else
+		rect_hi.visibility = &quot;hidden&quot;
+		HiPos = 0
+	End If
+	If val_B_H &lt;= val_R_HI Then
+		rect_h.visibility = &quot;visible&quot;
+		HPos = AutoPos(val_B_H)
+	Else
+		rect_h.visibility = &quot;hidden&quot;
+		HPos = 0
+	End If
+	If val_B_L &gt;= val_R_LO Then
+		rect_l.visibility = &quot;visible&quot;
+		LPos = AutoPos(val_B_L)
+	Else
+		rect_l.visibility = &quot;hidden&quot;
+		LPos = 0
+	End If
+	If val_B_LO &gt;= val_R_LO Then
+		rect_lo.visibility = &quot;visible&quot;
+		LoPos = AutoPos(val_B_LO)
+	Else
+		rect_lo.visibility = &quot;hidden&quot;
+		LoPos = 0
+	End If
+	If val_B_LOLO &gt;= val_R_LO Then
+		rect_lolo.visibility = &quot;visible&quot;
+		LoLoPos = AutoPos(val_B_LOLO)
+	Else
+		rect_lolo.visibility = &quot;hidden&quot;
+		LoLoPos = 0
+	End If
+Else
+	body.x = 0
+	body.width = wdth
+	line_null.visibility = &quot;hidden&quot;
+	rect_hihi.visibility = &quot;hidden&quot;
+	rect_hi.visibility = &quot;hidden&quot;
+	rect_h.visibility = &quot;hidden&quot;
+	rect_l.visibility = &quot;hidden&quot;
+	rect_lo.visibility = &quot;hidden&quot;
+	rect_lolo.visibility = &quot;hidden&quot;
+End If
+ValCalc()
+DetectAlarms()
+End Sub</rt:sub>
+    <rt:sub>Sub DetectAlarms()
+If PRJSPEC.GET_Susp(pv.PVId, False) || UseExternalBounds || NoBounds Then
+	In_Alarm = 0
+	Exit Sub
+End If
+If MyAlarm &amp;&amp; pv.NotAcknowledged Then
+	If pv.AlarmType == PLS_ALARMTYP_NONE Then
+		In_Alarm = 1	//снятая неквитированная сигнализация
+	Else
+		In_Alarm = 3	//нормальная неквитированная сигнализация
+	End If
+Else
+	In_Alarm = 0
+End If
+If FName Then
+	Exit Sub
+End If
+If B_HIHI != Nothing Then
+	If MyAlarm &amp;&amp; B_HIHI.NotAcknowledged Then
+		If B_HIHI.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+If B_HI != Nothing Then
+	If MyAlarm &amp;&amp; B_HI.NotAcknowledged Then
+		If B_HI.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+If B_H != Nothing Then
+	If MyAlarm &amp;&amp; B_H.NotAcknowledged Then
+		If B_H.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+If B_L != Nothing Then
+	If MyAlarm &amp;&amp; B_L.NotAcknowledged Then
+		If B_L.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+If B_LO != Nothing Then
+	If MyAlarm &amp;&amp; B_LO.NotAcknowledged Then
+		If B_LO.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+If B_LOLO != Nothing Then
+	If MyAlarm &amp;&amp; B_LOLO.NotAcknowledged Then
+		If B_LOLO.AlarmType == PLS_ALARMTYP_NONE Then
+			In_Alarm = In_Alarm | 1
+		Else
+			In_Alarm = In_Alarm | 3
+		End If
+	End If
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub CheckUsrGr()
+If UseExternalBounds || NoBounds Then
+	MyAlarm = False
+ElseIf Alarms_ForUser Then	//если надо распределять сигнализаци по пользователям
+	MyAlarm = PRJSPEC.CheckPvOwner(pv.PVId, True)
+Else
+	MyAlarm = True
+End If
+If !(FName || NoBounds) Then	//уставки BIN есть только для привязки через KKS с границами
+	If B_HIHI != Nothing Then
+		If Alarms_ForUser Then
+			MyAlarm = MyAlarm || PRJSPEC.CheckPvOwner(B_HIHI.PVId, False)
+		End If
+	End If
+	If B_HI != Nothing Then
+		If Alarms_ForUser Then
+			MyAlarm = MyAlarm || PRJSPEC.CheckPvOwner(B_HI.PVId, False)
+		End If
+	End If
+	If B_H != Nothing Then
+		If Alarms_ForUser Then
+			MyAlarm = MyAlarm || PRJSPEC.CheckPvOwner(B_H.PVId, False)
+		End If
+	End If
+	If B_L != Nothing Then
+		If Alarms_ForUser Then
+			MyAlarm = MyAlarm || PRJSPEC.CheckPvOwner(B_L.PVId, False)
+		End If
+	End If
+	If B_LO != Nothing Then
+		If Alarms_ForUser Then
+			MyAlarm = MyAlarm || PRJSPEC.CheckPvOwner(B_LO.PVId, False)
+		End If
+	End If
+	If B_LOLO != Nothing Then
+		If Alarms_ForUser Then
+			MyAlarm = MyAlarm || PRJSPEC.CheckPvOwner(B_LOLO.PVId, False)
+		End If
+	End If
+End If
+DetectAlarms()
+End Sub</rt:sub>
+    <rt:sub>Function AutoPos(ByVal LinVal As Double) As Float
+If (pv == Nothing) Then
+	AutoPos = wdth	//wdth - это бывший верх, теперь - право
+ElseIf (val_R_HI == val_R_LO) Then		//защита от деления на ноль
+		AutoPos = 0
+ElseIf LinVal == 0 Then	//защита от деления на ноль
+	If val_R_LO &gt; 0 Then	//когда ноль слева
+		AutoPos = 0
+	Else
+		AutoPos = wdth
+	End If
+ElseIf (Object_Type == 2) &amp;&amp;  (val_R_LO * val_R_HI &gt; 0) Then
+	If (LinVal &lt;= val_R_LO) Then
+		AutoPos = 0
+	ElseIf (LinVal &gt; val_R_HI) Then
+		AutoPos = wdth
+	ElseIf (val_R_LO &gt; 0) Then	//традиционный - слева-направо
+		AutoPos = Log(LinVal / val_R_LO) / Log(val_R_HI / val_R_LO) * wdth
+	ElseIf (val_R_HI &lt; 0) Then //отрицательная область - справа-налево
+		AutoPos = (1 - (Log(val_R_HI / LinVal) / Log(val_R_HI / val_R_LO))) * wdth
+	Else
+		AutoPos = -1	//для любого типа заливки это означает, что что-то не так
+	End If
+Else
+	AutoPos = (1 - ((val_R_HI - LinVal) / (val_R_HI - val_R_LO))) * wdth
+
+End If
+End Function</rt:sub>
+    <rt:event type="OnResize">InGr.x = -2.5
+InGr.width = _This.width + 5</rt:event>
+    <rt:event type="OnInitialize">wdth = _This.width
+If FName Then
+	Set pv = ANA(FKKS)
+Else
+	Set pv = ANA(FKKS + &quot;_&quot; + Suffix)
+	If !NoBounds &amp;&amp; (pv != Nothing) Then
+		Set B_IMITATION = GetImitationPV(pv.PVId)
+		If (PRJSPEC.GET_KKS (FKKS, 1) == &quot;Н.Д.&quot;) Then
+			Set B_HIHI = BIN(FKKS + &quot;_&quot; + BIN_HI_A)
+			Set B_HI = BIN(FKKS + &quot;_&quot; + BIN_HI_P)
+			Set B_H = BIN(FKKS + &quot;_&quot; + BIN_HI_T)
+			Set B_L = BIN(FKKS + &quot;_&quot; + BIN_LO_T)
+			Set B_LO = BIN(FKKS + &quot;_&quot; + BIN_LO_P)
+			Set B_LOLO = BIN(FKKS + &quot;_&quot; + BIN_LO_A)
+		Else
+			Set B_HIHI = BIN(PRJSPEC.GET_KKS (FKKS, 6))
+			Set B_HI = BIN(PRJSPEC.GET_KKS (FKKS, 5))
+			Set B_H = BIN(PRJSPEC.GET_KKS (FKKS, 4))
+			Set B_L = BIN(PRJSPEC.GET_KKS (FKKS, 3))
+			Set B_LO = BIN(PRJSPEC.GET_KKS (FKKS, 2))
+			Set B_LOLO = BIN(PRJSPEC.GET_KKS (FKKS, 1))
+		End If
+	End If
+End If
+ValColor = Color_ANA_ER_LINK
+If UseExternalBounds &amp;&amp; !NoBounds Then
+	val_R_HI = val_HR
+	val_R_LO = val_LR
+Else
+	val_R_HI = pv.RangeHigh
+	val_R_LO = pv.RangeLow
+End If
+Range_Error = (val_R_LO &gt;= val_R_HI)
+&apos;Тип объекта 1-обычный; 2-логарифмический
+If (pv != Nothing) &amp;&amp; !Range_Error Then
+	If ShowLogScale &amp;&amp; (val_R_HI * val_R_LO &gt; 0) Then
+		Object_Type = 2
+	Else
+		Object_Type = 1
+	End If
+End If
+H_range_exceed.visibility = &quot;hidden&quot;
+CheckUsrGr()</rt:event>
+    <rt:changeTrigger name="GRP">
+      <rt:condition>pv != Nothing</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(pv.PVId) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChBounds">
+      <rt:condition>!UseExternalBounds</rt:condition>
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:code>Show_Bounds()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChUsrBounds">
+      <rt:condition>UseExternalBounds</rt:condition>
+      <rt:chgItem>val_HR</rt:chgItem>
+      <rt:chgItem>val_LR</rt:chgItem>
+      <rt:chgItem>val_HAB</rt:chgItem>
+      <rt:chgItem>val_HWB</rt:chgItem>
+      <rt:chgItem>val_HTB</rt:chgItem>
+      <rt:chgItem>val_LTB</rt:chgItem>
+      <rt:chgItem>val_LWB</rt:chgItem>
+      <rt:chgItem>val_LAB</rt:chgItem>
+      <rt:code>Show_Bounds()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="IsItMyAlarm">
+      <rt:condition>Blink_on_NACK &amp;&amp; Alarms_ForUser</rt:condition>
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>CheckUsrGr()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_pv">
+      <rt:condition>!HasError</rt:condition>
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_HIHI">
+      <rt:condition>!HasError &amp;&amp; (B_HIHI != Nothing)</rt:condition>
+      <rt:chgItem>B_HIHI</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_HI">
+      <rt:condition>!HasError &amp;&amp; (B_HI != Nothing)</rt:condition>
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:chgItem>B_HI</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_H">
+      <rt:condition>!HasError &amp;&amp; (B_H != Nothing)</rt:condition>
+      <rt:chgItem>B_H</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_LOLO">
+      <rt:condition>!HasError &amp;&amp; (B_LOLO != Nothing)</rt:condition>
+      <rt:chgItem>B_LOLO</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_LO">
+      <rt:condition>!HasError &amp;&amp; (B_LO != Nothing)</rt:condition>
+      <rt:chgItem>B_LO</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_L">
+      <rt:condition>!HasError &amp;&amp; (B_L != Nothing)</rt:condition>
+      <rt:chgItem>B_L</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="VCalc_Imitation">
+      <rt:condition>!HasError &amp;&amp; (B_IMITATION != Nothing)</rt:condition>
+      <rt:chgItem>B_IMITATION</rt:chgItem>
+      <rt:code>DetectAlarms()</rt:code>
+      <rt:code>ValCalc()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="65" y="2.5" width="35" height="20" rx="0" ry="0" id="rect_h" fill="Col_Cyan" stroke-width="1">
+    <rt:dyn type="fill" mode="constant" value="Middle_Color_Wieghted(Color_ANA_HI_T, 0xffffff, 0.35)"/> 
+    <rt:dyn type="width" mode="onchange" value="wdth - HPos"/> 
+    <rt:dyn type="x" mode="onchange" value="HPos"/> 
+  </rect>
+  <rect x="75" y="2.5" width="25" height="20" rx="0" ry="0" id="rect_hi" fill="Col_Yellow" stroke-width="1">
+    <rt:dyn type="fill" mode="constant" value="Middle_Color_Wieghted(Color_ANA_HI_P, 0xffffff, 0.35)"/> 
+    <rt:dyn type="width" mode="onchange" value="wdth - HiPos"/> 
+    <rt:dyn type="x" mode="onchange" value="HiPos"/> 
+  </rect>
+  <rect x="85" y="2.5" width="15" height="20" rx="0" ry="0" id="rect_hihi" fill="Col_Red" stroke-width="1">
+    <rt:dyn type="fill" mode="constant" value="Middle_Color_Wieghted(Color_ANA_HI_A, 0xffffff, 0.35)"/> 
+    <rt:dyn type="width" mode="onchange" value="wdth - HiHiPos"/> 
+    <rt:dyn type="x" mode="onchange" value="HiHiPos"/> 
+  </rect>
+  <rect x="0" y="2.5" width="35" height="20" rx="0" ry="0" id="rect_l" fill="Col_Cyan" stroke-width="1">
+    <rt:dyn type="fill" mode="constant" value="Middle_Color_Wieghted(Color_ANA_LO_T, 0xffffff, 0.35)"/> 
+    <rt:dyn type="width" mode="onchange" value="LPos"/> 
+  </rect>
+  <rect x="0" y="2.5" width="25" height="20" rx="0" ry="0" id="rect_lo" fill="Col_Yellow" stroke-width="1">
+    <rt:dyn type="fill" mode="constant" value="Middle_Color_Wieghted(Color_ANA_LO_P, 0xffffff, 0.35)"/> 
+    <rt:dyn type="width" mode="onchange" value="LoPos"/> 
+  </rect>
+  <rect x="0" y="2.5" width="15" height="20" rx="0" ry="0" id="rect_lolo" fill="Col_Red" stroke-width="1">
+    <rt:dyn type="fill" mode="constant" value="Middle_Color_Wieghted(Color_ANA_LO_A, 0xffffff, 0.35)"/> 
+    <rt:dyn type="width" mode="onchange" value="LoLoPos"/> 
+  </rect>
+  <line x1="50" y1="2.5" x2="50" y2="22.5" id="line_null" stroke="black" stroke-width="2">
+    <rt:dyn type="x1" mode="onchange" value="NPos"/> 
+    <rt:dyn type="x2" mode="onchange" value="NPos"/> 
+  </line>
+  <rect x="0" y="5" width="100" height="15" rx="0" ry="0" id="Backgr_rect" fill="Col_BGmain" fill-opacity="0.849997" stroke="none"/> 
+  <rect x="0" y="5" width="100" height="15" rx="0" ry="0" id="body" fill="Col_Green" stroke="none">
+    <rt:dyn type="fill" mode="cyclic" value="ShowInAlarmColor(In_Alarm, ValColor, Col_Ar(11))"/> 
+  </rect>
+  <rect x="0" y="5" width="100" height="15" rx="0" ry="0" id="Backgr_frame" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <polygon points="97.5,7.5 102.5,12.5 97.5,17.5" id="H_range_exceed" visibility="visible" rt:detect="enabled" fill="Col_Grey1" stroke-width="1">
+    <rt:dyn type="fill" mode="onchange" value="Logical_Color(_Blink1, Color_Inval, Col_Ar(11))"/> 
+  </polygon>
+  <polygon points="2.5,7.5 -2.5,12.5 2.5,17.5" id="L_range_exceed" visibility="hidden" rt:detect="disabled" fill="Col_Grey1" stroke-width="1">
+    <rt:dyn type="fill" mode="onchange" value="Logical_Color(_Blink1, Color_Inval, Col_Ar(11))"/> 
+  </polygon>
+  <rect x="-2.5" y="0" width="105" height="25" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="1.5">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="-2.5" y="0" width="105" height="25" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">Dim aux_cmd As String
+If (Object_Type == 2) &amp;&amp; (pv != nothing) Then
+	aux_cmd = &quot;|&quot; + CStr(pv.RoundDigits)
+Else
+	aux_cmd = &quot;|-1&quot;
+End If
+If pv == nothing Then
+	NoLink(FKKS)
+ElseIf Range_Error Then
+	ShowWarning(&quot;Ошибка привязки границ.\nВерх = &quot; + CStr(val_R_HI) + &quot;\nНиз = &quot; + CStr(val_R_LO), 5)
+ElseIf Object_Type == 0 Then
+	ShowWarning(&quot;Ошибка определения типа.&quot;, 5)
+ElseIf NoBounds || UseExternalBounds Then
+	Call_Win (&quot;ws_ANA_NB&quot;, pv.PVId + aux_cmd)
+ElseIf FName Then
+	Call_Win (&quot;ws_ANA_FN&quot;, FKKS + aux_cmd)
+Else
+	Call_Win (&quot;ws_ANA&quot;, FKKS+&quot;|&quot;+Suffix + aux_cmd)
+End If</rt:event>
+    <rt:event type="OnRightClick">Dim aux_cmd As String
+If (Object_Type == 2) &amp;&amp; (pv != nothing) Then
+	aux_cmd = &quot;|&quot; + CStr(pv.RoundDigits)
+Else
+	aux_cmd = &quot;|-1&quot;
+End If
+If pv == nothing Then
+	NoLink(FKKS)
+ElseIf Range_Error Then
+	ShowWarning(&quot;Ошибка привязки границ.\nВерх = &quot; + CStr(val_R_HI) + &quot;\nНиз = &quot; + CStr(val_R_LO), 5)
+ElseIf Object_Type == 0 Then
+	ShowWarning(&quot;Ошибка определения типа.&quot;, 5)
+ElseIf NoBounds || UseExternalBounds Then
+	LoadPopUpMenu(pv.PVId + &quot;|ANAi|ws_ANA_NB &quot; + pv.PVId + aux_cmd)
+ElseIf FName Then
+	LoadPopUpMenu(FKKS + &quot;|ANAi|ws_ANA_FN &quot; + FKKS + aux_cmd)
+Else
+	LoadPopUpMenu(pv.PVId + &quot;|ANAi|ws_ANA &quot; + FKKS+&quot;|&quot;+Suffix + aux_cmd)
+End If</rt:event>
+  </rect>
+</svg>

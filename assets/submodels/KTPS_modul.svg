@@ -1,0 +1,12 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 80 75" width="80" height="75" id="KTPS_modul">
+  <desc>Описание индикаторов модулей КТПС-ПН</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="4.0-6.0"/> 
+  <rect x="0" y="0" width="80" height="75" rx="0" ry="0" id="backgr" fill="Col_BGmain" stroke="Col_Grey5" stroke-linejoin="miter" stroke-width="2"/> 
+  <polyline points="0,75 0,0 80,0" id="LT_border" fill="none" stroke="Col_Grey1" stroke-linecap="butt" stroke-linejoin="miter" stroke-width="2"/> 
+  <g fill="black" font-family="AAP_Font1" font-weight="bold" text-anchor="end">
+    <text x="77.5" y="17.5" font-size="13">Модуль:</text>
+    <text x="77.5" y="40" font-size="12">Отказ:</text>
+    <text x="77.5" y="65" font-size="12">Связь с ПК:</text>
+  </g>
+</svg>

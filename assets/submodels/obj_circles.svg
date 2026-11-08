@@ -1,0 +1,34 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 10 10" width="10" height="10" id="obj_circles">
+  <rt:model modelversion="7.2.0.18" comment="Служебная подмодель ПОРТАЛа">
+    <rt:var name="cnt" datatype="byte" value="0" comment=""/> 
+    <rt:sub>Sub ChCnt()
+If (cnt &lt; 3) Then
+	cnt = cnt + 1
+Else
+	cnt = 0
+End If
+End Sub</rt:sub>
+    <rt:cycleTrigger name="MyCycle" cycle="200" unit="millisecond">
+      <rt:code>ChCnt()</rt:code>
+    </rt:cycleTrigger>
+  </rt:model>
+  <circle cx="5" cy="5" r="0.5" id="r1" fill="none" stroke="deepskyblue" stroke-width="2">
+    <rt:dyn type="visibility" mode="unknown" value="(cnt == 1)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </circle>
+  <circle cx="5" cy="5" r="2" id="r2" fill="none" stroke="deepskyblue" stroke-width="2">
+    <rt:dyn type="visibility" mode="unknown" value="(cnt == 2)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </circle>
+  <circle cx="5" cy="5" r="4" id="r3" fill="none" stroke="deepskyblue" stroke-width="2">
+    <rt:dyn type="visibility" mode="unknown" value="(cnt == 3)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </circle>
+</svg>

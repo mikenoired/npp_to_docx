@@ -1,0 +1,287 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 25 100" width="25" height="100" id="scroll_bar_v">
+  <desc>Скроллбар верт.</desc>
+  <rt:model comment="Служебная подмодель ПОРТАЛа" revision="6.0">
+    <rt:param name="NN" datatype="int" value="20" comment="количество эл-тов списка"/> 
+    <rt:param name="MM" datatype="int" value="2" comment="количество видимых эл-тов списка"/> 
+    <rt:param name="int_MM" datatype="int" value="2" comment="локальное откорректированное количество видимых эл-тов списка"/> 
+    <rt:param name="N_first" datatype="int" value="3" comment="первый видимый зл-т"/> 
+    <rt:param name="N" datatype="int" value="1" comment="текущий эл-т"/> 
+    <rt:param name="Tint" datatype="string" value="white" comment="Оттенок серого для отображения скролл-бара"/> 
+    <rt:var name="w" datatype="float" value="0" comment="ширина, она же - высота кнопок"/> 
+    <rt:var name="h" datatype="float" value="0" comment="высота"/> 
+    <rt:var name="s" datatype="string" value="" comment="my new var"/> 
+    <rt:var name="sb_vis" datatype="boolean" value="True" comment="видимость скролбара"/> 
+    <rt:var name="SB_Colors" datatype="uint" comment="Основные цвета - массив. 0 - чёрный, а 1...5 аналогичны Col_Grey1...5" arraysize="6"/> 
+    <rt:var name="ActivateSlider" datatype="boolean" value="false" comment="Активирована функция сдвига слайдера"/> 
+    <rt:var name="sl_up" datatype="double" value="0" comment="абсолютная позиция верхней части слайдера"/> 
+    <rt:var name="sl_ht" datatype="double" value="0" comment="высота слайдера"/> 
+    <rt:var name="MouseY_start" datatype="float" comment="Начальная позиция по оси Y, где был клик, до смещения слайдера"/> 
+    <rt:var name="Pix_per_line" datatype="float" comment="Количество пикселей слайдера, приходящихся на одну строк списка" value="0"/> 
+    <rt:var name="PgDn_timer" datatype="byte" value="5" comment="Page Down счётчик обратного отсчёта для таймера выдержки"/> 
+    <rt:var name="PgUp_timer" datatype="byte" value="5" comment="Page Up счётчик обратного отсчёта для таймера выдержки"/> 
+    <rt:var name="PgDn_active" datatype="boolean" value="false" comment="Page Down полоска нажата"/> 
+    <rt:var name="PgUp_active" datatype="boolean" value="false" comment="Page Up полоска нажата"/> 
+    <rt:sub>Sub Move_Slider_PgDown()
+If !ActivateSlider Then
+	If (N_first &lt;= (NN - 2 * int_MM + 1)) Then
+		N_first = N_first + int_MM
+	Else
+		N_first = NN - int_MM + 1
+	End If
+	N = 0
+//	Slider_pos()
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Move_Slider_PgUp()
+If !ActivateSlider Then
+	If (N_first &gt; int_MM) Then
+		N_first = N_first - int_MM
+	Else
+		N_first = 1
+	End If
+	N = 0
+//	Slider_pos()
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub DeactivateSlider()
+	ActivateSlider = false
+End Sub</rt:sub>
+    <rt:sub>Sub PgDn_check()
+Dim x As float
+Dim y As float
+slider_slider_rect.GetObjectSpaceMousePos(x , y)
+If y &lt; (sl_up + sl_ht) Then
+	PgDn_active = false
+End If
+If PgDn_active Then
+	If PgDn_timer &gt; 0 Then
+		PgDn_timer = PgDn_timer - 1
+	Else
+		PgDn_timer = 0
+		Move_Slider_PgDown()
+	End If
+Else
+	PgDn_timer = 5
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub PgUp_check()
+Dim x As float
+Dim y As float
+slider_slider_rect.GetObjectSpaceMousePos(x , y)
+If y &gt; sl_up Then
+	PgUp_active = false
+End If
+If PgUp_active Then
+	If PgUp_timer &gt; 0 Then
+		PgUp_timer = PgUp_timer - 1
+	Else
+		PgUp_timer = 0
+		Move_Slider_PgUp()
+	End If
+Else
+	PgUp_timer = 5
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Adjust_Pars()
+Pix_per_line = (h - 2.0 * w) / CDbl(NN)
+If NN &lt; 1 Then
+	sb_vis = False
+	Exit Sub
+Else
+	sb_vis = True
+End If
+int_MM = MM
+If MM &lt; 1 Then
+	int_MM = 1
+ElseIf MM &gt; NN Then
+	int_MM = NN
+End If
+If N &lt; 0 Then
+	N = 0
+ElseIf N &gt; NN Then
+	N = NN	//если текущий элемент выходит за видимую область, то выделение снимается
+End If
+If N_first &lt; 1 Then
+	N_first = 1
+ElseIf N_first &gt; NN - int_MM + 1 Then
+	N_first = NN - int_MM + 1
+End If
+Slider_pos()
+End Sub</rt:sub>
+    <rt:event type="OnResize">/*
+If (_This.height &lt;= 2 * _This.width) Then
+	_This.width = _This.height / 2
+End If
+*/
+w = _This.width
+h = _This.height
+Dim sc_y As Double
+sc_y = (w * 4) / h
+g_up.transform = &quot;scale(1 &quot; + CStr(sc_y) + &quot;)&quot;
+g_dn_but_dn.y = (h * 3) / 4
+g_dn.transform = &quot;scale (1 &quot; + CStr(sc_y) + &quot;) translate(0 &quot; + CStr((h - w) / sc_y - 3 * h / 4) + &quot;)&quot;
+
+If (h &lt;= 2*w) Then
+	g_up.visibility = &quot;hidden&quot;
+	g_dn.visibility = &quot;hidden&quot;
+End If
+Pix_per_line = (h - 2.0 * w) / CDbl(NN)</rt:event>
+    <rt:event type="OnInitialize">w = _This.width
+h = _This.height
+SB_Colors(0) = 0
+SB_Colors(1) = 0xebebeb
+SB_Colors(2) = 0xcdcdcd
+SB_Colors(3) = 0xafafaf
+SB_Colors(4) = 0x7d7d7d
+SB_Colors(5) = 0x555555
+If Tint != &quot;white&quot; Then	//сменить оттенок
+	Dim i As UShort
+	For i = 1 To 5
+		SB_Colors(i) = Middle_Color_Wieghted(SB_Colors(i), (0xffffff &amp; VIS.Color(Tint)), 0.65)
+	Next i
+End If
+Slider_pos()</rt:event>
+    <rt:sub>Sub Slider_pos()
+If MM &gt;= NN Then
+	sb_vis = False
+Else
+	sb_vis = True
+	sl_up = w + ((h - 2 * w) * (N_first - 1)) / NN + 1
+	sl_ht = ((h - 2 * w) * int_MM) / NN - 2
+	slider_slider_rect.height = sl_ht
+	If !ActivateSlider Then	//чтобы слайдер не проскальзывал во время движения отключим его перепозиционирование
+		slider_slider_rect.y = sl_up
+		slider_slider_pl.points = &quot;0,&quot; + CStr(sl_up + sl_ht) + &quot; 0,&quot; + CStr(sl_up) + &quot; &quot; + CStr(slider_slider_rect.width) + &quot;,&quot; + CStr(sl_up)
+	End If
+	pg_up.y = w
+	pg_up.height = sl_up - w
+	pg_dn.y = sl_up + sl_ht
+	pg_dn.height = h - w - sl_up - sl_ht
+End If
+End Sub</rt:sub>
+    <rt:cycleTrigger name="Ch_PgDn" cycle="200" unit="millisecond">
+      <rt:condition>PgDn_active</rt:condition>
+      <rt:code>PgDn_check()</rt:code>
+    </rt:cycleTrigger>
+    <rt:cycleTrigger name="Ch_PgUp" cycle="200" unit="millisecond">
+      <rt:condition>PgUp_active</rt:condition>
+      <rt:code>PgUp_check()</rt:code>
+    </rt:cycleTrigger>
+    <rt:changeTrigger name="Ch_N_first">
+      <rt:chgItem>N_first</rt:chgItem>
+      <rt:code>Slider_pos()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Ch_param">
+      <rt:chgItem>NN</rt:chgItem>
+      <rt:chgItem>MM</rt:chgItem>
+      <rt:chgItem>N</rt:chgItem>
+      <rt:code>Adjust_Pars()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="25" height="100" rx="0" ry="0" id="backgr" fill="Col_Grey2" stroke="Col_Grey2" stroke-width="2">
+    <rt:dyn type="fill" mode="constant" value="SB_Colors(2)"/> 
+    <rt:dyn type="stroke" mode="constant" value="SB_Colors(2)"/> 
+  </rect>
+  <rect x="0" y="25" width="25" height="1" rx="0" ry="0" id="pg_up" visibility="visible" rt:detect="enabled" fill="Col_Yellow" fill-opacity="0" stroke="none">
+    <rt:dyn type="rt:detect" mode="onchange" value="sb_vis" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:event type="OnMouseDown">Move_Slider_PgUp()
+PgUp_active = true</rt:event>
+    <rt:event type="OnMouseUp">PgUp_active = false
+PgUp_timer = 5</rt:event>
+    <rt:event type="OnMouseOut">PgUp_active = false
+PgUp_timer = 5</rt:event>
+  </rect>
+  <rect x="0" y="29" width="25" height="46" rx="0" ry="0" id="pg_dn" visibility="visible" rt:detect="enabled" fill="Col_Blue" fill-opacity="0" stroke="none">
+    <rt:event type="OnMouseDown">Move_Slider_PgDown()
+PgDn_active = true</rt:event>
+    <rt:event type="OnMouseUp">PgDn_active = false
+PgDn_timer = 5</rt:event>
+    <rt:event type="OnMouseOut">PgDn_active = false
+PgDn_timer = 5</rt:event>
+    <rt:dyn type="rt:detect" mode="onchange" value="sb_vis" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <g id="slider">
+    <rt:dyn type="visibility" mode="onchange" value="sb_vis" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rect x="0" y="26" width="25" height="3" rx="0" ry="0" id="slider_rect" fill="Col_Grey3" fill-opacity="0.75" stroke="Col_Grey4" stroke-width="2">
+      <rt:dyn type="fill" mode="onchange" value="SB_Colors(3 + CInt(ActivateSlider))"/> 
+      <rt:dyn type="stroke" mode="constant" value="SB_Colors(4)"/> 
+      <rt:event type="OnMouseDown">ActivateSlider = true
+Dim x As float
+slider_slider_rect.GetObjectSpaceMousePos(x , MouseY_start)</rt:event>
+      <rt:event type="OnMouseUp">ActivateSlider = false</rt:event>
+      <rt:event type="OnMouseOut">ActivateSlider = false</rt:event>
+      <rt:event type="OnMouseMove">If ActivateSlider Then
+	Dim x As float
+	Dim y As float
+	Dim dy As float
+	Dim tmp_sl_up As float
+	slider_slider_rect.GetObjectSpaceMousePos(x , y )
+	dy = y - MouseY_start
+	tmp_sl_up = sl_up + dy
+	If tmp_sl_up &lt; (w + 1) Then
+		tmp_sl_up = w + 1
+	ElseIf (tmp_sl_up + sl_ht + 2) &gt; (h - w) Then
+		tmp_sl_up = h - w - sl_ht - 2
+	End If
+	//это просто, чтобы подвигать слайдер красиво
+	slider_slider_rect.y = tmp_sl_up
+	slider_slider_pl.points = &quot;0,&quot; + CStr(tmp_sl_up + sl_ht) + &quot; 0,&quot; + CStr(tmp_sl_up) + &quot; &quot; + CStr(slider_slider_rect.width) + &quot;,&quot; + CStr(tmp_sl_up)
+
+	If (Abs(tmp_sl_up - sl_up) &gt;= Pix_per_line) Then	//если курсор переместили более, чем на 1 сторку
+		MouseY_start = y
+		N_first = N_first + CInt((tmp_sl_up - sl_up) / Pix_per_line)
+		If N_first &lt; 1 Then
+			N_first = 1
+		ElseIf N_first &gt; (NN - int_MM + 1) Then
+			N_first = NN - int_MM + 1
+		End If
+		Slider_pos()
+	ElseIf (tmp_sl_up == (w + 1)) &amp;&amp; (dy &lt; 0) &amp;&amp; (N_first &gt; 1) Then	//последний переход на первую строку
+		N_first = 1
+//		Slider_pos()
+	ElseIf (tmp_sl_up == (h - w - sl_ht - 2)) &amp;&amp; (dy &gt; 0) &amp;&amp; (N_first &lt; NN - int_MM + 1) Then	//последний переход на ппоследнюю строку
+		N_first = NN - int_MM + 1
+//		Slider_pos()
+	End If
+
+End If</rt:event>
+    </rect>
+    <polyline points="0,29 0,26 25,26" id="slider_pl" fill="none" stroke="Col_Grey1" stroke-width="2">
+      <rt:dyn type="stroke" mode="constant" value="SB_Colors(1)"/> 
+    </polyline>
+  </g>
+  <g id="g_up" fill="black" stroke="none">
+    <rect x="0" y="0" width="25" height="25" rx="0" ry="0" id="bg_up" fill="Col_Grey2">
+      <rt:dyn type="fill" mode="constant" value="SB_Colors(2)"/> 
+    </rect>
+    <polygon points="5,17.5 20,17.5 12.5,5" id="ar_up"/> 
+    <image width="25" height="25" xlink:href="obj_Button_icon.svg" id="but_up">
+      <rt:event type="OnMouseDown">If (N_first &gt; 1) Then
+	N_first = N_first - 1
+//	Slider_pos()
+End If</rt:event>
+    </image>
+  </g>
+  <g id="g_dn" fill="black" stroke="none">
+    <rect x="0" y="75" width="25" height="25" rx="0" ry="0" id="bg_dn" fill="Col_Grey2">
+      <rt:dyn type="fill" mode="constant" value="SB_Colors(2)"/> 
+    </rect>
+    <polygon points="5,82.5 20,82.5 12.5,95" id="ar_dn"/> 
+    <image y="75" width="25" height="25" xlink:href="obj_Button_icon.svg" id="but_dn">
+      <rt:event type="OnMouseDown">If ((N_first + MM - 1) &lt; NN) Then
+	N_first = N_first + 1
+//	Slider_pos()
+End If</rt:event>
+    </image>
+  </g>
+</svg>

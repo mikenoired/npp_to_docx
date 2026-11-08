@@ -1,0 +1,99 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="codedlayout meet" viewBox="0 0 75 25" width="75" height="25" id="obj_link">
+  <desc>Переход на другой видеокадр</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="4.0-6.1">
+    <rt:param name="ModName" datatype="string" comment="Имя нового видеокадра"/> 
+    <rt:param name="TextStr" datatype="string" value="*" comment="Строка статического текста"/> 
+    <rt:param name="T_Font" datatype="string" value="AAP_Font3" comment="Шрифт"/> 
+    <rt:param name="T_Color" datatype="string" value="black" comment="Цвет текста"/> 
+    <rt:param name="T_Style" datatype="string" value="normal" comment="Стиль"/> 
+    <rt:param name="T_Weight" datatype="string" value="bold" comment="Толщина букв шрифта"/> 
+    <rt:param name="T_Resize" datatype="float" value="1" comment="Масштаб размера шрифта X:1"/> 
+    <rt:param name="CallLocallyOnly" datatype="boolean" value="false" comment="Вызов в/к будет произведён только на этом мониторе (независимо от настроек рабочей группы)"/> 
+    <rt:event type="OnClick">If Len(ModName) &gt; 0 Then
+	If CallLocallyOnly Then
+		LoadNew(ModName)
+	Else
+		SendNew(ModName)
+	End If
+End If</rt:event>
+    <rt:event type="OnResize">Dim wdth As Float
+Dim hght As Float
+Dim corner_x As Float
+Dim t_x As Float
+Dim W_txt As String
+Dim H_txt As String
+Dim C_txt As String
+Dim halfH_txt As String
+wdth = _This.width
+hght = _This.height
+corner_x = wdth - hght
+If corner_x &lt; 0 Then
+	corner_x = 0
+End If
+W_txt = RoundAscii(wdth, 2)
+H_txt = RoundAscii(hght, 2)
+halfH_txt = RoundAscii((hght / 2), 2)
+C_txt = RoundAscii(corner_x, 2)
+bg_grad.points = &quot;0,0 0,&quot; + H_txt + &quot; &quot; + C_txt + &quot;,&quot; + H_txt + &quot; &quot; + W_txt + &quot;,&quot; + halfH_txt + &quot; &quot; + C_txt + &quot;,0&quot;
+t_x = (wdth - (hght / 2.0)) / 2.0
+In_text.x = t_x
+In_text.y = hght * 0.75
+In_text.font_size = hght * 0.75 * T_Resize
+//определяем угол поворота
+Dim R_angle As Float
+R_angle = 0
+Dim Occ_Pos As Integer
+Dim Space_Pos As Integer
+Occ_Pos = InStr(_This.transform, &quot;rotate(&quot;)
+If Occ_Pos &gt; 0 Then
+	Occ_Pos = Occ_Pos + 7
+	Space_Pos = InStr(Occ_Pos, _This.transform, &quot; &quot;)
+	If Space_Pos == 0 Then
+		Space_Pos = InStr(Occ_Pos, _This.transform, &quot;)&quot;)
+	End If
+	R_angle = CSng(Mid(_This.transform, Occ_Pos, (Space_Pos - Occ_Pos)))
+	If _Err.Number &lt; 0 Then
+		R_angle = 0
+	End If
+End If
+If (InStr(_This.transform, &quot;flipX&quot;) &gt; 0) &amp;&amp; (R_angle == 0) Then
+	edge_edge_left_top.points = &quot;0,0 &quot; + C_txt + &quot;,0&quot; + &quot; &quot; + W_txt + &quot;,&quot; + halfH_txt
+	edge_edge_right_top.points = &quot;0,0 0,&quot; + H_txt
+	In_text.transform = &quot;flipX(&quot; + CStr(t_x) + &quot;)&quot;
+Else
+	If R_angle != 0 Then
+		In_text.setTextLengthChars(0)
+		edge_edge_left_top.points = &quot;0,0 &quot; + C_txt + &quot;,0 &quot; + W_txt + &quot;,&quot; + halfH_txt
+		edge_edge_right_top.points = &quot;0,0 0,&quot; + H_txt
+		If (R_angle &gt; 45) &amp;&amp; (R_angle &lt; 225) Then
+			bg_grad.transform = &quot;flipY(&quot; + halfH_txt + &quot;)&quot;
+			edge_edge_left_top.stroke = &quot;Col_Grey4&quot;
+			edge_edge_bottom_shadow.stroke = &quot;Col_Grey1&quot;
+		Else
+			bg_grad.transform = &quot;&quot;
+			edge_edge_left_top.stroke = &quot;Col_Grey1&quot;
+			edge_edge_bottom_shadow.stroke = &quot;Col_Grey4&quot;
+		End If
+	Else
+		In_text.setTextLengthChars(-1)
+		edge_edge_left_top.points = &quot;0,&quot; + H_txt + &quot; 0,0 &quot; + C_txt + &quot;,0&quot;
+		edge_edge_right_top.points = C_txt + &quot;,0 &quot; + W_txt + &quot;,&quot; + halfH_txt
+	End If
+End If
+edge_edge_bottom_shadow.points = &quot;0,&quot; + H_txt + &quot; &quot; + C_txt + &quot;,&quot; + H_txt + &quot; &quot; + W_txt + &quot;,&quot; + halfH_txt</rt:event>
+  </rt:model>
+  <polygon points="0,0 0,25 50,25 75,12.5 50,0" id="bg_grad" fill="url(#Cylinder_horizontal)" fill-opacity="0.75" stroke="none"/> 
+  <g id="edge" fill="none" stroke-opacity="0.75" stroke-width="1">
+    <polyline points="0,25 0,0 50,0" id="edge_left_top" stroke="Col_Grey1"/> 
+    <polyline points="50,0 75,12.5" id="edge_right_top" stroke="Col_Grey2"/> 
+    <polyline points="0,25 50,25 75,12.5" id="edge_bottom_shadow" stroke="Col_Grey4"/> 
+  </g>
+  <text x="30" y="18.75" id="In_text" fill="black" fill-opacity="1" font-family="AAP_Font3" font-size="18" font-style="normal" font-weight="bold" text-anchor="middle">
+    <rt:dyn type="text" mode="onchange" value="TextStr"/> 
+    <rt:dyn type="fill" mode="onchange" value="T_Color"/> 
+    <rt:dyn type="font-family" mode="constant" value="T_Font"/> 
+    <rt:dyn type="font-weight" mode="constant" value="T_Weight"/> 
+    <rt:dyn type="font-style" mode="constant" value="T_Style"/> 
+ABCD</text>
+</svg>

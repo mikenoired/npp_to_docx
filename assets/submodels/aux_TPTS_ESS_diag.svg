@@ -1,0 +1,446 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 495 310" width="495" height="310" id="aux_TPTS_ESS_diag" font-family="AAP_Font4" font-size="13" font-weight="bold">
+  <desc>ÔÓ‰ÏÓ‰ÂÎ¸ ‰Ë‡„ÌÓÒÚËÍË ‰Îˇ “œ“— ESS</desc>
+  <rt:model comment="—ÎÛÊÂ·Ì‡ˇ ÔÓ‰ÏÓ‰ÂÎ¸ œŒ–“¿À‡" revision="6.0">
+    <rt:param name="KKS" datatype="string" comment="KKS"/> 
+    <rt:param name="F0" datatype="PlsPVBin" comment="ÛÍ‡Á‡ÚÂÎ¸ Ì‡ BST F0"/> 
+    <rt:param name="F1" datatype="PlsPVBin" comment="ÛÍ‡Á‡ÚÂÎ¸ Ì‡ BST F1"/> 
+    <rt:param name="F2" datatype="PlsPVBin" comment="ÛÍ‡Á‡ÚÂÎ¸ Ì‡ BST F2"/> 
+    <rt:param name="Z0" datatype="PlsPVBin" comment="ÛÍ‡Á‡ÚÂÎ¸ Ì‡ BST Z0"/> 
+    <rt:param name="B0" datatype="PlsPVBin" comment="ÛÍ‡Á‡ÚÂÎ¸ Ì‡ BST B0"/> 
+    <rt:param name="OU" datatype="PlsPVBin" comment="ÍÓÏ‡Ì‰‡ ÛÔ‡‚ÎÂÌËˇ"/> 
+    <rt:param name="VB6" datatype="PlsPVBin" comment="ÛÍ‡Á‡ÚÂÎ¸ Ì‡ PL VB6"/> 
+    <rt:param name="VB9" datatype="PlsPVBin" comment="ÛÍ‡Á‡ÚÂÎ¸ Ì‡ PL VB9"/> 
+    <rt:param name="VB10" datatype="PlsPVBin" comment="ÛÍ‡Á‡ÚÂÎ¸ Ì‡ PL VB10"/> 
+    <rt:param name="VB11" datatype="PlsPVBin" comment="ÛÍ‡Á‡ÚÂÎ¸ Ì‡ PL VB11"/> 
+    <rt:param name="VB12" datatype="PlsPVBin" comment="ÛÍ‡Á‡ÚÂÎ¸ Ì‡ PL VB12"/> 
+    <rt:var name="No_OU" datatype="boolean" comment="ÌÂÚ ÔÂÂÏÂÌÌÓÈ ÛÔ‡‚ÎÂÌËˇ"/> 
+    <rt:var name="STrig" datatype="boolean" value="false" comment="‚ ÂÏÓÌÚÂ"/> 
+    <rt:var name="Is_EM" datatype="boolean" value="False" comment="¿ ÌÂ EM ÎË ˝ÚÓ ÛÔ‡‚ÎˇÂÚ Ó·ÓÛ‰Ó‚‡ÌËÂÏ?"/> 
+    <rt:sub>Sub F1_diag()
+	HighlightMessage(F1_gr_UEBA, PRJSPEC.DetectBit(F1, 9), 0xf5)
+	HighlightMessage(F1_gr_UAV, PRJSPEC.DetectBit(F1, 10), 0xf5)
+	HighlightMessage(F1_gr_TE, PRJSPEC.DetectBit(F1, 11), Middle_Color_Wieghted(Color_Imitation, 0,0.75))
+	HighlightMessage(F1_gr_AZS, PRJSPEC.DetectBit(F1, 12), 0xf5)
+	HighlightMessage(F1_gr_EFZAV, PRJSPEC.DetectBit(F1, 13), 0xf5)
+	HighlightMessage(EFAZV_EFAZM, PRJSPEC.DetectBit(VB10, 12) || PRJSPEC.DetectBit(F1, 14), 0xf5)
+	HighlightMessage(F1_gr_LZAFV, PRJSPEC.DetectBit(F1, 15), 0xf5)
+	HighlightMessage(F1_gr_LZZUV, PRJSPEC.DetectBit(F1, 16), 0xf5)
+End Sub</rt:sub>
+    <rt:sub>Sub F2_diag()
+	HighlightMessage(F2_gr_DEAFS, PRJSPEC.DetectBit(F2, 12), 0xf5)
+	HighlightMessage(F2_gr_DEZUS, PRJSPEC.DetectBit(F2, 13), 0xf5)
+	HighlightMessage(F2_gr_RMF2, PRJSPEC.DetectBit(F2, 14), 0xf5)
+	HighlightMessage(F2_gr_RMF1, PRJSPEC.DetectBit(F2, 15), 0xf5)
+	HighlightMessage(F2_gr_VOV, PRJSPEC.DetectBit(F2, 16), 0xf5)
+End Sub</rt:sub>
+    <rt:sub>Sub VB6_diag()
+	HighlightMessage(VB6_gr_BAN, PRJSPEC.CheckBits(VB6, 0xe10, True), 0xf5)
+	HighlightMessage(VB6_gr_BGF, PRJSPEC.DetectBit(VB6, 8), 0xf5)
+	HighlightMessage(VB6_gr_M8_M6, PRJSPEC.CheckBits(VB6, 0x6, True), Middle_Color_Wieghted(Color_Imitation, 0,0.75))
+	If ((VB6.Value &amp; 0x80) != 0) Then
+		VB6_gr_BSM.text = &quot;“≈’ÕŒÀŒ√»◊≈— »… –≈∆»Ã&quot;
+	Else
+		VB6_gr_BSM.text = &quot;› —œÀ”¿“¿÷»ŒÕÕ€… –≈∆»Ã&quot;
+	End If
+End Sub</rt:sub>
+    <rt:sub>Sub VB9_diag()
+	HighlightMessage(VB9_gr_UEF, PRJSPEC.DetectBit(VB9, 5), 0)
+	HighlightMessage(VB9_gr_UEFS, PRJSPEC.DetectBit(VB9, 6), 0)
+	HighlightMessage(VB9_gr_PFOE, PRJSPEC.DetectBit(VB9, 7), 0)
+	HighlightMessage(VB9_gr_PFS, PRJSPEC.DetectBit(VB9, 8), 0)
+	HighlightMessage(VB9_gr_BBL, PRJSPEC.DetectBit(VB9, 9), 0xf5)
+	HighlightMessage(VB9_gr_ALOE, PRJSPEC.DetectBit(VB9, 10), 0)
+	HighlightMessage(VB9_gr_ALS, PRJSPEC.DetectBit(VB9, 11), 0)
+	HighlightMessage(VB9_gr_ABOE, PRJSPEC.DetectBit(VB9, 12), 0)
+	HighlightMessage(VB9_gr_ABS, PRJSPEC.DetectBit(VB9, 13), 0)
+	HighlightMessage(VB9_gr_S2OE, PRJSPEC.DetectBit(VB9, 14), 0)
+	HighlightMessage(VB9_gr_S2S, PRJSPEC.DetectBit(VB9, 15), 0)
+	HighlightMessage(VB9_gr_S1S, PRJSPEC.DetectBit(VB9, 16), 0)
+End Sub</rt:sub>
+    <rt:sub>Sub VB10_diag()
+	HighlightMessage(VB10_gr_PDKSB, PRJSPEC.DetectBit(VB10, 9), 0)
+	HighlightMessage(VB10_gr_BKVSB, PRJSPEC.DetectBit(VB10, 10), 0)
+	HighlightMessage(VB10_gr_S1SV, PRJSPEC.DetectBit(VB10, 11), 0xf5)
+	HighlightMessage(EFAZV_EFAZM, PRJSPEC.DetectBit(VB10, 12) || PRJSPEC.DetectBit(F1, 14), 0xf5)
+	HighlightMessage(VB10_gr_WEAF, PRJSPEC.DetectBit(VB10, 15), 0)
+	HighlightMessage(VB10_gr_WEZU, PRJSPEC.DetectBit(VB10, 16), 0)
+End Sub</rt:sub>
+    <rt:sub>Sub B0_diag()
+	HighlightMessage(B0_gr_HBOE, PRJSPEC.DetectBit(B0, 15), 0)
+	HighlightMessage(B0_gr_HBS, PRJSPEC.DetectBit(B0, 16), 0)
+End Sub</rt:sub>
+    <rt:sub>Sub Z0_diag()
+	HighlightMessage(Z0_gr_ARAF, PRJSPEC.DetectBit(Z0, 15), 0)
+	HighlightMessage(Z0_gr_ARZU, PRJSPEC.DetectBit(Z0, 16), 0)
+End Sub</rt:sub>
+    <rt:sub>Sub HighlightMessage(ByVal TxtObj As RtSvgObj, ByVal Highlight As Boolean, ByVal HighlightColor As Int)
+If Highlight Then
+	TxtObj.fill = HighlightColor
+	TxtObj.font_size = 13
+	TxtObj.font_weight = &quot;bold&quot;
+Else
+	TxtObj.fill = 0xa0a0a0
+	TxtObj.font_size = 11
+	TxtObj.font_weight = &quot;normal&quot;
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub VB12_diag()
+	HighlightMessage(VB12_gr_ABOESB2, PRJSPEC.DetectBit(VB12, 5), 0)
+	HighlightMessage(VB12_gr_ABSSB2, PRJSPEC.DetectBit(VB12, 6), 0)
+	HighlightMessage(VB12_gr_ABOESB1, PRJSPEC.DetectBit(VB12, 7), 0)
+	HighlightMessage(VB12_gr_ABSSB1, PRJSPEC.DetectBit(VB12, 8), 0)
+	HighlightMessage(VB12_gr_PP1SB, PRJSPEC.DetectBit(VB12, 9), 0)
+	HighlightMessage(VB12_gr_PSBMM, PRJSPEC.DetectBit(VB12, 10), 0)
+	HighlightMessage(VB12_gr_VRPU, PRJSPEC.DetectBit(VB12, 11), 0)
+	HighlightMessage(VB12_gr_ZNE, PRJSPEC.DetectBit(VB12, 16), 0)
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (OU == nothing) Then
+	No_OU = True
+ElseIf (OU.PVCategories != 2) Then
+	No_OU = True
+Else
+	No_OU = False
+End If
+Is_EM = ((Z0.CategoryNr % 100) == 21)</rt:event>
+    <rt:changeTrigger name="OnF0">
+      <rt:condition>F0 != Nothing</rt:condition>
+      <rt:chgItem>F0</rt:chgItem>
+      <rt:code>HighlightMessage(F0_OS, PRJSPEC.DetectBit(F0, 11), 0xf5)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnF1">
+      <rt:condition>F1 != Nothing</rt:condition>
+      <rt:chgItem>F1</rt:chgItem>
+      <rt:code>F1_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnF2">
+      <rt:condition>F2 != Nothing</rt:condition>
+      <rt:chgItem>F2</rt:chgItem>
+      <rt:code>F2_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnVB6">
+      <rt:condition>VB6 != Nothing</rt:condition>
+      <rt:chgItem>VB6</rt:chgItem>
+      <rt:code>VB6_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnVB9">
+      <rt:condition>VB9 != Nothing</rt:condition>
+      <rt:chgItem>VB9</rt:chgItem>
+      <rt:code>VB9_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnVB10">
+      <rt:condition>VB10 != Nothing</rt:condition>
+      <rt:chgItem>VB10</rt:chgItem>
+      <rt:code>VB10_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnB0">
+      <rt:condition>B0 != Nothing</rt:condition>
+      <rt:chgItem>B0</rt:chgItem>
+      <rt:code>B0_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnVB12">
+      <rt:condition>VB12 != Nothing</rt:condition>
+      <rt:chgItem>VB12</rt:chgItem>
+      <rt:code>VB12_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnZ0">
+      <rt:chgItem>Z0</rt:chgItem>
+      <rt:code>Z0_diag()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="OnOU">
+      <rt:chgItem>OU</rt:chgItem>
+      <rt:code>STrig = ((OU.SuspendedFlags &amp; PLS_SUSP_CMD) != 0)</rt:code>
+      <rt:code>HighlightMessage(OU_SUSP, STrig, 0xf5)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <g id="info_area">
+    <rect x="0" y="0" width="495" height="310" rx="0" ry="0" fill="Col_BGSand" stroke="Col_Grey1" stroke-width="2"/> 
+    <polyline points="0,310 0,0 495,0" fill="none" stroke="Col_Grey5" stroke-width="2"/> 
+  </g>
+  <g stroke="Col_TxtStatic">
+    <line x1="2.5" y1="92.5" x2="492.5" y2="92.5"/> 
+    <line x1="150" y1="2.5" x2="150" y2="307.5"/> 
+    <line x1="345" y1="2.5" x2="345" y2="307.5"/> 
+    <line x1="2.5" y1="22.5" x2="150" y2="22.5"/> 
+    <line x1="345" y1="22.5" x2="492.5" y2="22.5"/> 
+    <line x1="150" y1="198" x2="345" y2="197.5"/> 
+    <line x1="2.5" y1="227.5" x2="492.5" y2="227.5"/> 
+  </g>
+  <text x="74.999" y="17" fill="Col_TxtStatic" font-family="AAP_Font3" font-weight="bold" text-anchor="middle">«¿ –€“‹</text>
+  <text x="415.006" y="17" fill="Col_TxtStatic" font-family="AAP_Font3" font-weight="bold" text-anchor="middle">Œ“ –€“‹</text>
+  <text x="155" y="87.5" id="F0_OS" fill="Col_Red">
+    <title>F0 - 11 (OS)</title>
+    <rt:dyn type="visibility" mode="constant" value="F0 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="F0.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+Œ¡Œ¡Ÿ≈ÕÕ¿ﬂ Õ≈»—œ–¿¬ÕŒ—“‹</text>
+  <g id="F1_gr">
+    <rt:dyn type="visibility" mode="constant" value="F1 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="F1.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="155" y="12.5" id="UEBA" fill="Col_Red">
+      <title>F1 - 9 (UEBA)</title>
+Õ≈»—œ–.  ŒÃ. ¬€’Œƒ¿</text>
+    <text x="155" y="130" id="UAV" fill="Col_Red">
+      <title>F1 - 10 (UAV)</title>
+Õ»« Œ≈ Õ¿œ–ﬂ∆≈Õ»≈</text>
+    <text x="155" y="105" id="TE" fill="Col_LtBlue">
+      <title>F1 - 11 (TE)</title>
+“≈—“Œ¬€… –≈∆»Ã</text>
+    <text x="155" y="25" id="AZS" fill="Col_Red">
+      <title>F1 - 12 (AZS)</title>
+Õ≈»—œ–. —’≈Ã€ ”œ–¿¬À.</text>
+    <text x="5" y="62.5" id="EFZAV" fill="Col_Red">
+      <title>F1 - 13 (EFZAV)</title>
+Õ≈—ŒŒ“¬. —Œ—“ŒﬂÕ»ﬂ</text>
+    <text x="350" y="50" id="LZAFV" fill="Col_Red">
+      <title>F1 - 15 (LZAFV)</title>
+œ–≈¬€ÿ≈Õ»≈ ¬–≈Ã≈Õ»</text>
+    <text x="5" y="50" id="LZZUV" fill="Col_Red">
+      <title>F1 - 16 (LZZUV)</title>
+œ–≈¬€ÿ≈Õ»≈ ¬–≈Ã≈Õ»</text>
+  </g>
+  <g id="F2_gr">
+    <rt:dyn type="visibility" mode="constant" value="F2 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="F2.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="350" y="37.5" id="DEAFS" fill="Col_Red">
+      <title>F2 - 12 (DEAFS)</title>
+      <rt:dyn type="visibility" mode="constant" value="Is_EM" trans="bi">
+        <rt:xy value="false" value2="3"/> 
+        <rt:xy value2="1"/> 
+      </rt:dyn>
+¿¬¿–»…Õ€… ÃŒÃ≈Õ“</text>
+    <text x="5" y="37.5" id="DEZUS" fill="Col_Red">
+      <title>F2 - 13 (DEZUS)</title>
+      <rt:dyn type="visibility" mode="constant" value="Is_EM" trans="bi">
+        <rt:xy value="false" value2="3"/> 
+        <rt:xy value2="1"/> 
+      </rt:dyn>
+¿¬¿–»…Õ€… ÃŒÃ≈Õ“</text>
+    <text x="155" y="50" id="RMF2" fill="Col_Red">
+      <title>F2 - 14 (RMF2)</title>
+Õ≈»—œ–. ÃŒÃ. ¬€ Àﬁ◊.</text>
+    <text x="155" y="37.5" id="RMF1" fill="Col_Red">
+      <title>F2 - 15 (RMF1)</title>
+Õ≈»—œ–.  ŒÕ÷. ¬€ Àﬁ◊.</text>
+    <text x="155" y="117.5" id="VOV" fill="Col_Red">
+      <title>F2 - 16 (VOV)</title>
+Ã≈—“ÕŒ≈ ”œ–¿¬À≈Õ»≈</text>
+  </g>
+  <g id="VB6_gr">
+    <rt:dyn type="visibility" mode="constant" value="VB6 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="VB6.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="155" y="62.5" id="BAN" fill="Col_Red">
+      <title>VB6 - 5 || 6 || 7 || 12 (BAN)</title>
+ÃŒƒ”À‹ Õ≈ Œ¡–¿¡¿“€¬¿≈“</text>
+    <text x="155" y="75" id="BGF" fill="Col_Red">
+      <title>VB6 - 8 (BGF)</title>
+Œÿ»¡ ¿ ÃŒƒ”Àﬂ</text>
+    <text x="155" y="155" id="M8_M6" fill="Col_LtBlue">
+      <title>VB6 - 14 || 15 (M8 || M6)</title>
+»Ã»“¿÷»ﬂ —»√Õ¿ÀŒ¬</text>
+    <text x="155" y="167.5" id="BSM" fill="black">
+      <title>VB6 - 9 (BSM)</title>
+› —œÀ”¿“¿÷»ŒÕÕ€… –≈∆»Ã</text>
+  </g>
+  <g id="VB9_gr">
+    <rt:dyn type="visibility" mode="constant" value="VB9 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="VB9.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="155" y="210" id="UEF" fill="black">
+      <title>VB9 - 5 (UEF)</title>
+¡ÀŒ »–. Õ≈—ŒŒ“¬≈“—“¬»ﬂ</text>
+    <text x="155" y="222.5" id="UEFS" fill="black">
+      <title>VB9 - 6 (UEFS)</title>
+¡ÀŒ »–. —»√Õ. «¿Ÿ»“€ 1</text>
+    <text x="350" y="130" id="PFOE" fill="black">
+      <title>VB9 - 7 (PFOE)</title>
+–¿«–≈ÿ≈ÕŒ</text>
+    <text x="5" y="130" id="PFS" fill="black">
+      <title>VB9 - 8 (PFS)</title>
+–¿«–≈ÿ≈ÕŒ</text>
+    <text x="155" y="142.5" id="BBL" fill="Col_Red">
+      <title>VB9 - 9 (BBL)</title>
+ ŒÃ¿Õƒ¿ ¡ÀŒ »–Œ¬¿Õ¿</text>
+    <text x="350" y="142.5" id="ALOE" fill="black">
+      <title>VB9 - 10 (ALOE)</title>
+¬€’ŒƒÕ¿ﬂ  ŒÃ¿Õƒ¿</text>
+    <text x="5" y="142.5" id="ALS" fill="black">
+      <title>VB9 - 11 (ALS)</title>
+¬€’ŒƒÕ¿ﬂ  ŒÃ¿Õƒ¿</text>
+    <text x="350" y="155" id="ABOE" fill="black">
+      <title>VB9 - 12 (ABOE)</title>
+¿¬“ŒÃ¿“.  ŒÃ¿Õƒ¿</text>
+    <text x="5" y="155" id="ABS" fill="black">
+      <title>VB9 - 13 (ABS)</title>
+¿¬“ŒÃ¿“.  ŒÃ¿Õƒ¿</text>
+    <text x="350" y="117.5" id="S2OE" fill="black">
+      <title>VB9 - 14 (S2OE)</title>
+«¿Ÿ»“¿</text>
+    <text x="5" y="117.5" id="S2S" fill="black">
+      <title>VB9 - 15 (S2S)</title>
+«¿Ÿ»“¿</text>
+    <text x="5" y="105" id="S1S" fill="black">
+      <title>VB9 - 16 (S1S)</title>
+«¿Ÿ»“¿ 1</text>
+  </g>
+  <g id="VB10_gr">
+    <rt:dyn type="visibility" mode="constant" value="VB10 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="VB10.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="350" y="75" id="S1SV" fill="Col_Red">
+      <title>VB10 - 11 (S1SV)</title>
+«¿Ÿ»“¿ 1 —–¿¡Œ“¿À¿</text>
+    <text x="5" y="180" id="WEZU" fill="black">
+      <title>VB10- 16 (WEZU)</title>
+ ŒÕ÷. ¬€ Àﬁ◊¿“≈À‹</text>
+    <text x="350" y="180" id="WEAF" fill="black">
+      <title>VB10 - 15 (WEAF)</title>
+ ŒÕ÷. ¬€ Àﬁ◊¿“≈À‹</text>
+    <text x="155" y="290" id="PDKSB" fill="black">
+      <title>VB10 - 9 (PDKSB)</title>
+œ–»Œ–»“≈“ –1+ƒ  Ì‡‰ —¡</text>
+    <text x="155" y="302.5" id="BKVSB" fill="black">
+      <title>VB10 - 10 (BKVSB)</title>
+      <rt:dyn type="visibility" mode="constant" value="Is_EM" trans="bi">
+        <rt:xy value="false" value2="3"/> 
+        <rt:xy value2="1"/> 
+      </rt:dyn>
+¡ÀŒ »–.  ŒÕ“–ŒÀﬂ ¬–≈Ã≈Õ»</text>
+  </g>
+  <g id="B0_gr">
+    <rt:dyn type="visibility" mode="constant" value="B0 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="B0.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="5" y="167.5" id="HBS" fill="black">
+      <title>B0 - 16 (HBS)</title>
+ƒ»—“.  ŒÃ¿Õƒ¿</text>
+    <text x="350" y="167.5" id="HBOE" fill="black">
+      <title>B0 - 15 (HBOE)</title>
+ƒ»—“.  ŒÃ¿Õƒ¿</text>
+  </g>
+  <g id="Z0_gr">
+    <rt:dyn type="visibility" mode="constant" value="Z0 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="Z0.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="5" y="192.5" id="ARZU" fill="black">
+      <title>Z0 - 16 (ARZU)</title>
+      <rt:dyn type="text" mode="onchange" value="((Z0.Value &amp; 192) != 0)" trans="bt">
+        <rt:xy value="false" value2="«¿ –€“Œ"/> 
+        <rt:xy value2="Õ≈ƒŒ—“Œ¬≈–ÕŒ"/> 
+      </rt:dyn>
+«¿ –€“Œ</text>
+    <text x="350" y="192.5" id="ARAF" fill="black">
+      <title>Z0 - 15 (ARAF)</title>
+      <rt:dyn type="text" mode="onchange" value="((Z0.Value &amp; 192) != 0)" trans="bt">
+        <rt:xy value="false" value2="Œ“ –€“Œ"/> 
+        <rt:xy value2="Õ≈ƒŒ—“Œ¬≈–ÕŒ"/> 
+      </rt:dyn>
+Œ“ –€“Œ</text>
+  </g>
+  <text x="155" y="180" id="OU_SUSP" fill="Col_Red">
+    <title>OU (Susp)</title>
+    <rt:dyn type="visibility" mode="constant" value="No_OU" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+–≈ÃŒÕ“</text>
+  <text x="155" y="192.5" id="NO_OU" fill="Col_Red">
+    <rt:dyn type="visibility" mode="constant" value="No_OU" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="title" mode="constant" value="&quot;œÂÂÏÂÌÌ‡ˇ &quot; + KKS + &quot;_OU ÌÂ Ì‡È‰ÂÌ‡ ËÎË ÂÂ ÚËÔ ÌÂ Out&quot;"/> 
+Õ≈“ œ≈–≈Ã≈ÕÕŒ… ”œ–¿¬À≈Õ»ﬂ</text>
+  <text x="350" y="62.5" id="EFAZV_EFAZM" fill="Col_Red">
+    <title>VB10 - 12 (EFAZV) || F1 - 14 (EFAZM)</title>
+    <rt:dyn type="visibility" mode="constant" value="(VB10 != Nothing) || (F1 !=  Nothing)" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="(VB10.Quality == PLS_QUAL_BAD) &amp;&amp; (F1.Quality == PLS_QUAL_BAD)" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+Õ≈—ŒŒ“¬. —Œ—“ŒﬂÕ»ﬂ</text>
+  <g id="VB12_gr">
+    <rt:dyn type="visibility" mode="constant" value="VB12 != Nothing" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+    <rt:dyn type="text-decoration" mode="onchange" value="VB12.Quality == PLS_QUAL_BAD" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="32"/> 
+    </rt:dyn>
+    <text x="5" y="240" id="ABSSB1" fill="black">
+      <title>VB12 - 8 (ABSSB1)</title>
+«¿ –€“‹ 1 ÓÚ —¡</text>
+    <text x="5" y="252.5" id="ABSSB2" fill="black">
+      <title>VB12 - 6 (ABSSB2)</title>
+«¿ –€“‹ 2 ÓÚ —¡</text>
+    <text x="350" y="240" id="ABOESB1" fill="black">
+      <title>VB12 - 7 (ABOESB1)</title>
+Œ“ –€“‹ 1 ÓÚ —¡</text>
+    <text x="350" y="252.5" id="ABOESB2" fill="black">
+      <title>VB12 - 5 (ABOESB2)</title>
+Œ“ –€“‹ 2 ÓÚ —¡</text>
+    <text x="155" y="240" id="VRPU" fill="black">
+      <title>VB12 - 11 (VRPU)</title>
+”œ–¿¬À≈Õ»≈ –œ”</text>
+    <text x="155" y="252.5" id="ZNE" fill="black">
+      <title>VB12 - 16 (ZNE)</title>
+«¿œ–≈“ Õ›</text>
+    <text x="155" y="265" id="PSBMM" fill="black">
+      <title>VB12 - 10 (PSBMM)</title>
+      <rt:dyn type="visibility" mode="constant" value="Is_EM" trans="bi">
+        <rt:xy value="false" value2="3"/> 
+        <rt:xy value2="1"/> 
+      </rt:dyn>
+œ–»Œ–»“≈“  ŒÃ¿Õƒ —¡ Ì‡‰ ÃÃ</text>
+    <text x="155" y="277.5" id="PP1SB" fill="black">
+      <title>VB12 - 9 (PP1SB)</title>
+œ–»Œ–»“≈“ –1 Ì‡‰  ŒÃ¿ÕƒŒ… —¡</text>
+  </g>
+</svg>

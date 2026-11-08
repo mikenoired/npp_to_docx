@@ -1,0 +1,460 @@
+<?xml  version="1.0" encoding="windows-1251"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 25 100" width="25" height="100" id="DS_ana_bar_usr1" stroke="Col_Grey5">
+  <desc>Универсальный барограф с пользовательскими формулами представления</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.0">
+    <rt:param name="PointID" datatype="string" comment="полный идентификатор отображаемого сигнала" value="NULL"/> 
+    <rt:param name="Formula_index" datatype="ushort" value="0" comment="Номер формулы для заливки (0 - линейная, 1 - Lg; 2 - кусочно-логарифм., вверх; 3 - кусочно-логарифм., вниз, 4 - обр.период, вверх)"/> 
+    <rt:param name="PointID_AB" datatype="string" comment="полный идентификатор сигнала аварийной границы (если есть)" value="NULL"/> 
+    <rt:param name="PointID_WB" datatype="string" comment="полный идентификатор сигнала предупредительной границы (если есть)" value="NULL"/> 
+    <rt:param name="val_AB" datatype="double" value="-9999" comment="значение аварийной уставки (если не -9999 и PointID_AB = NULL)"/> 
+    <rt:param name="val_WB" datatype="double" value="-9999" comment="значение предупредительной уставки (если не -9999 и PointID_WB = NULL и Calculate_WB = False)"/> 
+    <rt:param name="Calculate_WB" datatype="boolean" value="false" comment="предупредительная уставка рассчитывается из значения аварийной уставки (для некоторых формул игнорируется)"/> 
+    <rt:param name="WB_to_AB_ratio" datatype="float" value="0.98" comment="соотношение уровня предупредительной уставки к уровню аварийной уставки (при Calculate_WB = true и PointID_WB = NULL)"/> 
+    <rt:param name="AreUpperBounds" datatype="boolean" value="true" comment="данные границы верхние, а не нижние (статич. параметр, для некоторых формул игнорируется)"/> 
+    <rt:param name="FillDirection" datatype="byte" value="1" comment="Тип заливки: 0 - от нуля вверх и вниз; 1 - от минимума вверх; -1 - от максимума вниз (для некоторых формул игнорируется)"/> 
+    <rt:param name="val_HR" datatype="double" value="-9999" comment="значение верхнего диапазона барографа (если отличается от -9999) вместо значения из БД (статич. параметр)"/> 
+    <rt:param name="val_LR" datatype="double" value="-9999" comment="значение нижнего диапазона барографа (если отличается от -9999) вместо значения из БД (статич. параметр)"/> 
+    <rt:var name="pv" datatype="PlsPVAna" comment="аналоговый сигнал БД"/> 
+    <rt:var name="pv_AB" datatype="PlsPVAna" comment="аналоговый сигнал аварийной границы"/> 
+    <rt:var name="pv_WB" datatype="PlsPVAna" comment="аналоговый сигнал предупредительной границы"/> 
+    <rt:var name="val_R_HI" datatype="double" value="-9999" comment="actual value"/> 
+    <rt:var name="val_AlarmBound" datatype="double" value="-9999" comment="actual value"/> 
+    <rt:var name="val_WarningBound" datatype="double" value="-9999" comment="actual value"/> 
+    <rt:var name="val_R_LO" datatype="double" value="-9999" comment="actual value"/> 
+    <rt:var name="FillType" datatype="byte" value="1" comment="Тип заливки: 0 - от нуля вверх и вниз; 1 - от минимума вверх; -1 - от максимума вниз"/> 
+    <rt:var name="BoundPosition" datatype="boolean" value="true" comment="данные границы верхние, а не нижние"/> 
+    <rt:var name="NPos" datatype="float" comment="абсолютная координата нуля" value="-1"/> 
+    <rt:var name="In_Group" datatype="boolean" value="false" comment="object in group"/> 
+    <rt:var name="ht" datatype="float" comment="object height"/> 
+    <rt:var name="ValColor" datatype="uint" comment="цвет индикации" value="0"/> 
+    <rt:var name="HasError" datatype="boolean" value="false" comment="при инициализации произошла ошибка"/> 
+    <rt:var name="Range_Error" datatype="boolean" value="False" comment="Верхняя граница меньше нижней"/> 
+    <rt:var name="IsInversed" datatype="boolean" value="False" comment="обратные показания, верх и низ меняются местами"/> 
+    <rt:sub>Function Level_UserFunc(ByVal Level_Cur As Double) As Double
+&apos;Чтобы не было путаницы: 1 - соответствует низу барографа, а 0 - верху, чтобы работать в абсолютных координатах.
+If (val_R_LO &gt;= val_R_HI) || Range_Error || HasError Then	//ошибка
+	Level_UserFunc = 0
+Else
+	Dim TMP_bound As Double
+	If Formula_index == 0 Then		&apos;линейный масштаб
+		If Level_Cur &lt;= val_R_LO Then
+			Level_UserFunc = 1.0
+		ElseIf Level_Cur &gt;= val_R_HI Then
+			Level_UserFunc = 0
+		Else
+			Level_UserFunc = (val_R_HI - Level_Cur) / (val_R_HI - val_R_LO)
+		End If
+	ElseIf Formula_index == 1 Then	&apos;логарифмический масштаб
+		If Level_Cur &lt;= val_R_LO Then
+			Level_UserFunc = 1.0
+		ElseIf Level_Cur &gt;= val_R_HI Then
+			Level_UserFunc = 0
+		ElseIf (val_R_HI * val_R_LO &lt;= 0) Then	//отобразить такой логарифмический барограф нельзя - покажем линейный
+			Level_UserFunc = (Level_Cur - val_R_LO) / (val_R_HI - val_R_LO)
+		Else	//положительная и отрицательная области считаются одинаково
+			Level_UserFunc = Log(val_R_HI / Level_Cur) / Log(val_R_HI / val_R_LO)
+		End If
+	ElseIf Formula_index == 2 Then	&apos;кусочно-логарифмический снизу-вверх
+		If (val_AlarmBound == -9999) Then
+			TMP_bound = val_R_HI
+		Else
+			TMP_bound = val_AlarmBound
+		End If
+		If Level_Cur &lt;= val_R_LO Then
+			Level_UserFunc = 1.0
+		ElseIf Level_Cur &gt;= val_R_HI Then
+			Level_UserFunc = 0
+		ElseIf (Level_Cur &lt;= TMP_bound) Then
+			If ((TMP_bound - val_R_LO) != 0) Then
+				Level_UserFunc = 0.1 + Log10(1 + 500*(TMP_bound - Level_Cur)/(TMP_bound - val_R_LO)) / 3.0
+			Else
+				Level_UserFunc = 1.0
+			End If
+		Else
+			If ((val_R_HI - TMP_bound) != 0) Then
+				Level_UserFunc = 0.1 - Log10(1 + 500*(Level_Cur - TMP_bound)/(val_R_HI - TMP_bound)) / 27.0
+			Else
+				Level_UserFunc = 0
+			End If
+		End If
+	ElseIf Formula_index == 3 Then	&apos;кусочно-логарифмический сверху-вниз
+		If (val_AlarmBound == -9999) Then
+			TMP_bound = val_R_LO
+		Else
+			TMP_bound = val_AlarmBound
+		End If
+		If Level_Cur &lt;= val_R_LO Then
+			Level_UserFunc = 1.0
+		ElseIf Level_Cur &gt;= val_R_HI Then
+			Level_UserFunc = 0
+		ElseIf (Level_Cur &gt;= TMP_bound) Then
+			If ((val_R_HI - TMP_bound) != 0) Then
+				Level_UserFunc = 0.9 - Log10(1 + 500*(Level_Cur - TMP_bound)/(val_R_HI - TMP_bound)) / 3.0
+			Else
+				Level_UserFunc = 0
+			End If
+		Else
+			If ((TMP_bound - val_R_LO) != 0) Then
+				Level_UserFunc = 0.9 + Log10(1 + 500*(TMP_bound - Level_Cur)/(TMP_bound - val_R_LO)) / 27.0
+			Else
+				Level_UserFunc = 1.0
+			End If
+		End If
+	ElseIf Formula_index == 4 Then	&apos;обратный период снизу-вверх
+		If (Level_Cur &lt;= 0) Then
+			Level_UserFunc = 1.0
+		ElseIf (Level_Cur &lt;= val_R_LO) Then
+			Level_UserFunc = 0
+		Else
+			Level_UserFunc = 1.0 - val_R_LO / Level_Cur
+		End If
+	Else
+		Level_UserFunc = 0	//на всякий случай для недостоверности-неизвестности надо сначала залить целиком
+	End If
+End If
+If Level_UserFunc &lt; 0 Then
+	Level_UserFunc = 0
+ElseIf Level_UserFunc &gt; 1.0 Then
+	Level_UserFunc = 1.0
+End If
+End Function</rt:sub>
+    <rt:sub>Sub Get_Bounds()
+&apos;Если значение недостоверное, то оно не меняется
+&apos;Если задан PointID_AB, то val_AB игнорируется
+If pv_AB != Nothing Then
+	If pv_AB.Quality != PLS_QUAL_BAD Then
+		val_AlarmBound = pv_AB.Value
+		If Calculate_WB &amp;&amp; (pv_WB == Nothing) &amp;&amp; (WB_to_AB_ratio &gt; 0) Then
+			val_WarningBound = WB_to_AB_ratio * val_AlarmBound
+		End If
+	End If
+ElseIf val_AB != -9999 Then
+	val_AlarmBound = val_AB
+End If
+&apos;Если задан PointID_WB, то Calculate_WB или val_WB игнорируется
+If pv_WB != Nothing Then
+	If pv_WB.Quality != PLS_QUAL_BAD Then
+		val_WarningBound = pv_WB.Value
+	End If
+ElseIf (val_WB != -9999) &amp;&amp; !Calculate_WB Then
+	val_WarningBound = val_WB
+End If
+
+Draw_Bounds()
+End Sub</rt:sub>
+    <rt:sub>Sub Draw_Bounds()
+If val_AlarmBound != -9999 Then
+	rect_AB.visibility = &quot;visible&quot;
+	If BoundPosition || IsInversed Then
+		rect_AB.y = 0
+		rect_AB.height = Level_UserFunc(val_AlarmBound) * ht
+	Else
+		rect_AB.y = Level_UserFunc(val_AlarmBound) * ht
+		rect_AB.height = (1 - Level_UserFunc(val_AlarmBound)) * ht
+	End If
+Else
+	rect_AB.visibility = &quot;hidden&quot;
+End If
+If val_WarningBound != -9999 Then
+	rect_WB.visibility = &quot;visible&quot;
+	If BoundPosition || IsInversed Then
+		rect_WB.y = 0
+		rect_WB.height = Level_UserFunc(val_WarningBound) * ht
+	Else
+		rect_WB.y = Level_UserFunc(val_WarningBound) * ht
+		rect_WB.height = (1 - Level_UserFunc(val_WarningBound)) * ht
+	End If
+Else
+	rect_WB.visibility = &quot;hidden&quot;
+End If
+Get_BG_Color()
+End Sub</rt:sub>
+    <rt:sub>Sub Draw_value()
+If (pv == Nothing) || HasError || Range_Error Then
+	body.y = 0
+	body.height = ht
+	Exit Sub
+Else
+	Dim v As Double
+	v = pv.Value
+	H_range_exceed.visibility = &quot;hidden&quot;
+	L_range_exceed.visibility = &quot;hidden&quot;
+	If (v &gt; val_R_HI) Then
+		v = val_R_HI
+		If IsInversed Then	&apos;для обратных показаний всё становится с ног на голову
+			L_range_exceed.visibility = &quot;visible&quot;
+		Else
+			H_range_exceed.visibility = &quot;visible&quot;
+		End If
+	ElseIf (v &lt; val_R_LO) Then
+		v = val_R_LO
+		If IsInversed Then	&apos;для обратных показаний всё становится с ног на голову
+			H_range_exceed.visibility = &quot;visible&quot;
+		Else
+			L_range_exceed.visibility = &quot;visible&quot;
+		End If
+	End If
+
+	If (FillType &lt; 0) || ((FillType == 0) &amp;&amp; (val_R_HI &lt;= 0)) Then	&apos;сверху вниз
+		body.y = 0
+		body.height = Level_UserFunc(v) * ht
+	ElseIf (FillType &gt; 0) || ((FillType == 0) &amp;&amp; (val_R_LO &gt;= 0)) Then	&apos;снизу вверх
+		body.y = Level_UserFunc(v) * ht
+		body.height = (1 - Level_UserFunc(v)) * ht
+	Else	&apos;от нуля вверх и вниз
+		If v &gt;= 0 Then
+			body.y = Level_UserFunc(v) * ht
+			body.height = (1 - Level_UserFunc(v) - Level_UserFunc(0)) * ht
+		Else
+			body.y = Level_UserFunc(0) * ht
+			body.height = (Level_UserFunc(v) - Level_UserFunc(0)) * ht
+		End If
+	End If
+	Get_BG_Color()
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Get_BG_Color()
+If !HasError &amp;&amp; !Range_Error Then
+	Dim Bad_Q As Boolean
+	Bad_Q = False
+	If pv_WB != Nothing Then
+		Bad_Q = pv_WB.Quality == PLS_QUAL_BAD
+	End If
+	If pv_AB != Nothing Then
+		Bad_Q = Bad_Q || (pv_AB.Quality == PLS_QUAL_BAD)
+	End If
+	Bad_Q = Bad_Q || (pv.Quality == PLS_QUAL_BAD) 
+&apos;|| (pv.OriginalQualitySubstatus == PLS_QUALSUB_RANGEEXCEEDED) &apos;выход за диапазон покажем только стрелками
+	If ((pv.SuspendedFlags &amp; PLS_SUSP_CMD) != 0 ) Then
+		ValColor = Color_Remont
+	ElseIf Bad_Q Then
+		ValColor = Color_Inval
+	ElseIf (pv.QualitySubstatus == PLS_QUALSUB_LOCALOVERRIDE) Then
+		ValColor = Color_Imitation
+	ElseIf BoundPosition Then
+		If (val_AlarmBound != -9999) &amp;&amp; (pv.Value &gt;= val_AlarmBound) Then
+			ValColor = Color_ANA_HI_A
+		ElseIf (val_WarningBound != -9999) &amp;&amp; (pv.Value &gt;= val_WarningBound) Then
+			ValColor = Color_ANA_HI_P
+		Else
+			ValColor = Color_NB(pv)
+		End If
+	Else
+		If (val_AlarmBound != -9999) &amp;&amp; (pv.Value &lt;= val_AlarmBound) Then
+			ValColor = Color_ANA_LO_A
+		ElseIf (val_WarningBound != -9999) &amp;&amp; (pv.Value &lt;= val_WarningBound) Then
+			ValColor = Color_ANA_LO_P
+		Else
+			ValColor = Color_NB(pv)
+		End If
+	End If
+Else
+	ValColor = Color_ANA_ER_LINK
+End If
+End Sub</rt:sub>
+    <rt:event type="OnResize">InGr.y = -2.5
+InGr.height = _This.height + 5</rt:event>
+    <rt:event type="OnInitialize">ht = _This.height
+H_range_exceed.visibility = &quot;hidden&quot;
+If PointID != &quot;NULL&quot; Then
+	pv = ANA(PointID)
+Else
+	pv = Nothing
+	HasError = True
+	ValColor = Color_ANA_ER_LINK
+	Exit Sub
+End If
+If PointID_AB != &quot;NULL&quot; Then
+	pv_AB = ANA(PointID_AB)
+	If pv_AB == Nothing Then
+		HasError = True
+	ElseIf pv_AB.Quality != PLS_QUAL_BAD Then
+		val_AlarmBound = pv_AB.Value
+		If Calculate_WB Then
+			val_WarningBound = WB_to_AB_ratio * val_AlarmBound
+		End If
+	End If
+Else
+	pv_AB = Nothing
+	If val_AB != -9999 Then
+		val_AlarmBound = val_AB
+	End If
+End If
+If PointID_WB != &quot;NULL&quot; Then
+	pv_WB = ANA(PointID_WB)
+	If pv_WB == Nothing Then
+		HasError = True
+	ElseIf pv_WB.Quality != PLS_QUAL_BAD Then
+		val_WarningBound = pv_WB.Value
+	End If
+Else
+	pv_WB = Nothing
+	If (val_WB != -9999) &amp;&amp; !Calculate_WB Then
+		val_WarningBound = val_WB
+	End If
+End If
+If pv == Nothing || HasError Then
+	HasError = True
+	ValColor = Color_ANA_ER_LINK
+	Exit Sub
+End If
+FillType = FillDirection
+BoundPosition = AreUpperBounds
+&apos;теперь насильственно установим тип заливки и границы в зависимости от типа формулы
+If Formula_index == 2 Then
+	FillType = 1
+ElseIf Formula_index == 3 Then
+	FillType = -1
+ElseIf Formula_index == 4 Then
+	FillType = 1
+	BoundPosition = False
+	IsInversed = True
+End If
+If BoundPosition Then
+	rect_AB.fill = Middle_Color_Wieghted(Color_ANA_HI_A, 0xffffff, 0.35)
+	rect_WB.fill = Middle_Color_Wieghted(Color_ANA_HI_P, 0xffffff, 0.35)
+Else
+	rect_AB.fill = Middle_Color_Wieghted(Color_ANA_LO_A, 0xffffff, 0.35)
+	rect_WB.fill = Middle_Color_Wieghted(Color_ANA_LO_P, 0xffffff, 0.35)
+End If
+If val_HR != -9999 Then
+	val_R_HI = val_HR
+Else
+	val_R_HI = pv.RangeHigh
+End If
+If val_LR != -9999 Then
+	val_R_LO = val_LR
+Else
+	val_R_LO = pv.RangeLow
+End If
+Range_Error = (val_R_LO &gt;= val_R_HI) || ((Formula_index == 1) &amp;&amp; (val_R_LO * val_R_HI &lt;= 0))
+If Range_Error Then
+	ValColor = Color_ANA_ER_LINK
+ElseIf (val_R_LO * val_R_HI &lt;= 0) Then
+	NPos = Level_UserFunc(0) * ht
+End If</rt:event>
+    <rt:changeTrigger name="Ch_bounds">
+      <rt:chgItem>pv_AB</rt:chgItem>
+      <rt:chgItem>pv_WB</rt:chgItem>
+      <rt:chgItem>val_AB</rt:chgItem>
+      <rt:chgItem>val_WB</rt:chgItem>
+      <rt:chgItem>Calculate_WB</rt:chgItem>
+      <rt:chgItem>WB_to_AB_ratio</rt:chgItem>
+      <rt:code>Get_Bounds()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="Ch_pv">
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:code>Draw_value()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="GRP">
+      <rt:condition>pv != Nothing</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(pv.PVId) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <polygon points="7,85 7,85 7,85" id="L_range_exceed" rt:detect="disabled" fill="Col_Grey1">
+    <rt:dyn type="fill" mode="onchange" value="Logical_Color(_Blink1, Color_Inval, Col_Ar(11))"/> 
+  </polygon>
+  <polygon points="7.5,8.5 12.5,3.5 17.5,8.5" id="H_range_exceed" fill="Col_Grey1">
+    <rt:dyn type="fill" mode="onchange" value="Logical_Color(_Blink1, Color_Inval, Col_Ar(11))"/> 
+  </polygon>
+  <rect x="8.75" y="15" width="5" height="8.75" rx="0" ry="0" id="rect_WB" fill="Col_Yellow" stroke-width="1"/> 
+  <rect x="7" y="5" width="9.75" height="10" rx="0" ry="0" id="rect_AB" fill="Col_Red" stroke-width="1"/> 
+  <line x1="8.25" y1="50" x2="16.5" y2="42.5" id="line_null" stroke="black" stroke-width="2">
+    <rt:dyn type="y1" mode="onchange" value="NPos"/> 
+    <rt:dyn type="y2" mode="onchange" value="NPos"/> 
+    <rt:dyn type="visibility" mode="constant" value="NPos &lt; 0" trans="bi">
+      <rt:xy value="false" value2="0"/> 
+      <rt:xy value2="1"/> 
+    </rt:dyn>
+  </line>
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="Backgr_rect" fill="Col_BGmain" fill-opacity="0.849997" stroke="none"/> 
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="body" fill="Col_Green" stroke="none">
+    <rt:dyn type="fill" mode="unknown" value="ValColor"/> 
+  </rect>
+  <rect x="5" y="0" width="15" height="100" rx="0" ry="0" id="Backgr_frame" fill="none" stroke="Col_Grey5" stroke-width="1"/> 
+  <rect x="0" y="-2.5" width="25" height="105" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="1.5">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+  <rect x="0" y="-2.5" width="25" height="105" rx="0" ry="0" id="SelArea" fill="silver" fill-opacity="0" stroke="none">
+    <rt:event type="OnClick">If pv == nothing Then
+	ShowWarning(&quot;Ошибка привязки параметра\nPointID = &quot; + PointID, 10)
+ElseIf (PointID_AB != &quot;NULL&quot;) &amp;&amp; (pv_AB == Nothing) Then
+	ShowWarning(&quot;Ошибка привязки параметра\nPointID_AB = &quot; + PointID_AB, 10)
+ElseIf (PointID_WB != &quot;NULL&quot;) &amp;&amp; (pv_WB == Nothing) Then
+	ShowWarning(&quot;Ошибка привязки параметра\nPointID_WB = &quot; + PointID_WB, 10)
+ElseIf (Formula_index == 1) &amp;&amp; (pv.RangeLow * pv.RangeHigh &lt;= 0) Then
+	ShowWarning(&quot;Границы диапазона EXP имеют разные знаки.&quot;, 10)
+ElseIf (pv_WB == Nothing) &amp;&amp; (val_AB == -9999) &amp;&amp; Calculate_WB &amp;&amp; (WB_to_AB_ratio &lt;= 0) Then
+	ShowWarning(&quot;Значение WB_to_AB_ratio д.б. положительным\nWB_to_AB_ratio = &quot; + CStr(WB_to_AB_ratio), 10)
+ElseIf HasError Then
+	ShowWarning(&quot;При инициализации произошла\nнеопознанная ошибка.&quot;, 10)
+ElseIf (PointID_AB == &quot;NULL&quot;) &amp;&amp; (PointID_WB == &quot;NULL&quot;) Then
+	If (Formula_index &gt; 0) Then
+		Call_Win (&quot;ws_ANA_NB&quot;, pv.PVId + &quot;|&quot; + CStr(pv.RoundDigits))
+	Else
+		Call_Win (&quot;ws_ANA_NB&quot;, pv.PVId + &quot;|-1&quot;)
+	End If
+Else
+	Dim s As String
+	s = pv.PVId
+	If (pv_AB != Nothing) Then
+		If (pv_AB.Value &gt; pv.RangeHigh) || (pv_AB.Value &lt; pv.RangeLow) Then
+			ShowWarning (&quot;Некорректное значение.\nВеличина аварийной уставки\nвышла за диапазон.&quot;, 0)
+		End If
+		s = s + &quot;|&quot; + pv_AB.PVId
+	End If
+	If (pv_WB != Nothing) Then
+		If (pv_WB.Value &gt; pv.RangeHigh) || (pv_WB.Value &lt; pv.RangeLow) Then
+			ShowWarning (&quot;Некорректное значение.\nВеличина предупредит. уставки\nвышла за диапазон.&quot;, 0)
+		End If
+		s = s + &quot;|&quot; + pv_WB.PVId
+	End If
+	Open_Win_Uni(False, &quot;wi_&quot; + PointID, &quot;Составной объект &quot; + pv.CategoryText, &quot;wi_MultyPV&quot;, s)
+End If</rt:event>
+    <rt:event type="OnRightClick">If pv == nothing Then
+	ShowWarning(&quot;Ошибка привязки параметра\nPointID = &quot; + PointID, 10)
+ElseIf (PointID_AB != &quot;NULL&quot;) &amp;&amp; (pv_AB == Nothing) Then
+	ShowWarning(&quot;Ошибка привязки параметра\nPointID_AB = &quot; + PointID_AB, 10)
+ElseIf (PointID_WB != &quot;NULL&quot;) &amp;&amp; (pv_WB == Nothing) Then
+	ShowWarning(&quot;Ошибка привязки параметра\nPointID_WB = &quot; + PointID_WB, 10)
+ElseIf (Formula_index == 1) &amp;&amp; (pv.RangeLow * pv.RangeHigh &lt;= 0) Then
+	ShowWarning(&quot;Границы диапазона EXP имеют разные знаки.&quot;, 10)
+ElseIf (pv_WB == Nothing) &amp;&amp; (val_AB == -9999) &amp;&amp; Calculate_WB &amp;&amp; (WB_to_AB_ratio &lt;= 0) Then
+	ShowWarning(&quot;Значение WB_to_AB_ratio д.б. положительным\nWB_to_AB_ratio = &quot; + CStr(WB_to_AB_ratio), 10)
+ElseIf HasError Then
+	ShowWarning(&quot;При инициализации произошла\nнеопознанная ошибка.&quot;, 10)
+ElseIf (PointID_AB == &quot;NULL&quot;) &amp;&amp; (PointID_WB == &quot;NULL&quot;) Then
+	If (Formula_index &gt; 0) Then
+		LoadPopUpMenu(pv.PVId + &quot;|ANAi|ws_ANA_NB &quot; + pv.PVId + &quot;|&quot; + CStr(pv.RoundDigits))
+	Else
+		LoadPopUpMenu(pv.PVId + &quot;|ANAi|ws_ANA_NB &quot; + pv.PVId + &quot;|-1&quot;)
+	End If
+Else
+	Dim s As String
+	Dim i As UShort
+	s = pv.PVId
+	TmpBuffer(0) = pv.PVId
+	i = 1
+	If (pv_AB != Nothing) Then
+		If (pv_AB.Value &gt; pv.RangeHigh) || (pv_AB.Value &lt; pv.RangeLow) Then
+			ShowWarning (&quot;Некорректное значение.\nВеличина аварийной уставки\nвышла за диапазон.&quot;, 0)
+		End If
+		s = s + &quot;|&quot; + pv_AB.PVId
+		TmpBuffer(i) = pv_AB.PVId
+		i = i + 1
+	End If
+	If (pv_WB != Nothing) Then
+		If (pv_WB.Value &gt; pv.RangeHigh) || (pv_WB.Value &lt; pv.RangeLow) Then
+			ShowWarning (&quot;Некорректное значение.\nВеличина предупредит. уставки\nвышла за диапазон.&quot;, 0)
+		End If
+		s = s + &quot;|&quot; + pv_WB.PVId
+		TmpBuffer(i) = pv_WB.PVId
+	End If
+	LoadPopUpMenu(PointID + &quot;|NONi|&quot;)
+End If</rt:event>
+  </rect>
+</svg>

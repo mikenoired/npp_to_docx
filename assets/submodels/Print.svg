@@ -1,0 +1,92 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="none meet" viewBox="0 0 128 128" width="128" height="128" id="Print" stroke="black" stroke-width="3">
+  <desc>Принтер</desc>
+  <rt:model comment="Подмодель ПОРТАЛа" revision="1.0" modelversion="0.0.0.0">
+    <rt:param name="PointID" datatype="string" value="NULL" comment="идентификатор сигнала"/> 
+    <rt:param name="Col_ON" datatype="string" value="Col_Red" comment="цвет для индикации состояния True"/> 
+    <rt:param name="Col_OFF" datatype="string" value="Col_Green" comment="цвет для индикации состояния False"/> 
+    <rt:var name="pv" datatype="PlsPVBin" comment="входная переменная"/> 
+    <rt:var name="In_Group" datatype="boolean" value="False" comment="объект в группе"/> 
+    <rt:sub>/*
+Sub BGColor ()
+If pv == Nothing Then
+	body.fill = Color_ErLink
+ElseIf pv.Quality == 0 Then
+	body.fill = Color_Inval
+ElseIf pv.Value Then
+	body.fill = Col_ON
+Else
+	body.fill = Col_OFF
+End If
+End Sub
+*/</rt:sub>
+    <rt:event type="OnInitialize">/*
+If (PointID != &quot;NULL&quot;) Then
+	Set pv = BIN(PointID)
+Else
+	body.fill = Color_ErLink
+End If
+*/</rt:event>
+    <rt:event type="OnClick">/*
+If PointID == &quot;NULL&quot; Then
+	ShowWarning (&quot;Объект не привязан.&quot;, 5)
+ElseIf (pv == nothing) Then
+	NoLink (PointID)
+Else
+	Call_Win(&quot;wi_BIN&quot;, PointID)
+End If
+*/</rt:event>
+    <rt:event type="OnRightClick">/*
+If PointID == &quot;NULL&quot; Then
+	ShowWarning (&quot;Объект не привязан.&quot;, 5)
+ElseIf (pv == nothing) Then
+	NoLink (PointID)
+Else
+	LoadPopUpMenu(PointID + &quot;|BINi|wi_BIN &quot; + PointID)
+End If
+*/</rt:event>
+  </rt:model>
+  <rect x="10" y="10" width="107.5" height="109" rx="0" ry="0" id="Sel_Area" fill="silver" fill-opacity="0" stroke="none"/> 
+  <g id="Pr">
+    <line x1="72" y1="124" x2="118" y2="98" stroke-width="6"/> 
+    <polygon points="35,72 5,87 35,106 64,89" fill="white" stroke="none"/> 
+    <polygon points="31,71 28.5,49.5 39.5,55.5 49.5,63.5 72,72.5 72,125 50,118 35,106 69,88" fill="url(#Cylinder_horizontal)" stroke="none"/> 
+    <polygon points="32,70 30,49 41,55 51,63 73,72 73,124 51,117 35,105 69,88" fill="Col_Grey5" fill-opacity="0.599997" stroke="none"/> 
+    <polygon points="77,20 30,50 41,56 51,64 72,73 120,45" fill="Col_Grey1" stroke="none"/> 
+    <line x1="55" y1="37" x2="95" y2="61"/> 
+    <line x1="70" y1="36" x2="97" y2="52"/> 
+    <line x1="91" y1="59" x2="118" y2="43" stroke-width="6"/> 
+    <polygon points="73,72 73,119 117,94 120,45" fill="Col_Grey2" stroke="white"/> 
+    <line x1="76.0269" y1="32.9081" x2="103.277" y2="49.4081"/> 
+    <line x1="34" y1="70" x2="62" y2="86"/> 
+    <line x1="5" y1="88" x2="37" y2="107" stroke-width="6"/> 
+    <line x1="73" y1="72" x2="73" y2="126.5"/> 
+    <line x1="30" y1="50" x2="79" y2="21" stroke-width="6"/> 
+    <line x1="119" y1="45" x2="119" y2="92" stroke-width="6"/> 
+    <line x1="31" y1="48" x2="31" y2="72" stroke-width="6"/> 
+    <line x1="16" y1="79" x2="34" y2="69" stroke-width="9"/> 
+    <line x1="35.7005" y1="104.892" x2="69" y2="103.875"/> 
+    <line x1="68" y1="85" x2="68" y2="105"/> 
+    <line x1="3.5" y1="89.5" x2="18" y2="83" stroke-width="6"/> 
+    <line x1="16" y1="75" x2="16" y2="85" stroke-width="6"/> 
+    <line x1="117" y1="90" x2="117" y2="100" stroke-width="6"/> 
+    <line x1="70.7005" y1="36.8924" x2="78" y2="32.625"/> 
+    <line x1="46" y1="65" x2="46" y2="72"/> 
+    <line x1="33" y1="62" x2="46" y2="71"/> 
+    <line x1="34" y1="57" x2="47" y2="66"/> 
+    <line x1="32.374" y1="49.844" x2="41.25" y2="57.125"/> 
+    <line x1="41" y1="57" x2="52" y2="64"/> 
+    <line x1="52" y1="64" x2="65" y2="70"/> 
+    <line x1="63" y1="69" x2="74" y2="73"/> 
+    <line x1="31" y1="103" x2="40" y2="111"/> 
+    <line x1="40" y1="111" x2="51" y2="118"/> 
+    <line x1="51" y1="118" x2="64" y2="123.5"/> 
+    <line x1="62.5" y1="123" x2="73" y2="125.5"/> 
+    <ellipse cx="69" cy="61" rx="6" ry="3" fill="lightseagreen" stroke-width="1" transform="rotate(18.8296 60.25 58.625)"/> 
+    <line x1="51" y1="97" x2="68" y2="87" stroke-width="9"/> 
+    <line x1="35.5" y1="106.5" x2="49.5" y2="100.5" stroke-width="6"/> 
+    <line x1="51.5" y1="93.5" x2="51.5" y2="103.5" stroke-width="6"/> 
+    <line x1="77" y1="20" x2="121" y2="47" stroke-width="6"/> 
+    <polygon points="77,30 81,22 95,2 125,21 111,41 106,48" fill="white" stroke-width="4"/> 
+  </g>
+</svg>

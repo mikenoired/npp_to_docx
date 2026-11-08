@@ -1,0 +1,291 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="-35 -30 70 52.5" width="70" height="52.5" id="DS_reflux_valve">
+  <desc>Обратный клапан универсальный (Dull Screen)</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа (использует ModelControl)" revision="6.2" controlref="PortalControl_CO_valve">
+    <rt:param name="KKS" datatype="string" value="NULL" comment="KKS задвижки"/> 
+    <rt:param name="DATA_NARY" datatype="string" value="AUTO" comment="тип привязки: AUTO/TPTS/BIN/KTPS/TYPEn или суффикс многобитового сигнала состояний (n = 1...6)"/> 
+    <rt:param name="SIG_Open" datatype="string" value="NULL" comment="при KKS - нестандартный суффикс, а без KKS - идентификатор сигнала «ОТКРЫТО»"/> 
+    <rt:param name="SIG_Close" datatype="string" value="NULL" comment="при KKS - нестандартный суффикс, а без KKS - идентификатор сигнала  «ЗАКРЫТО»"/> 
+    <rt:param name="SIG_Fail" datatype="string" value="NULL" comment="при KKS - нестандартный суффикс, а без KKS - идентификатор сигнала  «Неисправность»"/> 
+    <rt:param name="Mask_Open" datatype="ushort" value="2" comment="только для NARY - маска состояния &quot;ОТКРЫТО&quot;"/> 
+    <rt:param name="Mask_Close" datatype="ushort" value="1" comment="только для NARY - маска состояния &quot;ЗАКРЫТО&quot;"/> 
+    <rt:param name="Mask_Fail" datatype="ushort" value="4" comment="только для NARY - маска состояния &quot;Неисправность&quot;"/> 
+    <rt:param name="Mask_Invalid" datatype="ushort" value="0" comment="только для NARY - маска состояния &quot;Недостоверность&quot;"/> 
+    <rt:param name="Inv" datatype="boolean" value="False" comment="вх. сигналы &quot;НЕ открыто&quot; и &quot;НЕ закрыто&quot; (только при DATA_NARY не равно AUTO!)"/> 
+    <rt:param name="Drive" datatype="string" value="NONE" comment="тип привода (hydro/NONE)"/> 
+    <rt:param name="Alt_OpenColor" datatype="boolean" value="False" comment="!!! для данного объекта этот параметр не работает"/> 
+    <rt:param name="Operate" datatype="boolean" value="False" comment="Сделать объект управляемым"/> 
+    <rt:var name="Actual_Signal_Open" datatype="string" comment="фактическое название сигнала «ОТКРЫТО»"/> 
+    <rt:var name="Actual_Signal_Close" datatype="string" comment="фактическое название сигнала  «ЗАКРЫТО»"/> 
+    <rt:var name="Actual_Signal_Fail" datatype="string" comment="фактическое название сигнала  «Неисправность»"/> 
+    <rt:var name="pv_1" datatype="PlsPVBin" comment="указатель на переменную ОТКРЫТО или NARY или Z0 для ТПТС"/> 
+    <rt:var name="pv_2" datatype="PlsPVBin" comment="указатель на переменную ЗАКРЫТО или VB11 для ТПТС"/> 
+    <rt:var name="pv_Fail" datatype="PlsPVBin" comment="указатель на переменную Неисправность"/> 
+    <rt:var name="pv_OU" datatype="PlsPVBin" comment="указатель на переменную управления, которая может встретиться для любого объекта"/> 
+    <rt:var name="pv_gOp" datatype="PlsPVBin" comment="указатель на переменную ХОД НА ЗАКРЫТИЕ если есть"/> 
+    <rt:var name="pv_gCl" datatype="PlsPVBin" comment="указатель на переменную ХОД НА ЗАКРЫТИЕ если есть"/> 
+    <rt:var name="Link_Type" datatype="ubyte" value="0" comment="Тип объекта: 0-неизвестный, 1-бинарный, 2-NARY, 3-ТПТС, 4-КТПС"/> 
+    <rt:var name="Inv_logic" datatype="boolean" value="False" comment="использовать сигналы НЕ открыто/закрыто на самом деле, а не согласно привязке"/> 
+    <rt:var name="SIGNAL_NARY" datatype="string" value="Z0" comment="Фактическое имя сигнала для типа NARY"/> 
+    <rt:var name="valve_type" datatype="string" value="REFLUX" comment="Тип клапана: COV, PULSE, PULSE3, ..."/> 
+    <rt:var name="ctrl" datatype="PortalControl_CO_valve" comment="pointer to the ModelControl C++ class"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub AckMe()
+	ctrl.AckMe()
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">g.transform=&quot;&quot;
+
+If !IsViewMode Then
+	If (Drive == &quot;hydro&quot;) Then
+		g_hydro.visibility = &quot;visible&quot;
+	Else	//Drive == &quot;NONE&quot;
+		g_Al_frame.y = -17.5
+		g_Al_frame.height = 35
+		g_InGr.y = -22.5
+		g_InGr.height = 45
+		g_Sel_frame.y = -17.5
+		g_Sel_frame.height = 35
+	End If
+	If (KKS == &quot;NULL&quot;) &amp;&amp; (SIG_Open == &quot;NULL&quot;) &amp;&amp; (SIG_Close == &quot;NULL&quot;) Then
+		g.transform = &quot;scale(0.75 0.75 0 0)&quot;
+		g_Right.fill = Color_Static
+		g_Al_frame.visibility = &quot;hidden&quot;
+		g_InGr.visibility = &quot;hidden&quot;
+	End If
+End If</rt:event>
+  </rt:model>
+  <g id="g">
+    <polygon points="0,0 7.5,-2.5 7.5,-20 -7.5,-20 -7.5,-2.5" id="hydro" visibility="hidden" rt:detect="disabled" fill="Col_Grey5" stroke="Col_Grey5" stroke-width="1"/> 
+    <polygon points="-25,-12.5 -25,12.5 0,0" id="Left" fill="Col_Grey5" stroke="none"/> 
+    <polygon points="0,0 25,-12.5 25,12.5" id="Right" fill="Col_LtYellow" stroke="none"/> 
+    <polygon points="-25,-12.5 -25,12.5 25,-12.5 25,12.5" id="contour" fill="none" stroke="Col_Grey5" stroke-linejoin="round" stroke-width="1"/> 
+    <g id="spring" visibility="hidden" rt:detect="disabled" stroke="Col_Grey5" stroke-width="1">
+      <polyline points="0,0 0,1" id="obj_spring" fill="none"/> 
+      <rect x="-5" y="-5" width="10" height="10" rx="0" ry="0" id="obj_spring_solenoid" visibility="hidden" rt:detect="disabled" fill="Col_LtBlue"/> 
+    </g>
+    <rect x="-35" y="-30" width="70" height="52.5" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-width="2"/> 
+    <rect x="-30" y="-25" width="60" height="42.5" rx="0" ry="0" id="Al_frame" fill="none" stroke="Col_Red" stroke-width="2"/> 
+    <rect x="-30" y="-25" width="60" height="42.5" rx="0" ry="0" id="Sel_frame" fill="black" fill-opacity="0" stroke="none">
+      <rt:event type="OnClick">Dim s As String
+If (Link_Type == 0) Then
+	If (KKS == &quot;NULL&quot;) Then
+		If (SIG_Open == &quot;NULL&quot;) &amp;&amp; (SIG_Close == &quot;NULL&quot;) Then
+			ShowMessage (&quot;Это статический объект.&quot;, 5)
+		ElseIf (SIG_Open != &quot;NULL&quot;) &amp;&amp; (pv_1 == Nothing) Then
+			ShowWarning (&quot;Ошибка привязки.\nSIG_Open = \&quot;&quot; + SIG_Open  + &quot;\&quot;\nSIG_Close = \&quot;&quot; + SIG_Close + &quot;\&quot;&quot;, 0)
+		ElseIf (SIG_Close != &quot;NULL&quot;) &amp;&amp; (pv_2 == Nothing) Then
+			ShowWarning (&quot;Ошибка привязки.\nSIG_Open = \&quot;&quot; + SIG_Open  + &quot;\&quot;\nSIG_Close = \&quot;&quot; + SIG_Close + &quot;\&quot;&quot;, 0)
+		Else
+			ShowWarning (&quot;Ошибка обработки\nвходных сигналов.&quot;, 0)
+		End If
+	ElseIf (DATA_NARY == &quot;AUTO&quot;) Then
+		ShowWarning (&quot;Ошибка привязки AUTO.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Open = \&quot;&quot; + SIG_Open  + &quot;\&quot;\nSIG_Close = \&quot;&quot; + SIG_Close + &quot;\&quot;&quot;, 0)
+	ElseIf (DATA_NARY == &quot;BIN&quot;) Then
+		ShowWarning (&quot;Ошибка привязки BIN.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Open = \&quot;&quot; + SIG_Open  + &quot;\&quot;\nSIG_Close = \&quot;&quot; + SIG_Close + &quot;\&quot;&quot;, 0)
+	ElseIf (DATA_NARY == &quot;TPTS&quot;) Then
+		ShowWarning (&quot;Ошибка привязки TPTS.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;&quot;, 0)
+	ElseIf (DATA_NARY == &quot;KTPS&quot;) Then
+		ShowWarning (&quot;Ошибка привязки KTPS.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;&quot;, 0)
+	ElseIf (Left(DATA_NARY, 4) == &quot;TYPE&quot;) Then
+		ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nDATA_NARY = \&quot;&quot; + DATA_NARY + &quot;\&quot;\nНе найдены сигналы.&quot;, 0)
+	Else
+		ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nDATA_NARY = \&quot;&quot; + DATA_NARY + &quot;\&quot;&quot;, 0)
+	End If
+ElseIf (SIG_Fail != &quot;NULL&quot;) &amp;&amp; (pv_Fail == Nothing) Then
+	ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Fail = \&quot;&quot; + SIG_Fail + &quot;\&quot;&quot;, 0)
+ElseIf (Left(DATA_NARY, 4) == &quot;TYPE&quot;) Then
+	&apos;Структура параметра
+	&apos;[KKS]|&lt;тип и номер схемы&gt;[|&lt;альтернативный цвет&gt;[|&lt;есть кнопка &quot;Стоп&quot;&gt;]]
+	s = KKS + &quot;|COV&quot; + Right(DATA_NARY, 1) + &quot;|&quot; + CStr(Alt_OpenColor) + &quot;|false&quot;
+	Open_TYPE_ws_wf_wi(&quot;PRJSPEC_CO_valve&quot;, s, Operate, &quot;COV&quot; + Right(DATA_NARY, 1))
+ElseIf (Link_Type == 1) || (Link_Type == 4) Then	//КТПС - это тот же набор бинарей
+	If (KKS != &quot;NULL&quot;) Then
+&apos;Структура параметра
+&apos;[KKS]|[{SIGNAL_open / PID_open}|{SIGNAL_close / PID_close}|&lt;есть инверсная логика&gt;|&lt;альтернативный цвет&gt;|[{SIGNAL_fail / PID_fail}[|{SIGNAL_go_open / PID_go_open}|{SIGNAL_go_close / PID_go_close}[|{&quot;&quot; / PID_OU}[|&lt;есть кнопка &quot;Стоп&quot;&gt;]]]]]
+
+		s = KKS + &quot;|&quot; + Actual_Signal_Open + &quot;|&quot; + Actual_Signal_Close + &quot;|&quot; + CStr(Inv_logic) + &quot;|False|&quot;
+		If pv_Fail != Nothing Then
+			s = s + Actual_Signal_Fail + &quot;|&quot;
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If pv_gOp != Nothing Then
+			s = s + Signal_COValve_GoOpen + &quot;|&quot;
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If pv_gCl != Nothing Then
+			s = s + Signal_COValve_GoClose + &quot;||&quot;
+		Else
+			s = s + &quot;||&quot;
+		End If
+		s = s + &quot;False&quot;
+		Open_ws_wf_wi(&quot;BIN_CO_valve&quot;, s, Operate)
+	Else
+		s = &quot;|&quot;
+		If (pv_1 != Nothing) Then
+			s = s + pv_1.PVId
+		End If
+		If (pv_2 != Nothing) Then
+			s = s + &quot;|&quot; + pv_2.PVId + &quot;|&quot;
+		Else
+			s = s + &quot;||&quot;
+		End If
+		s = s + CStr(Inv_logic) + &quot;|False&quot;
+		If (pv_Fail != Nothing) Then
+			s = s + &quot;|&quot; + pv_Fail.PVId
+		End If
+		Open_ws_wf_wi(&quot;BIN_CO_valve&quot;, s, False)
+	End If
+	If (DATA_NARY == &quot;AUTO&quot;) &amp;&amp; (Link_Type == 1) Then
+		ShowWarning (&quot;Привязка DATA_NARY = AUTO\nнежелательна.\nОна должна быть BIN.&quot;, 0)
+	ElseIf (DATA_NARY == &quot;AUTO&quot;) &amp;&amp; (Link_Type == 4) Then
+		ShowWarning (&quot;Привязка DATA_NARY = AUTO\nнежелательна.\nОна должна быть KTPS.&quot;, 0)
+	End If
+ElseIf (Link_Type == 2) Then
+&apos;Структура параметра
+&apos;KKS|SIGNAL|MASK_open|MASK_close|&lt;признак инверсной логики&gt;]|&lt;альтернативный цвет&gt;|MASK_fail|MASK_Invalid|&lt;есть кнопка &quot;Стоп&quot;&gt;
+	s = KKS + &quot;|&quot; + SIGNAL_NARY + &quot;|&quot; + CStr(Mask_Open) + &quot;|&quot; + CStr(Mask_Close) + &quot;|&quot; + CStr(Inv_logic) + &quot;|False|&quot; + CStr(Mask_Fail) + &quot;|&quot; + CStr(Mask_Invalid) + &quot;|False&quot;
+	Open_ws_wf_wi(&quot;NARY_CO_valve&quot;, s, Operate)
+	If (DATA_NARY == &quot;AUTO&quot;) Then
+		ShowWarning (&quot;Привязка DATA_NARY = AUTO\nнежелательна.\nОна должна быть Z0.&quot;, 0)
+	End If
+ElseIf (Link_Type == 3) Then
+	Open_ws_wf_wi(&quot;TPTS_reflux_valve&quot;, KKS, Operate)
+	If (DATA_NARY == &quot;AUTO&quot;) Then
+		ShowWarning (&quot;Привязка DATA_NARY = AUTO\nнежелательна.\nОна должна быть TPTS.&quot;, 0)
+	End If
+End If</rt:event>
+      <rt:event type="OnRightClick">Dim s As String
+If (Link_Type == 0) Then
+	If (KKS == &quot;NULL&quot;) Then
+		If (SIG_Open == &quot;NULL&quot;) &amp;&amp; (SIG_Close == &quot;NULL&quot;) Then
+			ShowMessage (&quot;Это статический объект.&quot;, 5)
+		ElseIf (SIG_Open != &quot;NULL&quot;) &amp;&amp; (pv_1 == Nothing) Then
+			ShowWarning (&quot;Ошибка привязки.\nSIG_Open = \&quot;&quot; + SIG_Open  + &quot;\&quot;\nSIG_Close = \&quot;&quot; + SIG_Close + &quot;\&quot;&quot;, 0)
+		ElseIf (SIG_Close != &quot;NULL&quot;) &amp;&amp; (pv_2 == Nothing) Then
+			ShowWarning (&quot;Ошибка привязки.\nSIG_Open = \&quot;&quot; + SIG_Open  + &quot;\&quot;\nSIG_Close = \&quot;&quot; + SIG_Close + &quot;\&quot;&quot;, 0)
+		Else
+			ShowWarning (&quot;Ошибка обработки\nвходных сигналов.&quot;, 0)
+		End If
+	ElseIf (DATA_NARY == &quot;AUTO&quot;) Then
+		ShowWarning (&quot;Ошибка привязки AUTO.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Open = \&quot;&quot; + SIG_Open  + &quot;\&quot;\nSIG_Close = \&quot;&quot; + SIG_Close + &quot;\&quot;&quot;, 0)
+	ElseIf (DATA_NARY == &quot;BIN&quot;) Then
+		ShowWarning (&quot;Ошибка привязки BIN.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Open = \&quot;&quot; + SIG_Open  + &quot;\&quot;\nSIG_Close = \&quot;&quot; + SIG_Close + &quot;\&quot;&quot;, 0)
+	ElseIf (DATA_NARY == &quot;TPTS&quot;) Then
+		ShowWarning (&quot;Ошибка привязки TPTS.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;&quot;, 0)
+	ElseIf (DATA_NARY == &quot;KTPS&quot;) Then
+		ShowWarning (&quot;Ошибка привязки KTPS.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;&quot;, 0)
+	ElseIf (Left(DATA_NARY, 4) == &quot;TYPE&quot;) Then
+		ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nDATA_NARY = \&quot;&quot; + DATA_NARY + &quot;\&quot;\nНе найдены сигналы.&quot;, 0)
+	Else
+		ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nDATA_NARY = \&quot;&quot; + DATA_NARY + &quot;\&quot;&quot;, 0)
+	End If
+ElseIf (SIG_Fail != &quot;NULL&quot;) &amp;&amp; (pv_Fail == Nothing) Then
+	ShowWarning (&quot;Ошибка привязки.\nKKS = \&quot;&quot; + KKS + &quot;\&quot;\nSIG_Fail = \&quot;&quot; + SIG_Fail + &quot;\&quot;&quot;, 0)
+ElseIf (Left(DATA_NARY, 4) == &quot;TYPE&quot;) Then
+	&apos;Структура параметра
+	&apos;[KKS]|&lt;тип и номер схемы&gt;[|&lt;альтернативный цвет&gt;[|&lt;есть кнопка &quot;Стоп&quot;&gt;]]
+	s = KKS + &quot;|COV&quot; + Right(DATA_NARY, 1) + &quot;|&quot; + CStr(Alt_OpenColor) + &quot;|false&quot;
+	If Operate &amp;&amp; Check_Oper_Rights(pv_OU) Then
+		LoadPopUpMenu(KKS + &quot;|COVo|PRJSPEC_CO_valve &quot; + s)
+	Else
+		LoadPopUpMenu(KKS + &quot;|COVi|PRJSPEC_CO_valve &quot; + s)
+	End If
+ElseIf (Link_Type == 1) || (Link_Type == 4) Then
+	If (KKS != &quot;NULL&quot;) Then
+		s = KKS + &quot;|&quot; + Actual_Signal_Open + &quot;|&quot; + Actual_Signal_Close + &quot;|&quot; + CStr(Inv_logic) + &quot;|False|&quot;
+		TmpBuffer(0) = pv_1.PVId
+		TmpBuffer(1) = pv_2.PVId
+		If pv_Fail != Nothing Then
+			s = s + Actual_Signal_Fail + &quot;|&quot;
+			TmpBuffer(2) = pv_Fail.PVId
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If pv_gOp != Nothing Then
+			s = s + Signal_COValve_GoOpen + &quot;|&quot;
+			TmpBuffer(3) = pv_gOp.PVId
+		Else
+			s = s + &quot;|&quot;
+		End If
+		If pv_gCl != Nothing Then
+			s = s + Signal_COValve_GoClose + &quot;||&quot;
+			TmpBuffer(4) = pv_gCl.PVId
+		Else
+			s = s + &quot;||&quot;
+		End If
+		s = s + &quot;False&quot;
+		TmpMnuPar = KKS + &quot;|COVo|BIN_CO_valve &quot; + s
+		If Operate &amp;&amp; Check_Oper_Rights(pv_OU) Then
+			LoadPopUpMenu(KKS + &quot;|COVo|BIN_CO_valve &quot; + s)
+		Else
+			LoadPopUpMenu(KKS + &quot;|COVi|BIN_CO_valve &quot; + s)
+		End If
+	Else
+		If (pv_1 != Nothing) &amp;&amp; (pv_2 != Nothing) Then
+			s = &quot;|&quot; + pv_1.PVId + &quot;|&quot; + pv_2.PVId + &quot;|&quot; + CStr(Inv_logic) + &quot;|False|&quot;
+			TmpBuffer(0) = pv_1.PVId
+			TmpBuffer(1) = pv_2.PVId
+			If pv_Fail != Nothing Then
+				s = s + &quot;|&quot; + pv_Fail.PVId
+				TmpBuffer(2) = pv_Fail.PVId
+			End If
+			LoadPopUpMenu(pv_1.PVId + &quot;|BINi|wi_BIN_CO_valve &quot; + s)
+		ElseIf  pv_Fail != Nothing Then
+			If (pv_1 != Nothing) Then
+				s = &quot;|&quot; + pv_1.PVId + &quot;||&quot; + CStr(Inv_logic) + &quot;|False|&quot; + pv_Fail.PVId
+				TmpBuffer(0) = pv_1.PVId
+				TmpBuffer(1) = pv_Fail.PVId
+				LoadPopUpMenu(pv_1.PVId + &quot;|BINi|wi_BIN_CO_valve &quot; + s)
+			Else
+				s = &quot;||&quot; + pv_2.PVId + &quot;|&quot; + CStr(Inv_logic) + &quot;|False|&quot; + pv_Fail.PVId
+				TmpBuffer(0) = pv_2.PVId
+				TmpBuffer(1) = pv_Fail.PVId
+				LoadPopUpMenu(pv_2.PVId + &quot;|BINi|wi_BIN_CO_valve &quot; + s)
+			End If
+		Else
+			If (pv_1 != Nothing) Then
+				s = &quot;|&quot; + pv_1.PVId + &quot;||&quot; + CStr(Inv_logic) + &quot;|False&quot;
+				LoadPopUpMenu(pv_1.PVId + &quot;|BINi|wi_BIN_CO_valve &quot; + s)
+			Else
+				s = &quot;||&quot; + pv_2.PVId + &quot;|&quot; + CStr(Inv_logic) + &quot;|False&quot;
+				LoadPopUpMenu(pv_2.PVId + &quot;|BINi|wi_BIN_CO_valve &quot; + s)
+			End If
+		End If
+	End If
+	If (DATA_NARY == &quot;AUTO&quot;) Then
+		ShowWarning (&quot;Привязка DATA_NARY должна быть BIN.&quot;, 0)
+	End If
+ElseIf (Link_Type == 2) Then
+	s = KKS + &quot;|&quot; + SIGNAL_NARY + &quot;|&quot; + CStr(Mask_Open) + &quot;|&quot; + CStr(Mask_Close) + &quot;|&quot; + CStr(Inv_logic) + &quot;|False|&quot; + CStr(Mask_Fail) + &quot;|&quot; + CStr(Mask_Invalid) + &quot;|False&quot;
+	If Operate &amp;&amp; Check_Oper_Rights(pv_OU) Then
+		LoadPopUpMenu(KKS + &quot;|SRKo|NARY_CO_valve &quot; + s)
+	Else
+		LoadPopUpMenu(KKS + &quot;|SRKi|NARY_CO_valve &quot; + s)
+	End If
+	If (DATA_NARY == &quot;AUTO&quot;) Then
+		ShowWarning (&quot;Привязка DATA_NARY должна быть Z0.&quot;, 0)
+	End If
+ElseIf (Link_Type == 3) Then
+	If Operate &amp;&amp; Check_Oper_Rights(pv_OU) Then
+		LoadPopUpMenu(KKS + &quot;|ES o|TPTS_reflux_valve &quot; + KKS)
+	Else
+		LoadPopUpMenu(KKS + &quot;|ES i|TPTS_reflux_valve &quot; + KKS)
+	End If
+	If (DATA_NARY == &quot;AUTO&quot;) Then
+		ShowWarning (&quot;Привязка DATA_NARY должна быть TPTS.&quot;, 0)
+	End If
+End If</rt:event>
+      <rt:event type="OnMiddleClick">If (KKS == &quot;NULL&quot;) &amp;&amp; (SIG_Open == &quot;NULL&quot;) &amp;&amp; (SIG_Close == &quot;NULL&quot;) Then
+	ShowMessage (&quot;Это статический объект.&quot;, 5)
+ElseIf (KKS != &quot;NULL&quot;) &amp;&amp; (pv_OU != nothing) Then
+	Open_Win_Uni(False, &quot;rights&quot;, &quot;Права управления&quot;, &quot;wi_rights&quot;, KKS + &quot;|&quot; + CStr(Operate))
+ElseIf (pv_OU == nothing) Then
+	ShowMessage (&quot;Нет переменной управления.&quot;, 5)
+Else
+	ShowMessage (&quot;Управление не предусмотрено.&quot;, 5)
+End If</rt:event>
+    </rect>
+  </g>
+</svg>

@@ -1,0 +1,101 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg baseProfile="" xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 150 25" width="150" height="25" id="obj_EnterPwd" fill="Col_Grey2" font-family="inherit">
+  <desc>Поле ввода текста</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.0">
+    <rt:param name="TextStr" datatype="string" value="Пароль" comment="текстовая строка"/> 
+    <rt:param name="Clean_Click" datatype="boolean" value="True" comment="стирать текст при клике"/> 
+    <rt:param name="Clean_Enter" datatype="boolean" value="False" comment="стирать текст после ввода"/> 
+    <rt:param name="Obj_Color" datatype="string" value="Col_Grey2" comment="цвет фона объекта"/> 
+    <rt:param name="T_Color" datatype="string" value="black" comment="цвет текста"/> 
+    <rt:param name="T_Font" datatype="string" value="AAP_Font3" comment="Шрифт"/> 
+    <rt:param name="T_Length" datatype="int" value="20" comment="количество вводимых символов"/> 
+    <rt:param name="T_Style" datatype="string" value="normal" comment="Стиль"/> 
+    <rt:param name="T_Weight" datatype="string" value="bold" comment="Толщина букв шрифта"/> 
+    <rt:param name="T_Resize" datatype="float" value="1" comment="коэффициент размера фонта"/> 
+    <rt:param name="Disable" datatype="boolean" value="False" comment="Сделать кнопку недоступной"/> 
+    <rt:var name="D_Color" datatype="uint" value="0" comment="my new var"/> 
+    <rt:var name="L_Color" datatype="uint" value="0xFFFFFF" comment="my new var"/> 
+    <rt:var name="STRLen" datatype="string" comment="my new var"/> 
+    <rt:var name="Local_Obj_Color" datatype="string" value="Col_Grey2" comment="Локальный цвет фона"/> 
+    <rt:var name="Local_Txt_Color" datatype="string" value="black" comment="Локальный цвет текста"/> 
+    <rt:var name="Initial_rt_detect" datatype="byte" comment="Начальное значение rt:detect"/> 
+    <rt:var name="First_call" datatype="boolean" value="True" comment="Первая загрузка"/> 
+    <rt:sub>Sub StatusColor()
+If Disable Then
+	In_text.setFocus (false)
+	Local_Obj_Color = &quot;Col_Grey2&quot;
+	Local_Txt_Color = &quot;Col_Grey3&quot;
+	TextStr = &quot;&quot;
+	In_text.text = &quot;&quot;
+	_This.rt_detect = &quot;disabled&quot;
+	LU_edge.stroke = L_Color
+	RB_edge.stroke = D_Color
+Else
+	In_text.setFocus (true)
+	Local_Obj_Color = Obj_Color
+	Local_Txt_Color = T_Color
+	If First_call Then
+		_This.rt_detect = Initial_rt_detect
+		First_call = false
+	Else
+		_This.rt_detect = &quot;enabled&quot;
+	End If
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub Activate()
+In_text.setFocus (true)
+If Clean_Click Then
+	TextStr = &quot;&quot;
+	In_text.text = &quot;&quot;
+End If
+LU_edge.stroke = D_Color
+RB_edge.stroke = L_Color
+End Sub</rt:sub>
+    <rt:sub>Sub setFocus(ByVal value As Boolean)
+	In_text.setFocus(value)
+End Sub</rt:sub>
+    <rt:event type="OnMouseDown">Backgr_cover.fill_opacity = 0.1</rt:event>
+    <rt:event type="OnMouseUp">Backgr_cover.fill_opacity = 0</rt:event>
+    <rt:event type="OnClick">Activate ()</rt:event>
+    <rt:event type="OnTextInput">TextStr = szText
+LU_edge.stroke = L_Color
+RB_edge.stroke = D_Color
+If Clean_Enter Then
+&apos;	In_text.text = &quot;&quot;
+	TextStr = &quot;&quot;
+End If</rt:event>
+    <rt:event type="OnInitialize">In_text.setTextLengthChars(T_Length)
+Initial_rt_detect = _This.rt_detect</rt:event>
+    <rt:event type="OnRightClick">In_text.setFocus (true)
+TextStr = &quot;&quot;
+In_text.text = &quot;&quot;
+LU_edge.stroke = D_Color
+RB_edge.stroke = L_Color</rt:event>
+    <rt:event type="OnMouseOut">Backgr_cover.fill_opacity = 0</rt:event>
+    <rt:changeTrigger name="ChTxtCol">
+      <rt:condition>!Disable</rt:condition>
+      <rt:chgItem>T_Color</rt:chgItem>
+      <rt:code>Local_Txt_Color = T_Color</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChDisable">
+      <rt:chgItem>Disable</rt:chgItem>
+      <rt:code>StatusColor()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="150" height="25" rx="0" ry="0" id="Backgr" fill="Col_Grey2" stroke="none">
+    <rt:dyn type="fill" mode="onchange" value="Local_Obj_Color"/> 
+  </rect>
+  <rect x="0" y="0" width="150" height="25" rx="0" ry="0" id="Backgr_cover" fill="black" fill-opacity="0" stroke="none"/> 
+  <text x="5" y="18.75" id="In_text" fill="black" fill-opacity="1" font-family="AAP_Font3" font-size="18" font-style="normal" font-weight="bold" text-anchor="start" text-decoration="password">
+    <rt:dyn type="text" mode="onchange" value="TextStr"/> 
+    <rt:dyn type="fill" mode="onchange" value="Local_Txt_Color"/> 
+    <rt:dyn type="font-family" mode="constant" value="T_Font"/> 
+    <rt:dyn type="font-weight" mode="constant" value="T_Weight"/> 
+    <rt:dyn type="font-size" mode="constant" value="_This.height * 0.75 * T_Resize"/> 
+    <rt:dyn type="font-style" mode="constant" value="T_Style"/> 
+    <rt:dyn type="y" mode="constant" value="_This.height * 0.75"/> 
+    <rt:dyn type="x" mode="constant" value="5"/> 
+Пароль</text>
+  <polyline points="0,25 150,25 150,0" id="RB_edge" fill="none" stroke="black" stroke-opacity="0.399805" stroke-width="2"/> 
+  <polyline points="0,25 0,0 150,0" id="LU_edge" fill="none" stroke="white" stroke-opacity="0.399805" stroke-width="2"/> 
+</svg>

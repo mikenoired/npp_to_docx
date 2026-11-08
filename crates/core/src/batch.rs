@@ -132,6 +132,7 @@ struct FrameReport {
     missing_resources: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     error: Option<String>,
+    reconstructed_resources: Vec<String>,
 }
 
 pub fn process(options: &Options, progress: &(impl Fn(Progress) + Sync)) -> Result<BatchResult> {
@@ -151,6 +152,10 @@ pub fn process(options: &Options, progress: &(impl Fn(Progress) + Sync)) -> Resu
     });
     fs::create_dir_all(&options.output_dir)?;
     let output = fs::canonicalize(&options.output_dir)?;
+    ensure!(
+        fs::canonicalize(&svg_dir)? != output,
+        "Выходная папка должна отличаться от папки SVG: экспорт не должен перезаписывать исходные кадры"
+    );
     let descriptions = DescriptionIndex::load(&input)?;
     let mut files: Vec<_> = fs::read_dir(&svg_dir)?
         .filter_map(|entry| entry.ok())
@@ -204,29 +209,31 @@ pub fn process(options: &Options, progress: &(impl Fn(Progress) + Sync)) -> Resu
             let (content,encoding) = svg::decode(&raw);
             let mut parsed = svg::parse(&content)?;
             for marker in &mut parsed.markers {marker.description = descriptions.lookup(marker.kks.as_deref());}
-            let (prepared,missing) = svg::prepare_resources(&svg::utf8_xml(&content),path);
+            let resources = svg::prepare_resources_detailed(&svg::utf8_xml(&content),path);
+            let prepared = resources.svg; let missing = resources.missing; let reconstructed = resources.reconstructed;
             let (png,width,height) = renderer.render(&prepared,&parsed)?;
-            let docx = docx::build(&png,width,height,&parsed.markers,&frame,&missing)?;
+            let docx = docx::build_with_reconstructions(&png,width,height,&parsed.markers,&frame,&missing,&reconstructed)?;
             let mut destination = output.join(path.file_name().unwrap());destination.set_extension("docx");
             docx::write(&destination,&docx)?;
-            Ok((parsed,missing,encoding))
+            fs::write(output.join(path.file_name().unwrap()), &prepared)?;
+            Ok((parsed,missing,reconstructed,encoding))
         })();
         let counts = match conversion {
-            Ok((parsed,missing,encoding)) => {
+            Ok((parsed,missing,reconstructed,encoding)) => {
                 success.fetch_add(1,Ordering::SeqCst);
                 let count = parsed.markers.len();
                 let mismatches = parsed.markers.iter().filter(|m|m.is_mismatch).count();
                 let new_records = parsed.markers.into_iter().filter(|m|m.submodel.as_ref().is_some_and(|s|!s.trim().is_empty())).map(|m|SearchRecord{frame_name:frame.clone(),marker_index:m.index,submodel:m.submodel.unwrap(),title:m.title,kks:m.kks,description:m.description});
                 records.lock().unwrap().extend(new_records);
                 if !missing.is_empty() {progress(Progress::Log(format!("WARNING {frame}: missing submodels: {}",missing.join(", "))));}
-                reports.lock().unwrap().push(FrameReport{frame:frame.clone(),markers:Some(count),missing_resources:Some(missing),error:None});
+                reports.lock().unwrap().push(FrameReport{frame:frame.clone(),markers:Some(count),missing_resources:Some(missing),reconstructed_resources:reconstructed,error:None});
                 progress(Progress::Log(format!("OK {frame} | markers={count} | mismatches={mismatches} | encoding={encoding} | {}ms",start.elapsed().as_millis())));
                 (count,mismatches)
             },
             Err(error) => {
                 failed.fetch_add(1,Ordering::SeqCst);
                 let message = format!("{error:#}");
-                reports.lock().unwrap().push(FrameReport{frame:frame.clone(),markers:None,missing_resources:None,error:Some(message.clone())});
+                reports.lock().unwrap().push(FrameReport{frame:frame.clone(),markers:None,missing_resources:None,reconstructed_resources:Vec::new(),error:Some(message.clone())});
                 progress(Progress::Log(format!("FAIL {frame}: {message}")));
                 (0,0)
             }
@@ -318,6 +325,21 @@ mod tests {
         };
         let result = process(&options, &|_| {})?;
         assert_eq!((result.success, result.failed), (1, 1));
+        assert!(
+            fs::read_to_string(output.join("good.svg"))?.contains("data:image/svg+xml;base64,")
+        );
+        let original = fs::read(tmp.path().join("good.svg"))?;
+        let unsafe_options = Options {
+            output_dir: tmp.path().into(),
+            ..options.clone()
+        };
+        assert!(
+            process(&unsafe_options, &|_| {})
+                .unwrap_err()
+                .to_string()
+                .contains("перезаписывать")
+        );
+        assert_eq!(fs::read(tmp.path().join("good.svg"))?, original);
         let index = SearchIndex::read(&output)?;
         assert_eq!(
             index.search(" MOTOR.SVG ")[0].description.as_deref(),

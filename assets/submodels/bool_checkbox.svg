@@ -1,0 +1,70 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="unknown meet" viewBox="0 0 25 25" width="25" height="25" id="bool_checkbox">
+  <desc>Чекбокс boolean</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.1">
+    <rt:param name="Stat" datatype="boolean" value="False" comment="значение сигнала"/> 
+    <rt:param name="Qual" datatype="ubyte" value="3" comment="качество сигнала"/> 
+    <rt:param name="Col_ON" datatype="string" value="Col_Red" comment="цвет для индикации состояния True"/> 
+    <rt:param name="Col_OFF" datatype="string" value="Col_Green" comment="цвет для индикации состояния False"/> 
+    <rt:param name="Grad_Style" datatype="boolean" value="false" comment="Индикатор имеет градиентную заливку - объёмный фон"/> 
+    <rt:sub>Sub BGColor()
+If Stat Then
+	bird.visibility = &quot;visible&quot;
+Else
+	bird.visibility = &quot;hidden&quot;
+End If
+If Qual == PLS_QUAL_BAD Then
+	body.fill = Color_Inval
+Else
+	If Stat Then
+		body.fill = Col_ON
+	Else
+		body.fill = Col_OFF
+	End If
+End If
+End Sub</rt:sub>
+    <rt:event type="OnClick">ShowMessage (&quot;Это индикатор\nдля локальной переменной.&quot;, 5)</rt:event>
+    <rt:event type="OnRightClick">ShowMessage (&quot;Для локальных переменных\nменю не предусмотрено.&quot;, 5)</rt:event>
+    <rt:event type="OnResize">Dim w As Float
+Dim h As Float
+w = _This.width
+h = _This.height 
+Grad_BG.x = 2.5
+Grad_BG.y = 2.5
+Grad_BG.width = w - 5
+Grad_BG.height = h - 5
+body.x = 2.5
+body.y = 2.5
+body.width = w - 5
+body.height = h - 5
+LU_border.points = &quot;2.5,&quot; + CStr(h - 2.5) + &quot; 2.5,2.5 &quot; + CStr(w - 2.5) + &quot;,2.5&quot;
+RB_border.points = &quot;2.5,&quot; + CStr(h - 2.5) + &quot; &quot; + CStr(w - 2.5) + &quot;,&quot; + CStr(h - 2.5) + &quot; &quot; + CStr(w - 2.5) + &quot;,2.5&quot;
+If _This.width &lt; _This.height Then
+	bird.stroke_width = 3.0 * _This.width / 25.0
+Else
+	bird.stroke_width = 3.0 * _This.height / 25.0
+End If</rt:event>
+    <rt:changeTrigger name="MyTrig">
+      <rt:chgItem>Stat</rt:chgItem>
+      <rt:chgItem>Qual</rt:chgItem>
+      <rt:chgItem>Col_ON</rt:chgItem>
+      <rt:chgItem>Col_OFF</rt:chgItem>
+      <rt:code>BGColor()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="2.5" y="2.5" width="20" height="20" rx="0" ry="0" id="Grad_BG" fill="url(#DS_circle)" stroke="none">
+    <rt:dyn type="fill-opacity" mode="onchange" value="CInt(Grad_Style &amp;&amp; (Qual != PLS_QUAL_BAD)) * _This.fill_opacity"/> 
+  </rect>
+  <rect x="2.5" y="2.5" width="20" height="20" rx="0" ry="0" id="body" fill="Col_Red" fill-opacity="0.5" stroke="none">
+    <rt:dyn type="fill-opacity" mode="onchange" value="(1.0 - 0.4 * CInt(Grad_Style &amp;&amp; (Qual != PLS_QUAL_BAD))) * _This.fill_opacity"/> 
+  </rect>
+  <polyline points="2.5,22.5 22.5,22.5 22.5,2.5" id="RB_border" fill="none" stroke="Col_Grey1" stroke-linecap="round" stroke-linejoin="miter" stroke-width="1">
+    <rt:dyn type="stroke-opacity" mode="unknown" value="_This.fill_opacity"/> 
+  </polyline>
+  <polyline points="2.5,22.5 2.5,2.5 22.5,2.5" id="LU_border" fill="none" stroke="Col_Grey5" stroke-linecap="round" stroke-linejoin="miter" stroke-width="1">
+    <rt:dyn type="stroke-opacity" mode="unknown" value="_This.fill_opacity"/> 
+  </polyline>
+  <polyline points="7.5,12.5 12.5,17.5 17.5,7.5" id="bird" fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+    <rt:dyn type="stroke-opacity" mode="unknown" value="_This.fill_opacity"/> 
+  </polyline>
+</svg>

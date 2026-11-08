@@ -49,6 +49,18 @@ pub fn build(
     frame: &str,
     missing: &[String],
 ) -> Result<Vec<u8>> {
+    build_with_reconstructions(png, width, height, markers, frame, missing, &[])
+}
+
+pub fn build_with_reconstructions(
+    png: &[u8],
+    width: u32,
+    height: u32,
+    markers: &[Marker],
+    frame: &str,
+    missing: &[String],
+    reconstructed: &[String],
+) -> Result<Vec<u8>> {
     let image_width = (width as f64)
         .min(960.0)
         .min(400.0 * width as f64 / height as f64);
@@ -70,6 +82,9 @@ pub fn build(
         "",
         "",
     ));
+    if !reconstructed.is_empty() {
+        body.push_str(&paragraph(&format!("Условно восстановлены подмодели: {}. Показания и состояния не заданы; исходная геометрия не подтверждена.", reconstructed.join(", ")), "", ""));
+    }
     if !missing.is_empty() {
         body.push_str(&paragraph(&format!("Отсутствуют изображения подмоделей: {}. На схеме они обозначены прямоугольниками с крестом.",missing.join(", ")),"",""));
     }

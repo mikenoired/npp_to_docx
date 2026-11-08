@@ -1,0 +1,110 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg color="silver" xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" viewBox="0 0 60 40" width="60" height="40" id="obj_Monitors">
+  <rt:model modelversion="7.2.0.18" comment="Служебная подмодель ПОРТАЛа" revision="4.0-6.0">
+    <rt:var name="Num_objects" datatype="ushort" value="3" comment="Количество окон, разрешенных для отображения"/> 
+    <rt:sub>Sub Detect_Monitors()
+Dim TmpWin As RtSvgWindow
+If (Win_Mask &amp; 1) &gt; 0 Then
+	TmpWin = Main_win(1)
+	If TmpWin == Nothing Then
+		MonFG1.fill = &quot;black&quot;
+		MW1.visibility = &quot;visible&quot;
+	Else
+		MonFG1.fill = &quot;deepskyblue&quot;
+		MW1.visibility = &quot;hidden&quot;
+	End If 
+End If
+If (Num_objects &gt; 1) &amp;&amp; ((Win_Mask &amp; 2) &gt; 0) Then
+	TmpWin = Main_win(2)
+	If TmpWin == Nothing Then
+		MonFG2.fill = &quot;black&quot;
+		MW2.visibility = &quot;visible&quot;
+	Else
+		MonFG2.fill = &quot;deepskyblue&quot;
+		MW2.visibility = &quot;hidden&quot;
+	End If 
+End If
+If (Num_objects &gt; 2) &amp;&amp; ((Win_Mask &amp; 4) &gt; 0) Then
+	TmpWin = Main_win(3)
+	If TmpWin == Nothing Then
+		MonFG3.fill = &quot;black&quot;
+		MW3.visibility = &quot;visible&quot;
+	Else
+		MonFG3.fill = &quot;deepskyblue&quot;
+		MW3.visibility = &quot;hidden&quot;
+	End If 
+End If
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (NumWin_Avail &lt; NumMon_Avail) Then
+	Num_objects = NumWin_Avail
+Else
+	Num_objects = NumMon_Avail
+End If
+If (Num_objects == 2) Then
+	MonBG1.Translate(4 , 0)
+	MonFG1.Translate(4 , 0)
+	NA1.Translate(4 , 0)
+	MW1.Translate(4 , 0)
+	MW1.visibility = &quot;hidden&quot;
+	MonBG2.Translate(11 , 0)
+	MonFG2.Translate(11 , 0)
+	NA2.Translate(11 , 0)
+	MW2.Translate(11 , 0)
+	MW2.visibility = &quot;hidden&quot;
+
+	MonBG3.visibility = &quot;hidden&quot;
+	MonFG3.visibility = &quot;hidden&quot;
+	NA3.visibility = &quot;hidden&quot;
+	MW3.visibility = &quot;hidden&quot;
+&apos;Для одного окна конфигурация не имеет смысла, но ее надо поддерживать
+ElseIf (NumMon_Avail == 1) Then
+	MonBG1.Translate(17 , 0)
+	MonFG1.Translate(17 , 0)
+	NA1.Translate(17 , 0)
+	MW1.Translate(17 , 0)
+	MW1.visibility = &quot;hidden&quot;
+
+	MonBG2.visibility = &quot;hidden&quot;
+	MonFG2.visibility = &quot;hidden&quot;
+	NA2.visibility = &quot;hidden&quot;
+	MW2.visibility = &quot;hidden&quot;
+	MonBG3.visibility = &quot;hidden&quot;
+	MonFG3.visibility = &quot;hidden&quot;
+	NA3.visibility = &quot;hidden&quot;
+	MW3.visibility = &quot;hidden&quot;
+End If
+If (Win_Mask &amp; 1) &gt; 0 Then
+	NA1.visibility = &quot;hidden&quot;
+Else
+	MonFG1.fill = &quot;black&quot;
+End If
+If (Win_Mask &amp; 2) &gt; 0 Then
+	NA2.visibility = &quot;hidden&quot;
+Else
+	MonFG2.fill = &quot;black&quot;
+End If
+If (Win_Mask &amp; 4) &gt; 0 Then
+	NA3.visibility = &quot;hidden&quot;
+Else
+	MonFG3.fill = &quot;black&quot;
+End If</rt:event>
+    <rt:cycleTrigger name="check_cicle" cycle="1" unit="second">
+      <rt:condition>Num_objects &gt; 1</rt:condition>
+      <rt:code>Detect_Monitors()</rt:code>
+    </rt:cycleTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="60" height="40" rx="0" ry="0" id="BG" fill="silver"/> 
+  <image width="60" height="40" xlink:href="dull_Restore_2.bmp"/> 
+  <rect x="4.625" y="7.25" width="15" height="12.5" rx="2" ry="2" id="MonBG1" fill="url(#RtSvgGradient)" stroke="Col_Grey4"/> 
+  <rect x="22.125" y="7.25" width="15" height="12.5" rx="2" ry="2" id="MonBG2" fill="url(#RtSvgGradient)" stroke="Col_Grey4"/> 
+  <rect x="39.625" y="7.25" width="15" height="12.5" rx="2" ry="2" id="MonBG3" fill="url(#RtSvgGradient)" stroke="Col_Grey4"/> 
+  <rect x="4.625" y="7.25" width="15" height="12.5" rx="2" ry="2" id="MonFG1" fill="deepskyblue" fill-opacity="0.5" stroke="Col_Grey4"/> 
+  <rect x="22.125" y="7.25" width="15" height="12.5" rx="2" ry="2" id="MonFG2" fill="deepskyblue" fill-opacity="0.5" stroke="Col_Grey4"/> 
+  <rect x="39.625" y="7.25" width="15" height="12.5" rx="2" ry="2" id="MonFG3" fill="deepskyblue" fill-opacity="0.5" stroke="Col_Grey4"/> 
+  <polyline points="19.625,7.25 4.625,19.75 12.125,13.5 4.625,7.25 19.625,19.75" id="NA1" fill="none" stroke="Col_Red" stroke-linejoin="bevel"/> 
+  <polyline points="37.125,7.25 22.125,19.75 29.625,13.5 22.125,7.25 37.125,19.75" id="NA2" fill="none" stroke="Col_Red" stroke-linejoin="bevel"/> 
+  <polyline points="54.625,7.25 39.625,19.75 47.125,13.5 39.625,7.25 54.625,19.75" id="NA3" fill="none" stroke="Col_Red" stroke-linejoin="bevel"/> 
+  <image x="6.875" y="8.5" width="10" height="10" xlink:href="obj_circles.svg" id="MW1"/> 
+  <image x="24.875" y="8.25" width="10" height="10" xlink:href="obj_circles.svg" id="MW2"/> 
+  <image x="42.375" y="8.5" width="10" height="10" xlink:href="obj_circles.svg" id="MW3"/> 
+</svg>

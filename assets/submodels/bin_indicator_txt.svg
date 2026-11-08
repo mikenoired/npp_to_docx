@@ -1,0 +1,149 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rt="http://www.rts.co.at/2001/XMLSchema/RtSvgPL" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2000/svg C:\RTS\RtSvg\XML\SVG.xsd" preserveAspectRatio="codedlayout meet" viewBox="0 0 50 25" width="50" height="25" id="bin_indicator_txt">
+  <desc>Индикатор стандартный текстовый</desc>
+  <rt:model comment="Стандартная подмодель ПОРТАЛа" revision="6.2">
+    <rt:param name="PointID" datatype="string" value="NULL" comment="идентификатор сигнала"/> 
+    <rt:param name="Col_ON" datatype="string" value="Col_Yellow" comment="цвет для индикации состояния True"/> 
+    <rt:param name="Col_OFF" datatype="string" value="Col_Green" comment="цвет для индикации состояния False"/> 
+    <rt:param name="T_String" datatype="string" value="" comment="Текст на индикаторе"/> 
+    <rt:param name="T_Color" datatype="string" value="black" comment="Цвет текста"/> 
+    <rt:param name="T_Font" datatype="string" value="inherit" comment="Шрифт"/> 
+    <rt:param name="T_Size" datatype="float" value="15" comment="Размер шрифта"/> 
+    <rt:param name="T_Style" datatype="string" value="normal" comment="Стиль"/> 
+    <rt:param name="T_Weight" datatype="string" value="normal" comment="Толщина букв шрифта"/> 
+    <rt:param name="Grad_Style" datatype="boolean" value="false" comment="Индикатор имеет градиентную заливку - объёмный фон"/> 
+    <rt:var name="pv" datatype="PlsPVBin" comment="входная переменная"/> 
+    <rt:var name="In_Group" datatype="boolean" value="False" comment="объект в группе"/> 
+    <rt:var name="ValColor" datatype="uint" comment="Цвет заливки"/> 
+    <rt:var name="In_Alarm" datatype="ubyte" value="0" comment="наличие сигнализации"/> 
+    <rt:var name="MyAlarm" datatype="boolean" value="true" comment="синализации сигнала принадлежат текущему пользователю"/> 
+    <rt:var name="NoGrad" datatype="boolean" value="false" comment="отображение градиента запрещено"/> 
+    <rt:var name="AckSupport" datatype="boolean" value="true" comment="Фиктивная переменная, означающая, что данный объект поддерживает самоквитирование по функции AckMe()"/> 
+    <rt:sub>Sub AckMe()
+If Allow_Confirm &amp;&amp; Blink_on_NACK &amp;&amp; flag_confirm &amp;&amp; (In_Alarm &gt; 0) &amp;&amp; MyAlarm Then
+	If pv.NotAcknowledged Then
+		pv.AcknowledgeAlarm(0)
+	End If
+	In_Alarm = False
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub BGColor ()
+NoGrad = False
+If pv == Nothing Then
+	ValColor = Color_ErLink
+	NoGrad = True
+Else
+	Dim STrig As Boolean
+	STrig = PRJSPEC.GET_Susp(pv.PVId, False)
+	If Allow_Confirm &amp;&amp; Blink_on_NACK Then
+		If MyAlarm &amp;&amp; pv.NotAcknowledged &amp;&amp; !STrig Then
+			If pv.AlarmType == PLS_ALARMTYP_NONE Then
+				In_Alarm = 1	//снятая неквитированная сигнализация
+			Else
+				In_Alarm = 3	//нормальная неквитированная сигнализация
+			End If
+		Else
+			In_Alarm = 0
+		End If
+	End If
+	If STrig Then
+		ValColor = Color_Remont
+		NoGrad = True
+	ElseIf pv.Quality == 0 Then
+		ValColor = Color_Inval
+		NoGrad = True
+	ElseIf pv.Value Then
+		ValColor = VIS.Color(Col_ON)
+	Else
+		ValColor = VIS.Color(Col_OFF)
+	End If
+End If
+End Sub</rt:sub>
+    <rt:sub>Sub CheckUsrGr()
+If Alarms_ForUser Then	//если надо распределять сигнализаци по пользователям
+	MyAlarm = PRJSPEC.CheckPvOwner(PointID, False)
+Else
+	MyAlarm = True
+End If
+BGColor()
+End Sub</rt:sub>
+    <rt:event type="OnInitialize">If (PointID != &quot;NULL&quot;) Then
+	Set pv = BIN(PointID)
+	If pv != Nothing Then
+		CheckUsrGr()
+	End If
+Else
+	ValColor = Color_ErLink
+End If</rt:event>
+    <rt:event type="OnClick">If PointID == &quot;NULL&quot; Then
+	ShowWarning (&quot;Объект не привязан.&quot;, 5)
+ElseIf (pv == nothing) Then
+	NoLink (PointID)
+Else
+	Call_Win(&quot;wi_BIN&quot;, PointID)
+End If</rt:event>
+    <rt:event type="OnRightClick">If PointID == &quot;NULL&quot; Then
+	ShowWarning (&quot;Объект не привязан.&quot;, 5)
+ElseIf (pv == nothing) Then
+	NoLink (PointID)
+Else
+	LoadPopUpMenu(PointID + &quot;|BINi|wi_BIN &quot; + PointID)
+End If</rt:event>
+    <rt:event type="OnResize">Dim Th_Ht As Float
+Dim Th_Wdth As Float
+Th_Ht = _This.height
+Th_Wdth = _This.width
+
+Grad_BG.width = Th_Wdth
+Grad_BG.height = Th_Ht
+body.width = Th_Wdth
+body.height = Th_Ht
+RB_border.points = &quot;0,&quot; + CStr(Th_Ht) + &quot; &quot; + CStr(Th_Wdth)+ &quot;,&quot; + CStr(Th_Ht) + &quot; &quot; + CStr(Th_Wdth) + &quot;,0&quot;
+LU_border.points =  &quot;0,&quot; + CStr(Th_Ht) + &quot; 0,0 &quot; + CStr(Th_Wdth) + &quot;,0&quot;
+InGr.x = -2.5
+InGr.y = -2.5
+InGr.width = Th_Wdth + 5
+InGr.height = Th_Ht + 5
+I_Text.x = Th_Wdth / 2
+I_Text.y = Th_Ht / 2 - 2.5 &apos;2.5 - коррекция по высоте для мелких размеров</rt:event>
+    <rt:changeTrigger name="ChPV">
+      <rt:condition>PointID != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>pv</rt:chgItem>
+      <rt:code>BGColor()</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="ChkGroup">
+      <rt:condition>PointID != &quot;NULL&quot;</rt:condition>
+      <rt:chgItem>VAR(MyTaskName + &quot;.TMP_GROUP&quot;)</rt:chgItem>
+      <rt:code>In_Group = (PRJSPEC.GRP_In(PointID) &gt; 0)</rt:code>
+    </rt:changeTrigger>
+    <rt:changeTrigger name="IsItMyAlarm">
+      <rt:condition>Blink_on_NACK &amp;&amp; Alarms_ForUser &amp;&amp; (pv != Nothing)</rt:condition>
+      <rt:chgItem>CurUserGrNumber</rt:chgItem>
+      <rt:code>CheckUsrGr()</rt:code>
+    </rt:changeTrigger>
+  </rt:model>
+  <rect x="0" y="0" width="50" height="25" rx="0" ry="0" id="Grad_BG" fill="url(#Cylinder_horizontal2)" stroke="none"/> 
+  <rect x="0" y="0" width="50" height="25" rx="0" ry="0" id="body" fill="Col_Yellow" fill-opacity="0.599997" stroke="none">
+    <rt:dyn type="fill" mode="cyclic" value="ShowInAlarmColor(In_Alarm, ValColor, Col_Ar(11))"/> 
+    <rt:dyn type="fill-opacity" mode="onchange" value="Grad_Style &amp;&amp; !NoGrad" trans="bd">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0.6"/> 
+    </rt:dyn>
+  </rect>
+  <polyline points="0,25 50,25 50,0" id="RB_border" fill="none" stroke="Col_Grey1" stroke-linecap="round" stroke-linejoin="miter" stroke-width="1"/> 
+  <polyline points="0,25 0,0 50,0" id="LU_border" fill="none" stroke="Col_Grey5" stroke-linecap="round" stroke-linejoin="miter" stroke-width="1"/> 
+  <text x="25" y="10" id="I_Text" fill="black" font-size="15" font-style="normal" font-weight="normal" text-anchor="middle" rt:text-vertanchor="middle">
+    <rt:dyn type="font-size" mode="onchange" value="T_Size"/> 
+    <rt:dyn type="font-family" mode="onchange" value="T_Font"/> 
+    <rt:dyn type="font-style" mode="onchange" value="T_Style"/> 
+    <rt:dyn type="font-weight" mode="onchange" value="T_Weight"/> 
+    <rt:dyn type="text" mode="onchange" value="T_String"/> 
+    <rt:dyn type="fill" mode="onchange" value="T_Color"/> 
+Текст</text>
+  <rect x="-2.5" y="-2.5" width="55" height="30" rx="0" ry="0" id="InGr" fill="none" stroke="Col_InGR1" stroke-linecap="round" stroke-linejoin="miter" stroke-width="2">
+    <rt:dyn type="visibility" mode="onchange" value="In_Group" trans="bi">
+      <rt:xy value="false" value2="1"/> 
+      <rt:xy value2="0"/> 
+    </rt:dyn>
+  </rect>
+</svg>

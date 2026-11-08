@@ -297,41 +297,114 @@ pub fn parse(content: &str) -> Result<Parsed> {
     Ok(parsed)
 }
 
+mod bundled {
+    include!(concat!(env!("OUT_DIR"), "/bundled_resources.rs"));
+}
+
+pub struct PreparedResources {
+    pub svg: String,
+    pub missing: Vec<String>,
+    pub reconstructed: Vec<String>,
+}
+
 pub fn prepare_resources(content: &str, path: &Path) -> (String, Vec<String>) {
+    let result = prepare_resources_detailed(content, path);
+    (result.svg, result.missing)
+}
+
+pub fn prepare_resources_detailed(content: &str, path: &Path) -> PreparedResources {
+    expand_resources(content, path, &[], &mut 2000)
+}
+
+fn expand_resources(
+    content: &str,
+    path: &Path,
+    ancestors: &[String],
+    budget: &mut usize,
+) -> PreparedResources {
     let mut missing = BTreeSet::new();
+    let mut reconstructed = BTreeSet::new();
     let svg = IMAGE
         .replace_all(content, |tag: &Captures| {
             let Some(href) = HREF.captures(&tag[0]) else {
-                return tag[0].into();
+                return tag[0].to_string();
             };
             let reference = href.get(1).or(href.get(2)).unwrap().as_str();
             if reference.starts_with("data:") {
-                return tag[0].into();
-            };
-            let name = reference.replace('\\', "/");
-            let safe = !Path::new(&name).is_absolute()
-                && !name.split('/').any(|v| v == "..")
-                && !SCHEME.is_match(&name);
-            let data = if safe {
-                fs::read(path.parent().unwrap_or(Path::new(".")).join(name)).ok()
+                return tag[0].to_string();
+            }
+            let normalized = reference.replace('\\', "/");
+            let legacy = normalized.as_bytes().get(1) == Some(&b':')
+                && normalized.as_bytes().get(2) == Some(&b'/');
+            let name = if legacy {
+                normalized.rsplit('/').next().unwrap()
             } else {
-                None
+                &normalized
             };
-            let lower = reference.to_lowercase();
+            let safe = !Path::new(name).is_absolute()
+                && !name.split('/').any(|p| p == "..")
+                && !SCHEME.is_match(name);
+            let mut resource = None;
+            if safe {
+                let parent = path.parent().unwrap_or(Path::new("."));
+                let mut roots = vec![parent.join("../submodels")];
+                if !legacy {
+                    roots.insert(0, parent.to_path_buf());
+                }
+                for root in roots {
+                    for candidate in [name.to_string(), format!("{name}.svg")] {
+                        let candidate = if candidate.to_lowercase().ends_with(".bmp") {
+                            format!("{candidate}.png")
+                        } else {
+                            candidate
+                        };
+                        let location = root.join(&candidate);
+                        if let Ok(data) = fs::read(&location) {
+                            resource = Some((data, location));
+                            break;
+                        }
+                    }
+                    if resource.is_some() {
+                        break;
+                    }
+                }
+                if resource.is_none() {
+                    for candidate in [name.to_string(), format!("{name}.svg")] {
+                        let candidate = if candidate.to_lowercase().ends_with(".bmp") {
+                            format!("{candidate}.png")
+                        } else {
+                            candidate
+                        };
+                        if let Some(data) = bundled::get(&candidate) {
+                            resource = Some((
+                                data.to_vec(),
+                                Path::new("bundled-submodels").join(candidate),
+                            ));
+                            break;
+                        }
+                    }
+                }
+            }
             let mut uri = None;
-            if let Some(data) = data {
+            if let Some((data, location)) = resource {
+                let lower = location.to_string_lossy().to_lowercase();
                 if lower.ends_with(".svg") {
-                    let text = utf8_xml(&decode(&data).0);
-                    let text = normalize_paints(&text).unwrap_or(text);
-                    let external = IMAGE.captures_iter(&text).any(|image| {
-                        HREF.captures(&image[0]).is_some_and(|h| {
-                            !h.get(1).or(h.get(2)).unwrap().as_str().starts_with("data:")
-                        })
-                    });
-                    if !external {
+                    let key = location.to_string_lossy().into_owned();
+                    if ancestors.len() < 12 && *budget > 0 && !ancestors.contains(&key) {
+                        *budget -= 1;
+                        let text = utf8_xml(&decode(&data).0);
+                        if text.contains("data-reconstructed=\"true\"") {
+                            reconstructed.insert(reference.to_string());
+                        }
+                        let text = normalize_paints(&text).unwrap_or(text);
+                        let mut next = ancestors.to_vec();
+                        next.push(key);
+                        let result = expand_resources(&text, &location, &next, budget);
+                        missing.extend(result.missing);
+                        reconstructed.extend(result.reconstructed);
                         uri = Some(format!(
                             "data:image/svg+xml;base64,{}",
-                            STANDARD.encode(text)
+                            STANDARD.encode(result.svg)
                         ));
                     }
                 } else if lower.ends_with(".png")
@@ -360,7 +433,11 @@ pub fn prepare_resources(content: &str, path: &Path) -> (String, Vec<String>) {
             .into_owned()
         })
         .into_owned();
-    (svg, missing.into_iter().collect())
+    PreparedResources {
+        svg,
+        missing: missing.into_iter().collect(),
+        reconstructed: reconstructed.into_iter().collect(),
+    }
 }
 
 pub struct Renderer {
@@ -819,6 +896,57 @@ mod tests {
         assert_eq!(parsed.markers[1].point, Some(Point { x: 6.0, y: 3.0 }));
         assert_eq!(parsed.markers[2].title, "(empty title)");
         assert!(!parsed.markers[2].is_mismatch);
+        Ok(())
+    }
+    #[test]
+    fn bundled_and_nested_resources_are_explicit() -> Result<()> {
+        let tmp = tempfile::tempdir()?;
+        fs::create_dir_all(tmp.path().join("frames"))?;
+        let path = tmp.path().join("frames/frame.svg");
+        let original = prepare_resources_detailed(
+            &utf8_xml(&FRAME.replace("motor.svg", "DS_CO_valve.svg")),
+            &path,
+        );
+        assert!(original.missing.is_empty());
+        assert!(original.reconstructed.is_empty());
+        let conditional = prepare_resources_detailed(
+            &utf8_xml(&FRAME.replace("motor.svg", "DS_ana_900.svg")),
+            &path,
+        );
+        assert!(conditional.missing.is_empty());
+        assert_eq!(conditional.reconstructed, vec!["DS_ana_900.svg"]);
+        let library = tmp.path().join("submodels");
+        fs::create_dir_all(&library)?;
+        fs::write(
+            library.join("outer.svg"),
+            "<svg><image href=\"spds_tablo.svg\"/></svg>",
+        )?;
+        let nested =
+            prepare_resources_detailed(&utf8_xml(&FRAME.replace("motor.svg", "outer.svg")), &path);
+        assert!(nested.missing.is_empty());
+        assert_eq!(nested.reconstructed, vec!["spds_tablo.svg"]);
+        fs::write(
+            library.join("outer.svg"),
+            "<svg><image href=\"outer.svg\"/></svg>",
+        )?;
+        assert_eq!(
+            prepare_resources_detailed(&utf8_xml(&FRAME.replace("motor.svg", "outer.svg")), &path)
+                .missing,
+            vec!["outer.svg"]
+        );
+        let legacy = r"F:\old\документ_ЦВД_низ.jpg";
+        let converted =
+            prepare_resources_detailed(&utf8_xml(&FRAME.replace("motor.svg", legacy)), &path);
+        assert!(converted.missing.is_empty());
+        assert_eq!(converted.reconstructed, vec![legacy]);
+        assert_eq!(
+            prepare_resources_detailed(
+                &utf8_xml(&FRAME.replace("motor.svg", "../motor.svg")),
+                &path
+            )
+            .missing,
+            vec!["../motor.svg"]
+        );
         Ok(())
     }
     const FRAME: &str = "<svg width=\"100\" height=\"100\"><title>Насос</title><image x=\"10\" y=\"20\" width=\"30\" height=\"40\" xlink:href=\"motor.svg\"><title>41ABC</title><rt:dyn type=\"KKS\" value=\"41ABC\"/></image></svg>";

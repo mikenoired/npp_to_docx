@@ -1,0 +1,23 @@
+{
+  "base": "f8f62d0",
+  "batch": {
+    "elapsed_ms": 206083.41675,
+    "failed": 0,
+    "success": 1410,
+    "summary": "Готово. успешно=1410, провально=0, всего_маркеров=85603, всего_несовпадений=10383",
+    "totalMarkers": 85603,
+    "totalMismatches": 10383
+  },
+  "frames": 1410,
+  "missingResources": 0,
+  "conditionalFrames": 91,
+  "originalAssets": 212,
+  "conditionalAssets": 18,
+  "checks": [
+    "cargo fmt --all --check",
+    "cargo test --locked -p npp-core",
+    "cargo clippy --locked -p npp-core --all-targets -- -D warnings",
+    "cargo build --release --locked -p npp-core"
+  ],
+  "scope": "macOS core; desktop and Windows/Linux not built locally"
+}
